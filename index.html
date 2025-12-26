@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vape Shop — Premium</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -12,7 +11,7 @@
 
 <header id="header">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
-  <div class="title">Horn Hub</div>
+  <div class="title">VAPE SHOP</div>
   <div class="header-actions">
     <div class="lang-currency">
       <select id="langSelect" onchange="setLang(this.value)">
@@ -39,12 +38,6 @@
   <button onclick="filterCategory('disposable')" data-i18n="disposable">Одноразки</button>
   <button onclick="filterCategory('cartridge')" data-i18n="cartridges">Картриджи</button>
   <div class="divider"></div>
-  <div class="sidebar-title" data-i18n="priceFilter">Фильтр по цене</div>
-  <div class="price-filter">
-    <input type="number" id="priceMin" placeholder="Мин" min="0" value="0" oninput="applyPriceFilter()">
-    <input type="number" id="priceMax" placeholder="Макс" min="0" value="1000" oninput="applyPriceFilter()">
-  </div>
-  <div class="divider"></div>
   <button onclick="showFavorites()" data-i18n="favorites">Избранное ❤️</button>
   <button id="backAllBtn" class="hidden" onclick="backToAll()" data-i18n="backToAll">Все товары</button>
 </div>
@@ -52,7 +45,7 @@
 <main id="mainPage" class="page">
   <div class="search-sort">
     <div class="search-box">
-      <input id="searchInput" type="text" placeholder="Поиск..." oninput="searchProducts(this.value)">
+      <input id="searchInput" type="text" data-i18n-placeholder="searchPlaceholder" placeholder="Поиск..." oninput="searchProducts(this.value)">
       <div id="autocomplete" class="autocomplete"></div>
     </div>
     <select id="sortSelect" onchange="sortProducts(this.value)">
@@ -78,7 +71,6 @@
 
 <div id="toast" class="toast"></div>
 
-<!-- Modal: order details -->
 <div id="orderModal" class="modal hidden">
   <div class="modal-content">
     <h3 data-i18n="orderTitle">Ваш заказ</h3>
