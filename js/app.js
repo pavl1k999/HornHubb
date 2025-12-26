@@ -2,15 +2,16 @@
 const ADMIN_NICK = 'pvlenemy';
 const ADMIN_URL = `https://t.me/${ADMIN_NICK}`;
 
-// Currency and language
+// Currency and language (updated rates)
 const currencyRates = {
-  PLN: 1,        // base
-  EUR: 0.23,     // approximate
-  UAH: 6.0       // approximate
+  PLN: 1,     // base
+  EUR: 0.24,  // approximate Dec 2025
+  UAH: 11.7    // approximate Dec 2025
 };
 const currencySymbols = { PLN: 'zł', EUR: '€', UAH: '₴' };
 let currency = localStorage.getItem('currency') || 'PLN';
 
+// I18n dictionary
 const i18n = {
   ru: {
     categories: "Категории",
@@ -20,6 +21,7 @@ const i18n = {
     cartridges: "Картриджи",
     priceFilter: "Фильтр по цене",
     favorites: "Избранное ❤️",
+    backToAll: "Все товары",
     sort: "Сортировка",
     priceAsc: "Цена ↑",
     priceDesc: "Цена ↓",
@@ -32,6 +34,13 @@ const i18n = {
     emptyCart: "Корзина пуста",
     addedToCart: "Товар добавлен в корзину ✅",
     removedFromCart: "Товар удалён",
+    orderTitle: "Ваш заказ",
+    copyOrder: "Скопировать заказ",
+    sendTelegram: "Открыть Telegram",
+    close: "Закрыть",
+    consultant: "Ваш консультант",
+    orderNumber: "Номер заказа",
+    total: "Итого",
   },
   ua: {
     categories: "Категорії",
@@ -41,6 +50,7 @@ const i18n = {
     cartridges: "Картриджі",
     priceFilter: "Фільтр за ціною",
     favorites: "Обране ❤️",
+    backToAll: "Всі товари",
     sort: "Сортування",
     priceAsc: "Ціна ↑",
     priceDesc: "Ціна ↓",
@@ -53,6 +63,13 @@ const i18n = {
     emptyCart: "Кошик порожній",
     addedToCart: "Додано до кошика ✅",
     removedFromCart: "Видалено з кошика",
+    orderTitle: "Ваше замовлення",
+    copyOrder: "Скопіювати замовлення",
+    sendTelegram: "Відкрити Telegram",
+    close: "Закрити",
+    consultant: "Ваш консультант",
+    orderNumber: "Номер замовлення",
+    total: "Разом",
   },
   en: {
     categories: "Categories",
@@ -62,6 +79,7 @@ const i18n = {
     cartridges: "Cartridges",
     priceFilter: "Price filter",
     favorites: "Favorites ❤️",
+    backToAll: "All products",
     sort: "Sort",
     priceAsc: "Price ↑",
     priceDesc: "Price ↓",
@@ -74,6 +92,13 @@ const i18n = {
     emptyCart: "Cart is empty",
     addedToCart: "Added to cart ✅",
     removedFromCart: "Removed from cart",
+    orderTitle: "Your order",
+    copyOrder: "Copy order",
+    sendTelegram: "Open Telegram",
+    close: "Close",
+    consultant: "Your consultant",
+    orderNumber: "Order number",
+    total: "Total",
   }
 };
 let lang = localStorage.getItem('lang') || 'ru';
@@ -113,6 +138,7 @@ const autocompleteBox = document.getElementById('autocomplete');
 const sortSelect = document.getElementById('sortSelect');
 const priceMinEl = document.getElementById('priceMin');
 const priceMaxEl = document.getElementById('priceMax');
+const backAllBtn = document.getElementById('backAllBtn');
 
 // Utils
 function formatPricePLN(pln){
@@ -135,14 +161,12 @@ function flyToCart(imgEl){
   if(!imgEl || !cartBtn) return;
   const rectImg = imgEl.getBoundingClientRect();
   const rectCart = cartBtn.getBoundingClientRect();
-
   const clone = document.createElement('img');
   clone.src = imgEl.src;
   clone.className = 'fly-img';
   clone.style.left = rectImg.left + 'px';
   clone.style.top = rectImg.top + 'px';
   document.body.appendChild(clone);
-
   const dx = rectCart.left - rectImg.left;
   const dy = rectCart.top - rectImg.top;
   clone.style.transform = `translate(${dx}px, ${dy}px) scale(0.4)`;
@@ -187,7 +211,7 @@ function renderProducts(list = filtered){
         <div class="muted">${p.category}</div>
         <div class="price">${formatPricePLN(p.price)}</div>
         <div class="actions">
-          <button class="btn btn-primary" onclick="addToCart(${p.id}, this)">В корзину</button>
+          <button class="btn btn-primary" onclick="addToCart(${p.id}, this)">${i18n[lang].addedToCart.includes('Добавлен') ? 'В корзину' : (lang==='ua' ? 'До кошика' : 'Add to cart')}</button>
           <button class="btn btn-outline ${favActive?'active':''}" onclick="toggleFavorite(${p.id})">${favActive?'❤️':'🤍'}</button>
         </div>
       </div>
@@ -217,12 +241,12 @@ function renderCart(){
             <button class="qty-btn" onclick="changeQty(${i},-1)">–</button>
             <div>${p.qty}</div>
             <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
-            <button class="remove-btn" onclick="removeFromCart(${i})">Удалить</button>
+            <button class="remove-btn" onclick="removeFromCart(${i})">${lang==='ru'?'Удалить':lang==='ua'?'Видалити':'Remove'}</button>
           </div>
         </div>
       </div>`;
   });
-  totalBox.textContent = `Итого: ${formatPricePLN(totalPLN)}`;
+  totalBox.textContent = `${i18n[lang].total}: ${formatPricePLN(totalPLN)}`;
 }
 
 // Interactions
@@ -234,8 +258,6 @@ function addToCart(id, btnEl){
   updateCartCount();
   saveCart();
   showToast('addedToCart');
-
-  // fly animation using closest product image
   const card = btnEl?.closest('.product');
   const img = card?.querySelector('img');
   if(img) flyToCart(img);
@@ -264,8 +286,10 @@ function closeCart(){
   mainPage.classList.remove('hidden');
 }
 
+// Filtering & search
 function filterCategory(cat){
   toggleMenu(false);
+  backAllBtn.classList.add('hidden');
   showingFavorites = false;
   if(cat==='all'){ filtered = [...products]; }
   else { filtered = products.filter(p=>p.category===cat); }
@@ -274,10 +298,11 @@ function filterCategory(cat){
 }
 
 function searchProducts(q){
+  backAllBtn.classList.add('hidden');
+  showingFavorites = false;
   const v = q.toLowerCase();
   const candidates = products.filter(p=>p.name.toLowerCase().includes(v));
-  // update filtered by search
-  filtered = products.filter(p=>p.name.toLowerCase().includes(v));
+  filtered = candidates;
   renderProducts();
 
   // autocomplete
@@ -307,12 +332,12 @@ function sortProducts(t){
 function applyPriceFilter(skipRender){
   const min = Number(priceMinEl.value)||0;
   const max = Number(priceMaxEl.value)||Infinity;
-  // filter from full set or current filter
-  const base = showingFavorites ? products.filter(p=>favorites.includes(p.id)) : products;
+  const base = products;
   filtered = base.filter(p=>p.price>=min && p.price<=max);
   if(!skipRender) renderProducts();
 }
 
+// Favorites
 function toggleFavorite(id){
   const idx = favorites.indexOf(id);
   if(idx>-1) favorites.splice(idx,1);
@@ -324,11 +349,19 @@ function toggleFavorite(id){
 function showFavorites(){
   toggleMenu(false);
   showingFavorites = true;
+  backAllBtn.classList.remove('hidden');
   filtered = products.filter(p=>favorites.includes(p.id));
   renderProducts();
 }
 
-// Sidebar
+function backToAll(){
+  showingFavorites = false;
+  backAllBtn.classList.add('hidden');
+  filtered = [...products];
+  renderProducts();
+}
+
+// Sidebar toggle
 function toggleMenu(force){
   const s=document.getElementById('sidebar');
   force===false ? s.classList.remove('active') : s.classList.toggle('active');
@@ -340,9 +373,8 @@ window.addEventListener('scroll',()=>{
     .classList.toggle('compact', window.scrollY>20);
 });
 
-// Image preview (simple)
+// Image preview
 function previewImage(src){
-  // Could be expanded with a modal; for now, open in new tab
   window.open(src, '_blank');
 }
 
@@ -355,11 +387,53 @@ function applyI18n(){
 }
 function setLang(l){
   lang = l; localStorage.setItem('lang', l);
+  document.getElementById('langSelect').value = lang;
   applyI18n(); renderProducts(); renderCart();
 }
 function setCurrency(c){
   currency = c; localStorage.setItem('currency', c);
+  document.getElementById('currencySelect').value = currency;
   renderProducts(); renderCart();
+}
+
+// Checkout modal
+let lastOrderText = '';
+function checkout(){
+  if(!cart.length) return alert(i18n[lang].emptyCart);
+  const orderId = Date.now().toString().slice(-6);
+  let totalPLN = cart.reduce((s,p)=>s+p.price*p.qty,0);
+  const lines = cart.map(p=>`• ${p.name} × ${p.qty} — ${formatPricePLN(p.price*p.qty)}`);
+  const header = `${i18n[lang].orderNumber}: ${orderId}\n${i18n[lang].consultant}: @${ADMIN_NICK}`;
+  const totalLine = `${i18n[lang].total}: ${formatPricePLN(totalPLN)}`;
+  lastOrderText = `${header}\n\n${lines.join('\n')}\n\n${totalLine}`;
+
+  // Fill modal HTML
+  const detailsEl = document.getElementById('orderDetails');
+  detailsEl.innerHTML = `
+    <p><strong>${i18n[lang].orderNumber}:</strong> ${orderId}</p>
+    <p><strong>${i18n[lang].consultant}:</strong> @${ADMIN_NICK}</p>
+    <ul>${cart.map(p=>`<li>${p.name} × ${p.qty} — ${formatPricePLN(p.price*p.qty)}</li>`).join('')}</ul>
+    <p><strong>${i18n[lang].total}:</strong> ${formatPricePLN(totalPLN)}</p>
+  `;
+  document.getElementById('orderModal').classList.remove('hidden');
+}
+
+function closeOrderModal(){
+  document.getElementById('orderModal').classList.add('hidden');
+}
+
+async function copyOrder(){
+  try {
+    await navigator.clipboard.writeText(lastOrderText);
+    showToast(lang==='ua'?'Скопійовано':'Скопировано');
+  } catch {
+    showToast(lang==='ua'?'Помилка копіювання':'Ошибка копирования');
+  }
+}
+
+function sendOrderTelegram(){
+  // Откроем чат с админом; пользователь отправит ему скопированный текст
+  window.open(ADMIN_URL, '_blank');
 }
 
 // Init
@@ -370,14 +444,11 @@ window.addEventListener('click', (e)=>{
 });
 
 window.addEventListener('load', ()=>{
-  // load state
   loadCart(); loadFavorites();
-  // set selects
   document.getElementById('langSelect').value = lang;
   document.getElementById('currencySelect').value = currency;
-  // initial render
-  filtered = [...products];
   applyI18n();
+  filtered = [...products];
   renderProducts();
   updateCartCount();
 });
