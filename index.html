@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vape Shop — Premium</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -11,20 +12,18 @@
 
 <header id="header">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
-  <div class="title">VAPE SHOP</div>
+  <div class="title" data-i18n="title">VAPE SHOP</div>
   <div class="header-actions">
-    <div class="lang-currency">
-      <select id="langSelect" onchange="setLang(this.value)">
-        <option value="ru" selected>RU</option>
-        <option value="ua">UA</option>
-        <option value="en">EN</option>
-      </select>
-      <select id="currencySelect" onchange="setCurrency(this.value)">
-        <option value="PLN" selected>zł</option>
-        <option value="EUR">€</option>
-        <option value="UAH">₴</option>
-      </select>
-    </div>
+    <select id="langSelect" onchange="setLang(this.value)">
+      <option value="ru">RU</option>
+      <option value="ua">UA</option>
+      <option value="en">EN</option>
+    </select>
+    <select id="currencySelect" onchange="setCurrency(this.value)">
+      <option value="PLN">zł</option>
+      <option value="EUR">€</option>
+      <option value="UAH">₴</option>
+    </select>
     <div class="cart-btn" onclick="openCart()">
       🛒 <span class="cart-count" id="cartCount">0</span>
     </div>
@@ -32,57 +31,22 @@
 </header>
 
 <div class="sidebar" id="sidebar">
-  <div class="sidebar-title" data-i18n="categories">Категории</div>
-  <button onclick="filterCategory('all')" data-i18n="allProducts">Все товары</button>
-  <button onclick="filterCategory('liquid')" data-i18n="liquids">Жидкости</button>
-  <button onclick="filterCategory('disposable')" data-i18n="disposable">Одноразки</button>
-  <button onclick="filterCategory('cartridge')" data-i18n="cartridges">Картриджи</button>
-  <div class="divider"></div>
-  <button onclick="showFavorites()" data-i18n="favorites">Избранное ❤️</button>
-  <button id="backAllBtn" class="hidden" onclick="backToAll()" data-i18n="backToAll">Все товары</button>
+  <button onclick="filterCategory('all')" data-i18n="allProducts"></button>
+  <button onclick="filterCategory('liquid')" data-i18n="liquids"></button>
+  <button onclick="filterCategory('disposable')" data-i18n="disposable"></button>
+  <button onclick="filterCategory('cartridge')" data-i18n="cartridges"></button>
 </div>
 
 <main id="mainPage" class="page">
   <div class="search-sort">
-    <div class="search-box">
-      <input id="searchInput" type="text" data-i18n-placeholder="searchPlaceholder" placeholder="Поиск..." oninput="searchProducts(this.value)">
-      <div id="autocomplete" class="autocomplete"></div>
-    </div>
+    <input id="searchInput" type="text" placeholder="" oninput="searchProducts(this.value)">
     <select id="sortSelect" onchange="sortProducts(this.value)">
-      <option value="default" data-i18n="sort">Сортировка</option>
-      <option value="low" data-i18n="priceAsc">Цена ↑</option>
-      <option value="high" data-i18n="priceDesc">Цена ↓</option>
-      <option value="name" data-i18n="byName">По названию</option>
+      <option value="default" data-i18n="sort"></option>
+      <option value="low" data-i18n="priceAsc"></option>
+      <option value="high" data-i18n="priceDesc"></option>
+      <option value="name" data-i18n="byName"></option>
     </select>
   </div>
-
   <div class="products" id="productList"></div>
-</main>
+</main
 
-<section id="cartPage" class="cart-page hidden">
-  <div class="back-btn" onclick="closeCart()" data-i18n="back">← Назад</div>
-  <h3 data-i18n="cart">Корзина</h3>
-  <div id="cartItems"></div>
-  <div id="cartTotal" class="cart-total"></div>
-
-  <button class="checkout-btn" onclick="checkout()" data-i18n="checkout">Оформить заказ</button>
-  <a class="admin-btn" id="adminBtn" target="_blank" data-i18n="contactAdmin">Написать админу</a>
-</section>
-
-<div id="toast" class="toast"></div>
-
-<div id="orderModal" class="modal hidden">
-  <div class="modal-content">
-    <h3 data-i18n="orderTitle">Ваш заказ</h3>
-    <div id="orderDetails" class="order-details"></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="copyOrder()" data-i18n="copyOrder">Скопировать заказ</button>
-      <button class="btn btn-primary" onclick="sendOrderTelegram()" data-i18n="sendTelegram">Открыть Telegram</button>
-      <button class="btn btn-outline" onclick="closeOrderModal()" data-i18n="close">Закрыть</button>
-    </div>
-  </div>
-</div>
-
-<script src="js/app.js"></script>
-</body>
-</html>
