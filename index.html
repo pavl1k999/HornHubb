@@ -10,8 +10,9 @@
 
 <header id="header">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
-  <div class="logo">VAPE SHOP</div>
-  <div class="cart-btn" onclick="openCart()">🛒
+  <div class="title">VAPE SHOP</div>
+  <div class="cart-btn" onclick="openCart()">
+    🛒
     <div class="cart-count" id="cartCount">0</div>
   </div>
 </header>
@@ -26,7 +27,7 @@
 <div id="mainPage">
 
   <div class="search-sort">
-    <input type="text" placeholder="Поиск товара..." oninput="searchProducts(this.value)">
+    <input type="text" placeholder="Поиск..." oninput="searchProducts(this.value)">
     <select onchange="sortProducts(this.value)">
       <option value="default">Сортировка</option>
       <option value="low">Цена ↑</option>
@@ -55,5 +56,4 @@
 <script src="js/app.js"></script>
 </body>
 </html>
-
 
