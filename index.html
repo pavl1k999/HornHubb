@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vape Shop — Premium</title>
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,12 +18,12 @@
   <div class="header-actions">
     <div class="lang-currency">
       <select id="langSelect" onchange="setLang(this.value)">
-        <option value="ru" selected>RU</option>
+        <option value="ru">RU</option>
         <option value="ua">UA</option>
         <option value="en">EN</option>
       </select>
       <select id="currencySelect" onchange="setCurrency(this.value)">
-        <option value="PLN" selected>zł</option>
+        <option value="PLN">zł</option>
         <option value="EUR">€</option>
         <option value="UAH">₴</option>
       </select>
@@ -39,12 +41,6 @@
   <button onclick="filterCategory('disposable')" data-i18n="disposable">Одноразки</button>
   <button onclick="filterCategory('cartridge')" data-i18n="cartridges">Картриджи</button>
   <div class="divider"></div>
-  <div class="sidebar-title" data-i18n="priceFilter">Фильтр по цене</div>
-  <div class="price-filter">
-    <input type="number" id="priceMin" placeholder="Мин" min="0" value="0" oninput="applyPriceFilter()">
-    <input type="number" id="priceMax" placeholder="Макс" min="0" value="1000" oninput="applyPriceFilter()">
-  </div>
-  <div class="divider"></div>
   <button onclick="showFavorites()" data-i18n="favorites">Избранное ❤️</button>
 </div>
 
@@ -55,10 +51,10 @@
       <div id="autocomplete" class="autocomplete"></div>
     </div>
     <select id="sortSelect" onchange="sortProducts(this.value)">
-      <option value="default" data-i18n="sort">Сортировка</option>
-      <option value="low" data-i18n="priceAsc">Цена ↑</option>
-      <option value="high" data-i18n="priceDesc">Цена ↓</option>
-      <option value="name" data-i18n="byName">По названию</option>
+      <option value="default">Сортировка</option>
+      <option value="low">Цена ↑</option>
+      <option value="high">Цена ↓</option>
+      <option value="name">По названию</option>
     </select>
   </div>
 
@@ -66,13 +62,14 @@
 </main>
 
 <section id="cartPage" class="cart-page hidden">
-  <div class="back-btn" onclick="closeCart()" data-i18n="back">← Назад</div>
-  <h3 data-i18n="cart">Корзина</h3>
+  <div class="back-btn" onclick="closeCart()">← Назад</div>
+  <h3>Корзина</h3>
+
   <div id="cartItems"></div>
   <div id="cartTotal" class="cart-total"></div>
 
-  <button class="checkout-btn" onclick="checkout()" data-i18n="checkout">Оформить заказ</button>
-  <a class="admin-btn" id="adminBtn" target="_blank" data-i18n="contactAdmin">Написать админу</a>
+  <button class="checkout-btn" onclick="checkout()">Оформить заказ</button>
+  <a class="admin-btn" id="adminBtn" target="_blank">Написать админу</a>
 </section>
 
 <div id="toast" class="toast"></div>
@@ -80,5 +77,4 @@
 <script src="js/app.js"></script>
 </body>
 </html>
-
 
