@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Horn Hub</title>
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vape Shop</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -12,8 +12,7 @@
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
   <div class="title">VAPE SHOP</div>
   <div class="cart-btn" onclick="openCart()">
-    🛒
-    <div class="cart-count" id="cartCount">0</div>
+    🛒 <span class="cart-count" id="cartCount">0</span>
   </div>
 </header>
 
@@ -24,8 +23,7 @@
   <button onclick="filterCategory('cartridge')">Картриджи</button>
 </div>
 
-<div id="mainPage">
-
+<div id="mainPage" class="page">
   <div class="search-sort">
     <input type="text" placeholder="Поиск..." oninput="searchProducts(this.value)">
     <select onchange="sortProducts(this.value)">
@@ -36,24 +34,21 @@
     </select>
   </div>
 
-  <div class="categories">
-    <div class="category" onclick="filterCategory('liquid')">Жидкости</div>
-    <div class="category" onclick="filterCategory('disposable')">Одноразки</div>
-    <div class="category" onclick="filterCategory('cartridge')">Картриджи</div>
-  </div>
-
   <div class="products" id="productList"></div>
 </div>
 
-<div class="cart-page hidden" id="cartPage">
+<div id="cartPage" class="cart-page hidden">
   <div class="back-btn" onclick="closeCart()">← Назад</div>
   <h3>Корзина</h3>
   <div id="cartItems"></div>
   <div id="cartTotal"></div>
+
   <button class="checkout-btn" onclick="checkout()">Оформить заказ</button>
+  <a class="admin-btn" id="adminBtn" target="_blank">Написать админу</a>
 </div>
 
 <script src="js/app.js"></script>
 </body>
 </html>
+
 
