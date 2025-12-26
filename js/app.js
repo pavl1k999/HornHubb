@@ -400,23 +400,19 @@ function setCurrency(c){
 let lastOrderText = '';
 function checkout(){
   if(!cart.length) return alert(i18n[lang].emptyCart);
+
   const orderId = Date.now().toString().slice(-6);
   let totalPLN = cart.reduce((s,p)=>s+p.price*p.qty,0);
   const lines = cart.map(p=>`• ${p.name} × ${p.qty} — ${formatPricePLN(p.price*p.qty)}`);
   const header = `${i18n[lang].orderNumber}: ${orderId}\n${i18n[lang].consultant}: @${ADMIN_NICK}`;
   const totalLine = `${i18n[lang].total}: ${formatPricePLN(totalPLN)}`;
-  lastOrderText = `${header}\n\n${lines.join('\n')}\n\n${totalLine}`;
+  const orderText = `${header}\n\n${lines.join('\n')}\n\n${totalLine}`;
 
-  // Fill modal HTML
-  const detailsEl = document.getElementById('orderDetails');
-  detailsEl.innerHTML = `
-    <p><strong>${i18n[lang].orderNumber}:</strong> ${orderId}</p>
-    <p><strong>${i18n[lang].consultant}:</strong> @${ADMIN_NICK}</p>
-    <ul>${cart.map(p=>`<li>${p.name} × ${p.qty} — ${formatPricePLN(p.price*p.qty)}</li>`).join('')}</ul>
-    <p><strong>${i18n[lang].total}:</strong> ${formatPricePLN(totalPLN)}</p>
-  `;
-  document.getElementById('orderModal').classList.remove('hidden');
+  // Открываем Telegram с текстом заказа
+  const tgUrl = `https://t.me/${ADMIN_NICK}?text=${encodeURIComponent(orderText)}`;
+  window.open(tgUrl, '_blank');
 }
+
 
 function closeOrderModal(){
   document.getElementById('orderModal').classList.add('hidden');
