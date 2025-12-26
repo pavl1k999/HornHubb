@@ -1,57 +1,59 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vape Shop</title>
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vape Shop</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header id="header">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
-  <div class="title">VAPE SHOP</div>
-  <div class="cart-btn" onclick="openCart()">
-    🛒 <span id="cartCount">0</span>
+  <div class="logo">VAPE SHOP</div>
+  <div class="cart-btn" onclick="openCart()">🛒
+    <div class="cart-count" id="cartCount">0</div>
   </div>
 </header>
 
-<nav class="sidebar" id="sidebar">
-  <button onclick="filterCategory('elf')">Elf Liq</button>
-  <button onclick="filterCategory('chaser')">Chaser</button>
-  <button onclick="filterCategory('vazool')">Vazool</button>
+<div class="sidebar" id="sidebar">
+  <button onclick="filterCategory('all')">Все товары</button>
+  <button onclick="filterCategory('liquid')">Жидкости</button>
+  <button onclick="filterCategory('disposable')">Одноразки</button>
   <button onclick="filterCategory('cartridge')">Картриджи</button>
-</nav>
+</div>
 
-<main id="main">
-  <div class="controls">
-    <input type="text" placeholder="Поиск..." oninput="searchProducts(this.value)">
+<div id="mainPage">
+
+  <div class="search-sort">
+    <input type="text" placeholder="Поиск товара..." oninput="searchProducts(this.value)">
     <select onchange="sortProducts(this.value)">
       <option value="default">Сортировка</option>
-      <option value="priceAsc">Цена ↑</option>
-      <option value="priceDesc">Цена ↓</option>
+      <option value="low">Цена ↑</option>
+      <option value="high">Цена ↓</option>
+      <option value="name">По названию</option>
     </select>
   </div>
 
   <div class="categories">
-    <div class="category" onclick="filterCategory('elf')">Elf Liq</div>
-    <div class="category" onclick="filterCategory('chaser')">Chaser</div>
-    <div class="category" onclick="filterCategory('vazool')">Vazool</div>
+    <div class="category" onclick="filterCategory('liquid')">Жидкости</div>
+    <div class="category" onclick="filterCategory('disposable')">Одноразки</div>
     <div class="category" onclick="filterCategory('cartridge')">Картриджи</div>
   </div>
 
   <div class="products" id="productList"></div>
-</main>
+</div>
 
-<section class="cart-page hidden" id="cartPage">
-  <div class="back" onclick="closeCart()">← Назад</div>
-  <h2>Корзина</h2>
+<div class="cart-page hidden" id="cartPage">
+  <div class="back-btn" onclick="closeCart()">← Назад</div>
+  <h3>Корзина</h3>
   <div id="cartItems"></div>
-  <div class="total" id="cartTotal"></div>
-  <button class="checkout" onclick="checkout()">Оформить заказ</button>
-</section>
+  <div id="cartTotal"></div>
+  <button class="checkout-btn" onclick="checkout()">Оформить заказ</button>
+</div>
 
 <script src="js/app.js"></script>
 </body>
 </html>
+
 
