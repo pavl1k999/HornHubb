@@ -105,18 +105,19 @@ header.compact { height: 60px; }
 
 /* Search and sort */
 .search-sort {
-  display: flex; gap: 10px; padding: 16px;
+  display: flex;
+  gap: 10px;
+  padding: 12px;
 }
-.search-box { position: relative; flex: 1; }
+.search-box, .search-sort select {
+  flex: 1;
+}
 .search-sort input,
 .search-sort select {
-  width: 100%;
   padding: 12px;
-  background: var(--bg-2);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
-  color: var(--txt);
+  font-size: 16px; /* одинаковый размер текста */
 }
+
 .autocomplete{
   position: absolute;
   top: calc(100% + 6px); left: 0; right: 0;
