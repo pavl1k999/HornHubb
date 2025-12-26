@@ -8,38 +8,42 @@
 body {
   background: #0f0f12;
   color: #fff;
+  padding-top: 70px;
 }
 
+/* HEADER */
 header {
   position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
-  z-index: 50;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px;
-  background: rgba(18,18,22,0.95);
+  height: 64px;
+  background: rgba(18,18,22,0.96);
   backdrop-filter: blur(12px);
-  transition: transform 0.3s;
+  border-bottom: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 100;
+  transition: height 0.25s ease, padding 0.25s ease;
 }
 
-header.hide {
-  transform: translateY(100%);
+header.compact {
+  height: 52px;
+  padding: 0 14px;
 }
 
-.logo {
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
-.menu-btn, .cart-btn {
+.menu-btn,
+.cart-btn {
   font-size: 22px;
   cursor: pointer;
+  position: relative;
 }
 
-.cart-btn {
-  position: relative;
+.title {
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
 .cart-count {
@@ -52,6 +56,7 @@ header.hide {
   font-size: 12px;
 }
 
+/* SIDEBAR */
 .sidebar {
   position: fixed;
   top: 0;
@@ -59,9 +64,10 @@ header.hide {
   width: 260px;
   height: 100%;
   background: rgba(18,18,22,0.98);
-  padding: 20px;
+  backdrop-filter: blur(12px);
+  padding: 80px 20px;
   transition: 0.3s;
-  z-index: 100;
+  z-index: 200;
 }
 
 .sidebar.active {
@@ -74,65 +80,69 @@ header.hide {
   border: none;
   color: #fff;
   padding: 14px 0;
-  text-align: left;
   font-size: 16px;
+  text-align: left;
   cursor: pointer;
 }
 
+/* SEARCH */
 .search-sort {
   display: flex;
   gap: 10px;
-  padding: 80px 16px 16px;
+  padding: 16px;
 }
 
 .search-sort input,
 .search-sort select {
-  background: #1a1a1f;
+  background: #1c1c22;
   border: none;
-  color: #fff;
+  border-radius: 12px;
   padding: 10px;
-  border-radius: 10px;
+  color: #fff;
 }
 
-.search-sort input {
-  flex: 1;
-}
-
+/* CATEGORIES */
 .categories {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  padding: 16px;
+  padding: 0 16px 16px;
 }
 
 .category {
   background: #1c1c22;
   border-radius: 16px;
-  padding: 18px;
+  padding: 16px;
   text-align: center;
   cursor: pointer;
 }
 
+/* PRODUCTS */
 .products {
   display: grid;
-  grid-template-columns: repeat(2,1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px;
-  padding: 16px;
+  padding: 0 16px 20px;
 }
 
 .product {
   background: #1c1c22;
   border-radius: 16px;
   padding: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .product img {
   width: 100%;
+  height: 140px;
+  object-fit: cover;
   border-radius: 12px;
 }
 
 .product h4 {
   margin: 8px 0 4px;
+  min-height: 42px;
 }
 
 .product span {
@@ -140,53 +150,57 @@ header.hide {
 }
 
 .product button {
-  width: 100%;
-  margin-top: 8px;
+  margin-top: auto;
   padding: 10px;
-  background: #7c7cff;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
+  background: linear-gradient(135deg,#7c7cff,#5b5bff);
   color: #fff;
   cursor: pointer;
 }
 
+/* CART */
 .cart-page {
-  padding: 80px 16px;
+  padding: 80px 16px 20px;
   min-height: 100vh;
-}
-
-.hidden {
-  display: none;
 }
 
 .cart-item {
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 12px;
+  background: #1c1c22;
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 12px;
 }
 
 .cart-item img {
-  width: 60px;
-  border-radius: 8px;
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  object-fit: cover;
 }
 
 .remove-btn {
-  background: #ff4d4d;
+  background: none;
   border: none;
-  padding: 6px 8px;
-  border-radius: 6px;
-  color: #fff;
+  color: #ff5c5c;
   cursor: pointer;
 }
 
 .checkout-btn {
   width: 100%;
-  padding: 14px;
-  background: #22c55e;
+  padding: 16px;
   border: none;
-  border-radius: 14px;
-  font-size: 16px;
-  margin-top: 12px;
+  border-radius: 16px;
+  background: linear-gradient(135deg,#22c55e,#16a34a);
+  color: #000;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.hidden {
+  display: none;
 }
 
 .back-btn {
@@ -194,4 +208,3 @@ header.hide {
   color: #7c7cff;
   cursor: pointer;
 }
-
