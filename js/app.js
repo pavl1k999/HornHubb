@@ -382,4 +382,39 @@ window.addEventListener('load', ()=>{
   updateCartCount();
 });
 
+/********************
+ * CHECKOUT → ADMIN
+ ********************/
+function checkout(){
+  if(!cart.length){
+    showToast('emptyCart');
+    return;
+  }
+
+  let text = `🧾 НОВЫЙ ЗАКАЗ\n\n`;
+  let totalPLN = 0;
+
+  cart.forEach(p=>{
+    text += `• ${p.name} × ${p.qty} = ${p.price * p.qty} PLN\n`;
+    totalPLN += p.price * p.qty;
+  });
+
+  text += `\n💰 Итого: ${totalPLN} PLN`;
+  text += `\n\n✍️ Напишите мне для подтверждения заказа`;
+
+  const url =
+    `https://t.me/${ADMIN_NICK}?text=` +
+    encodeURIComponent(text);
+
+  // открываем чат с админом
+  window.open(url, '_blank');
+
+  // очистка корзины после перехода
+  cart = [];
+  saveCart();
+  updateCartCount();
+  renderCart();
+}
+
+
 
