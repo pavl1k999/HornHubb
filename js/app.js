@@ -1,113 +1,137 @@
+const ADMIN_NICK = '@pvlenemy';
+
 const products = [
-  {id:1, name:'Pod X', price:1200, category:'pods', img:'https://via.placeholder.com/300?text=Pod+X'},
-  {id:2, name:'Pod Y', price:1100, category:'pods', img:'https://via.placeholder.com/300?text=Pod+Y'},
-  {id:3, name:'Liquid A', price:300, category:'liquid', img:'https://via.placeholder.com/300?text=Liquid+A'},
-  {id:4, name:'Liquid B', price:450, category:'liquid', img:'https://via.placeholder.com/300?text=Liquid+B'},
-  {id:5, name:'Cartridge 1', price:250, category:'cartridge', img:'https://via.placeholder.com/300?text=Cartridge+1'},
-  {id:6, name:'Cartridge 2', price:350, category:'cartridge', img:'https://via.placeholder.com/300?text=Cartridge+2'},
-  {id:7, name:'Disposable A', price:900, category:'disposable', img:'https://via.placeholder.com/300?text=Disposable+A'},
-  {id:8, name:'Disposable B', price:750, category:'disposable', img:'https://via.placeholder.com/300?text=Disposable+B'},
-  {id:9, name:'Pod Z', price:1350, category:'pods', img:'https://via.placeholder.com/300?text=Pod+Z'},
-  {id:10, name:'Liquid C', price:500, category:'liquid', img:'https://via.placeholder.com/300?text=Liquid+C'}
+  // Elf Liq – 45 zl
+  ...[
+    'Strawberry Cherry Lemon','Sour Watermelon Gummy','Pink Lemonade Soda',
+    'Pineapple Colada','Lemon Lime','Blueberry Raspberry Pomegranate',
+    'Apple Pear','Strawberry Snow','Blackcurrant Aniseed',
+    'P&B Cloud','Grape Cherry'
+  ].map((n,i)=>({id:i+1,name:`Elf Liq – ${n}`,price:45,category:'liquid',img:'images/elf.jpg'})),
+
+  // Chaser – 45 zl
+  ...[
+    'Grape Mint','Berry Lemonade','Blackberry Lemonade','Sour Apple',
+    'Vitamin','Coconut Melon','Energetic','Strawberry Cream',
+    'Watermelon Raspberry','Kiwi Passion Guava'
+  ].map((n,i)=>({id:100+i,name:`Chaser – ${n}`,price:45,category:'liquid',img:'images/chaser.jpg'})),
+
+  // Vazool – 60 zl
+  ...[
+    'Grape Ice','Watermelon Ice','Kiwi Passion Guava','Strawberry Ice Cream',
+    'Sour Apple Ice','Love 777','Mixed Berries','Purple Candy',
+    'Dragon Fruit Banana Cherry'
+  ].map((n,i)=>({id:200+i,name:`Vazool – ${n}`,price:60,category:'disposable',img:'images/vazool.jpg'})),
+
+  // Cartridge
+  {id:300,name:'Xros Cartridge 0.6Ω',price:20,category:'cartridge',img:'images/cart.jpg'}
 ];
 
 let cart = [];
-let filteredProducts = [...products];
+let filtered = [...products];
 
 const productList = document.getElementById('productList');
 const cartCount = document.getElementById('cartCount');
-const cartPage = document.getElementById('cartPage');
-const mainPage = document.getElementById('mainPage');
-const cartItems = document.getElementById('cartItems');
-const cartTotal = document.getElementById('cartTotal');
 
-function renderProducts(list = filteredProducts) {
-  productList.innerHTML = '';
-  list.forEach(p => {
-    productList.innerHTML += `
+function renderProducts(list=filtered){
+  productList.innerHTML='';
+  if(list.length===0){
+    productList.innerHTML='<p style="padding:16px;color:#aaa">Нет товара в наличии</p>';
+    return;
+  }
+  list.forEach(p=>{
+    productList.innerHTML+=`
       <div class="product">
         <img src="${p.img}">
         <h4>${p.name}</h4>
-        <span>${p.price} ₴</span>
-        <button onclick='addToCart(${JSON.stringify(p)})'>В корзину</button>
+        <span>${p.price} zł</span>
+        <button onclick='addToCart(${p.id})'>В корзину</button>
       </div>`;
   });
 }
 
-function addToCart(product) {
-  cart.push(product);
+function addToCart(id){
+  const p = products.find(x=>x.id===id);
+  cart.push(p);
   cartCount.textContent = cart.length;
 }
 
-function openCart() {
-  mainPage.classList.add('hidden');
-  cartPage.classList.remove('hidden');
+function openCart(){
+  document.getElementById('mainPage').classList.add('hidden');
+  document.getElementById('cartPage').classList.remove('hidden');
   renderCart();
 }
 
-function closeCart() {
-  cartPage.classList.add('hidden');
-  mainPage.classList.remove('hidden');
+function closeCart(){
+  document.getElementById('cartPage').classList.add('hidden');
+  document.getElementById('mainPage').classList.remove('hidden');
 }
 
-function renderCart() {
-  cartItems.innerHTML = '';
-  let total = 0;
-  cart.forEach((p,i) => {
-    total += p.price;
-    cartItems.innerHTML += `
+function renderCart(){
+  const box = document.getElementById('cartItems');
+  const totalBox = document.getElementById('cartTotal');
+  box.innerHTML='';
+  let total=0;
+  cart.forEach((p,i)=>{
+    total+=p.price;
+    box.innerHTML+=`
       <div class="cart-item">
         <img src="${p.img}">
         <div>
           <div>${p.name}</div>
-          <div>${p.price} ₴</div>
+          <div>${p.price} zł</div>
           <button class="remove-btn" onclick="removeFromCart(${i})">Удалить</button>
         </div>
       </div>`;
   });
-  cartTotal.textContent = `Итого: ${total} ₴`;
+  totalBox.textContent = `Итого: ${total} zł`;
 }
 
-function removeFromCart(index) {
-  cart.splice(index,1);
+function removeFromCart(i){
+  cart.splice(i,1);
   cartCount.textContent = cart.length;
   renderCart();
 }
 
-function filterCategory(cat) {
+function checkout(){
+  if(!cart.length) return alert('Корзина пуста');
+  const text = cart.map(p=>`${p.name} – ${p.price} zł`).join('\n');
+  const total = cart.reduce((s,p)=>s+p.price,0);
+  alert(`Заказ отправлен!\n\nНапишите админу: ${ADMIN_NICK}\n\n${text}\n\nИтого: ${total} zł`);
+}
+
+function filterCategory(cat){
   toggleMenu(false);
-  filteredProducts = cat==='all' ? [...products] : products.filter(p => p.category===cat);
+  filtered = cat==='all' ? [...products] : products.filter(p=>p.category===cat);
   renderProducts();
 }
 
-function searchProducts(query) {
-  filteredProducts = products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
+function searchProducts(q){
+  filtered = products.filter(p=>p.name.toLowerCase().includes(q.toLowerCase()));
   renderProducts();
 }
 
-function sortProducts(type) {
-  if(type==='priceAsc') filteredProducts.sort((a,b)=>a.price-b.price);
-  else if(type==='priceDesc') filteredProducts.sort((a,b)=>b.price-a.price);
+function sortProducts(type){
+  if(type==='low') filtered.sort((a,b)=>a.price-b.price);
+  if(type==='high') filtered.sort((a,b)=>b.price-a.price);
+  if(type==='name') filtered.sort((a,b)=>a.name.localeCompare(b.name));
   renderProducts();
 }
 
-function toggleMenu(force) {
-  const sb = document.getElementById('sidebar');
-  if(force===false) sb.classList.remove('active');
-  else sb.classList.toggle('active');
+function toggleMenu(force){
+  const s=document.getElementById('sidebar');
+  force===false ? s.classList.remove('active') : s.classList.toggle('active');
 }
 
-function checkout() {
-  const order = {
-    items: cart,
-    total: cart.reduce((s,p)=>s+p.price,0)
-  };
-  if(window.Telegram && Telegram.WebApp){
-    Telegram.WebApp.sendData(JSON.stringify(order));
-  } else {
-    alert('Заказ сформирован (эмуляция): '+JSON.stringify(order));
-  }
-}
+// скрытие шапки при скролле
+let last=0;
+window.addEventListener('scroll',()=>{
+  const h=document.getElementById('header');
+  const cur=window.scrollY;
+  cur>last ? h.classList.add('hide') : h.classList.remove('hide');
+  last=cur;
+});
 
 renderProducts();
+
 
