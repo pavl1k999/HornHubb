@@ -46,7 +46,6 @@
   </div>
   <div class="divider"></div>
   <button onclick="showFavorites()" data-i18n="favorites">Избранное ❤️</button>
-  <button id="backAllBtn" class="hidden" onclick="backToAll()" data-i18n="backToAll">Все товары</button>
 </div>
 
 <main id="mainPage" class="page">
@@ -77,19 +76,6 @@
 </section>
 
 <div id="toast" class="toast"></div>
-
-<!-- Modal: order details -->
-<div id="orderModal" class="modal hidden">
-  <div class="modal-content">
-    <h3 data-i18n="orderTitle">Ваш заказ</h3>
-    <div id="orderDetails" class="order-details"></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="copyOrder()" data-i18n="copyOrder">Скопировать заказ</button>
-      <button class="btn btn-primary" onclick="sendOrderTelegram()" data-i18n="sendTelegram">Открыть Telegram</button>
-      <button class="btn btn-outline" onclick="closeOrderModal()" data-i18n="close">Закрыть</button>
-    </div>
-  </div>
-</div>
 
 <script src="js/app.js"></script>
 </body>
