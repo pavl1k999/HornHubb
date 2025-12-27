@@ -209,31 +209,6 @@ function updateCartCount(){
   cartCount.textContent = totalQty;
 }
 
-// Rendering
-function renderProducts(list = filtered){
-  productList.innerHTML = '';
-  const items = showingFavorites ? list.filter(p=>favorites.includes(p.id)) : list;
-  if(!items.length){
-    productList.innerHTML = `<p class="empty">${i18n[lang].emptyProducts}</p>`;
-    return;
-  }
-  items.forEach(p=>{
-    const favActive = favorites.includes(p.id);
-    productList.innerHTML += `
-      <div class="product">
-        <img src="${p.img}" onclick="previewImage('${p.img}')" alt="${p.name}">
-        <h4>${p.name}</h4>
-        <div class="muted">${p.category}</div>
-        <div class="price">${formatPricePLN(p.price)}</div>
-        <div class="actions">
-          <button class="btn btn-primary" onclick="addToCart(${p.id}, this)">${i18n[lang].addedToCart.includes('Добавлен') ? 'В корзину' : (lang==='ua' ? 'До кошика' : 'Add to cart')}</button>
-          <button class="btn btn-outline ${favActive?'active':''}" onclick="toggleFavorite(${p.id})">${favActive?'❤️':'🤍'}</button>
-        </div>
-      </div>
-    `;
-  });
-}
-
 function renderProducts(list = filtered){
   productList.innerHTML = '';
   const items = showingFavorites ? list.filter(p=>favorites.includes(p.id)) : list;
