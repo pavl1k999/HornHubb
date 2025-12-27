@@ -11,7 +11,7 @@
 <body>
 
 <header id="header">
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+  <div class="menu-btn" id="menuBtn" onclick="toggleMenu()">☰</div>
   <div class="title">HORN HUB</div>
   <div class="header-actions">
     <div class="lang-currency">
@@ -45,7 +45,7 @@
 <main id="mainPage" class="page">
   <div class="search-sort">
     <div class="search-box">
-      <input id="searchInput" type="text" placeholder="Поиск..." oninput="searchProducts(this.value)">
+      <input id="searchInput" type="text" data-i18n-placeholder="search" oninput="searchProducts(this.value)">
       <div id="autocomplete" class="autocomplete"></div>
     </div>
     <select id="sortSelect" onchange="sortProducts(this.value)">
