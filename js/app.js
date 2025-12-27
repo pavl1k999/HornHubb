@@ -239,6 +239,35 @@ function renderProducts(list = filtered){
   });
 }
 
+function renderCart(){
+  const box=document.getElementById('cartItems');
+  const totalBox=document.getElementById('cartTotal');
+  box.innerHTML='';
+  if(!cart.length){
+    box.innerHTML = `<p class="empty">${i18n[lang].emptyCart}</p>`;
+    totalBox.textContent = '';
+    return;
+  }
+  let totalPLN=0;
+  cart.forEach((p,i)=>{
+    totalPLN+=p.price*p.qty;
+    box.innerHTML+=`
+      <div class="cart-item">
+        <img src="${p.img}" alt="${p.name}">
+        <div style="flex:1">
+          <div class="name">${p.name}</div>
+          <div class="line">${formatPricePLN(p.price)} × ${p.qty}</div>
+          <div class="qty-controls">
+            <button class="qty-btn" onclick="changeQty(${i},-1)">–</button>
+            <div>${p.qty}</div>
+            <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+            <button class="remove-btn" onclick="removeFromCart(${i})">${lang==='ru'?'Удалить':lang==='ua'?'Видалити':'Remove'}</button>
+          </div>
+        </div>
+      </div>`;
+  });
+  totalBox.textContent = `${i18n[lang].total}: ${formatPricePLN(totalPLN)}`;
+}
 
 // Interactions
 function addToCart(id, btnEl){
