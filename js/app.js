@@ -130,7 +130,7 @@ const products = [
     name: `Elf Liq – ${n}`,
     price: 45,
     category: 'liquid',
-    img: `images/elf/${n.replace(/[^a-zA-Z0-9]/g,'_')}.jpg` // уникальная картинка по названию
+    img: `images/elf/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png` // уникальная картинка по названию
   })),
 
   // Chaser
