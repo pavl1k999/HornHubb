@@ -303,9 +303,10 @@ header.compact { height: 58px; }
   box-shadow: var(--shadow);
 }
 
+/* Promo banner */
 .promo-banner {
   max-width: 1200px;
-  margin: 88px auto 18px;
+  margin: 88px auto 6px; /* ↓ уменьшили нижний отступ */
   padding: 0 12px;
 }
 
@@ -318,6 +319,7 @@ header.compact { height: 58px; }
   border-radius: 16px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.15);
 }
+
 
 
 .order-details { color: #ddd; font-size: 14px; margin: 8px 0; }
