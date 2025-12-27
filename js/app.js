@@ -146,6 +146,8 @@ let filtered = [...products];
 let showingFavorites = false;
 
 // Elements
+const mainPage = document.getElementById('mainPage');
+const cartPage = document.getElementById('cartPage');
 const productList = document.getElementById('productList');
 const cartCount = document.getElementById('cartCount');
 const searchInput = document.getElementById('searchInput');
