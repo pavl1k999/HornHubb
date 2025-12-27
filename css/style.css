@@ -318,7 +318,7 @@ header.compact { height: 58px; }
 .promo-banner img {
   width: 100%;
   height: 100%;
-  object-fit: cover;         /* картинка красиво вписывается */
+  object-fit: contain;         /* картинка красиво вписывается */
   display: block;
 }
 .order-details { color: #ddd; font-size: 14px; margin: 8px 0; }
