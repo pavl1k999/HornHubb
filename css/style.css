@@ -302,6 +302,24 @@ header.compact { height: 58px; }
   max-width: 420px;
   box-shadow: var(--shadow);
 }
+
+.promo-banner {
+  max-width: 1200px;
+  margin: 88px auto 18px;
+  padding: 0 12px;
+}
+
+.promo-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 2480 / 964;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+
 .order-details { color: #ddd; font-size: 14px; margin: 8px 0; }
 .order-details ul { margin: 6px 0 0 16px; }
 .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
