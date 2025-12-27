@@ -120,23 +120,45 @@ let lang = localStorage.getItem('lang') || 'ru';
 
 // Products (base prices in PLN)
 const products = [
+  // Elf Liq
   ...[
     'Strawberry Cherry Lemon','Sour Watermelon Gummy','Pink Lemonade Soda',
     'Pineapple Colada','Lemon Lime','Blueberry Raspberry Pomegranate',
     'Apple Pear','Strawberry Snow','Blackcurrant Aniseed','P&B Cloud','Grape Cherry'
-  ].map((n,i)=>({id:i+1,name:`Elf Liq – ${n}`,price:45,category:'liquid',img:'images/elf.jpg'})),
+  ].map((n,i)=>({
+    id: i+1,
+    name: `Elf Liq – ${n}`,
+    price: 45,
+    category: 'liquid',
+    img: `images/elf/${n.replace(/[^a-zA-Z0-9]/g,'_')}.jpg` // уникальная картинка по названию
+  })),
 
+  // Chaser
   ...[
     'Grape Mint','Berry Lemonade','Blackberry Lemonade','Sour Apple','Vitamin',
     'Coconut Melon','Energetic','Strawberry Cream','Watermelon Raspberry','Kiwi Passion Guava'
-  ].map((n,i)=>({id:100+i,name:`Chaser – ${n}`,price:45,category:'liquid',img:'images/chaser.jpg'})),
+  ].map((n,i)=>({
+    id: 100+i,
+    name: `Chaser – ${n}`,
+    price: 45,
+    category: 'liquid',
+    img: `images/chaser/${n.replace(/[^a-zA-Z0-9]/g,'_')}.jpg`
+  })),
 
+  // Vazool
   ...[
     'Grape Ice','Watermelon Ice','Kiwi Passion Guava','Strawberry Ice Cream',
     'Sour Apple Ice','Love 777','Mixed Berries','Purple Candy','Dragon Fruit Banana Cherry'
-  ].map((n,i)=>({id:200+i,name:`Vazool – ${n}`,price:60,category:'disposable',img:'images/vazool.jpg'})),
+  ].map((n,i)=>({
+    id: 200+i,
+    name: `Vazool – ${n}`,
+    price: 60,
+    category: 'disposable',
+    img: `images/vazool/${n.replace(/[^a-zA-Z0-9]/g,'_')}.jpg`
+  })),
 
-  {id:300,name:'Xros Cartridge 0.6Ω',price:20,category:'cartridge',img:'images/cart.jpg'}
+  // Cartridge
+  {id: 300, name:'Xros Cartridge 0.6Ω', price: 20, category: 'cartridge', img:'images/cart.jpg'}
 ];
 
 // State
