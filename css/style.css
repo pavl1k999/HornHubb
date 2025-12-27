@@ -305,7 +305,7 @@ header.compact { height: 58px; }
 
 .promo-banner {
   max-width: 1200px;
-  margin: 0 auto 12px; /* нижний отступ меньше */
+  margin: 12px auto; /* сверху и снизу по 12px */
   padding: 0 12px;
 }
 
@@ -313,8 +313,6 @@ header.compact { height: 58px; }
   width: 100%;
   height: auto;
   display: block;
-  aspect-ratio: 2480 / 964;
-  object-fit: cover;
   border-radius: 16px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.15);
 }
