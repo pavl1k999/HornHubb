@@ -14,6 +14,11 @@ let currency = localStorage.getItem('currency') || 'PLN';
 // I18n dictionary
 const i18n = {
   ru: {
+    addToCart: "В корзину",
+    search: "Поиск...",
+    liquid: "Жидкости",
+    disposable: "Одноразки",
+    cartridge: "Картриджи",
     categories: "Категории",
     allProducts: "Все товары",
     liquids: "Жидкости",
@@ -43,6 +48,11 @@ const i18n = {
     total: "Итого",
   },
   ua: {
+    addToCart: "До кошика",
+    search: "Пошук...",
+    liquid: "Рідини",
+    disposable: "Одноразки",
+    cartridge: "Картриджі",
     categories: "Категорії",
     allProducts: "Всі товари",
     liquids: "Рідини",
@@ -72,6 +82,11 @@ const i18n = {
     total: "Разом",
   },
   en: {
+    addToCart: "Add to cart",
+    search: "Search...",
+    liquid: "Liquids",
+    disposable: "Disposables",
+    cartridge: "Cartridges",
     categories: "Categories",
     allProducts: "All products",
     liquids: "Liquids",
@@ -219,35 +234,36 @@ function renderProducts(list = filtered){
   });
 }
 
-function renderCart(){
-  const box=document.getElementById('cartItems');
-  const totalBox=document.getElementById('cartTotal');
-  box.innerHTML='';
-  if(!cart.length){
-    box.innerHTML = `<p class="empty">${i18n[lang].emptyCart}</p>`;
-    totalBox.textContent = '';
+function renderProducts(list = filtered){
+  productList.innerHTML = '';
+  const items = showingFavorites ? list.filter(p=>favorites.includes(p.id)) : list;
+
+  if(!items.length){
+    productList.innerHTML = `<p class="empty">${i18n[lang].emptyProducts}</p>`;
     return;
   }
-  let totalPLN=0;
-  cart.forEach((p,i)=>{
-    totalPLN+=p.price*p.qty;
-    box.innerHTML+=`
-      <div class="cart-item">
-        <img src="${p.img}" alt="${p.name}">
-        <div style="flex:1">
-          <div class="name">${p.name}</div>
-          <div class="line">${formatPricePLN(p.price)} × ${p.qty}</div>
-          <div class="qty-controls">
-            <button class="qty-btn" onclick="changeQty(${i},-1)">–</button>
-            <div>${p.qty}</div>
-            <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
-            <button class="remove-btn" onclick="removeFromCart(${i})">${lang==='ru'?'Удалить':lang==='ua'?'Видалити':'Remove'}</button>
-          </div>
+
+  items.forEach(p=>{
+    const favActive = favorites.includes(p.id);
+    productList.innerHTML += `
+      <div class="product">
+        <img src="${p.img}" onclick="previewImage('${p.img}')" alt="${p.name}">
+        <h4>${p.name}</h4>
+        <div class="muted">${i18n[lang][p.category] || p.category}</div>
+        <div class="price">${formatPricePLN(p.price)}</div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="addToCart(${p.id}, this)">
+            ${i18n[lang].addToCart}
+          </button>
+          <button class="btn btn-outline ${favActive?'active':''}" onclick="toggleFavorite(${p.id})">
+            ${favActive ? '❤️' : '🤍'}
+          </button>
         </div>
-      </div>`;
+      </div>
+    `;
   });
-  totalBox.textContent = `${i18n[lang].total}: ${formatPricePLN(totalPLN)}`;
 }
+
 
 // Interactions
 function addToCart(id, btnEl){
@@ -330,10 +346,9 @@ function sortProducts(t){
 }
 
 function applyPriceFilter(skipRender){
-  const min = Number(priceMinEl.value)||0;
-  const max = Number(priceMaxEl.value)||Infinity;
-  const base = products;
-  filtered = base.filter(p=>p.price>=min && p.price<=max);
+  const min = Number(priceMinEl?.value)||0;
+  const max = Number(priceMaxEl?.value)||Infinity;
+  filtered = filtered.filter(p=>p.price>=min && p.price<=max);
   if(!skipRender) renderProducts();
 }
 
@@ -363,9 +378,19 @@ function backToAll(){
 
 // Sidebar toggle
 function toggleMenu(force){
-  const s=document.getElementById('sidebar');
-  force===false ? s.classList.remove('active') : s.classList.toggle('active');
+  const sidebar = document.getElementById('sidebar');
+  const btn = document.getElementById('menuBtn');
+
+  if(force === false){
+    sidebar.classList.remove('active');
+    btn.textContent = '☰';
+    return;
+  }
+
+  sidebar.classList.toggle('active');
+  btn.textContent = sidebar.classList.contains('active') ? '✕' : '☰';
 }
+
 
 // Header compact
 window.addEventListener('scroll',()=>{
@@ -384,7 +409,13 @@ function applyI18n(){
     const key = el.getAttribute('data-i18n');
     if(i18n[lang][key]) el.textContent = i18n[lang][key];
   });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key = el.dataset.i18nPlaceholder;
+    if(i18n[lang][key]) el.placeholder = i18n[lang][key];
+  });
 }
+
 function setLang(l){
   lang = l; localStorage.setItem('lang', l);
   document.getElementById('langSelect').value = lang;
