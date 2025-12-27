@@ -303,12 +303,12 @@ header.compact { height: 58px; }
   box-shadow: var(--shadow);
 }
 
-/* Баннер */
+/* Баннер для телефона */
 .promo-banner {
-  max-width: 1200px;
-  width: 100%;
-  height: 360px; /* фиксированная высота */
-  margin: 8px auto 8px; /* сверху 12px, снизу 8px */
+  width: 90%;                  /* чуть меньше ширины экрана */
+  max-width: 400px;            /* не слишком широкий */
+  aspect-ratio: 2480 / 964;    /* соотношение сторон исходной картинки */
+  margin: 16px auto;           /* одинаковый отступ сверху и снизу */
   overflow: hidden;
   border-radius: 16px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.15);
@@ -316,10 +316,11 @@ header.compact { height: 58px; }
 
 .promo-banner img {
   width: 100%;
-  height: 100%; /* подгоняем картинку под блок */
-  object-fit: cover; /* обрезаем края, сохраняем пропорции */
+  height: 100%;
+  object-fit: cover;           /* картинка заполняет блок, центрируется */
   display: block;
 }
+м
 
 
 .order-details { color: #ddd; font-size: 14px; margin: 8px 0; }
