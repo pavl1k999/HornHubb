@@ -153,7 +153,7 @@ const products = [
     id: 200+i,
     name: `Vazool – ${n}`,
     price: 50,
-    category: 'disposable',
+    category: 'liquid',
     img: `images/vazool/${n.replace(/[^a-zA-Z0-9]/g,'_')}.jpg`
   })),
 
