@@ -2,8 +2,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
 # Вставь сюда свой токен
-BOT_TOKEN = "ВАШ_ТОКЕН"
-MINI_APP_URL = "8558152282:AAEMe8XfKCRO7f8I1olp10uzyLzHeXltryU"
+BOT_TOKEN = "8558152282:AAEMe8XfKCRO7f8I1olp10uzyLzHeXltryU"
+MINI_APP_URL = "https://pavl1k999.github.io/HornHubb/"
 
 def start(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
@@ -37,5 +37,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
