@@ -124,7 +124,7 @@ const products = [
   ...[
     'Strawberry Cherry Lemon','Sour Watermelon Gummy','Pink Lemonade Soda',
     'Pineapple Colada','Lemon Lime','Blueberry Raspberry Pomegranate',
-    'Apple Pear','Strawberry Snow','Blackcurrant Aniseed','P&B Cloud','Grape Cherry'
+    'Apple Pear','Strawberry Snoow','Blackcurrant Aniseed','P&B Cloud','Grape Cherry'
   ].map((n,i)=>({
     id: i+1,
     name: `Elf Liq – ${n}`,
