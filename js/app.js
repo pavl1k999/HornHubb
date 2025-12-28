@@ -142,7 +142,7 @@ const products = [
     name: `Chaser – ${n}`,
     price: 50,
     category: 'liquid',
-    img: `images/chaser/${n.replace(/[^a-zA-Z0-9]/g,'_')}.jpg`
+    img: `images/chaser/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png`
   })),
 
   // Vazool
