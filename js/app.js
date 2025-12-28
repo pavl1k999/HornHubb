@@ -477,8 +477,6 @@ function checkout(){
   window.open(tgUrl, '_blank');
 }
 
-
-
 function closeOrderModal(){
   document.getElementById('orderModal').classList.add('hidden');
 }
