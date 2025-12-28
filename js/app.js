@@ -426,11 +426,6 @@ window.addEventListener('scroll',()=>{
     .classList.toggle('compact', window.scrollY>20);
 });
 
-// Image preview
-function previewImage(src){
-  window.open(src, '_blank');
-}
-
 // Language and currency
 function applyI18n(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{
