@@ -1,16 +1,25 @@
 const TelegramBot = require('node-telegram-bot-api');
 
-const TOKEN = '8558152282:AAEMe8XfKCRO7f8I1olp10uzyLzHeXltryU';
+// ВСТАВЬ СЮДА
+const BOT_TOKEN = '8558152282:AAEMe8XfKCRO7f8I1olp10uzyLzHeXltryU';
 const MINI_APP_URL = 'https://pavl1k999.github.io/HornHubb/'; // где лежит index.html
 
-const bot = new TelegramBot(TOKEN, { polling: true });
+const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
 bot.onText(/\/start/, (msg) => {
+  const chatId = msg.chat.id;
+
   bot.sendPhoto(
-    msg.chat.id,
-    'https://your-domain.com/images/banner.png',
+    chatId,
+    'https://pavl1k999.github.io/HornHubb/images/banner.png',
     {
-      caption: 'Добро пожаловать в HORN HUB 🔥\nОткройте магазин ниже',
+      caption:
+`👋 Добро пожаловать в Vape Shop
+
+🛒 Одноразки • Жидкости • Картриджи
+⚡ Заказ прямо в Telegram
+
+Нажмите кнопку ниже 👇`,
       reply_markup: {
         keyboard: [[
           {
@@ -23,4 +32,6 @@ bot.onText(/\/start/, (msg) => {
     }
   );
 });
+
+
 
