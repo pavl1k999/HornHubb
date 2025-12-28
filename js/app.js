@@ -128,7 +128,7 @@ const products = [
   ].map((n,i)=>({
     id: i+1,
     name: `Elf Liq – ${n}`,
-    price: 45,
+    price: 50,
     category: 'liquid',
     img: `images/elf/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png` // уникальная картинка по названию
   })),
@@ -140,7 +140,7 @@ const products = [
   ].map((n,i)=>({
     id: 100+i,
     name: `Chaser – ${n}`,
-    price: 45,
+    price: 50,
     category: 'liquid',
     img: `images/chaser/${n.replace(/[^a-zA-Z0-9]/g,'_')}.jpg`
   })),
@@ -152,7 +152,7 @@ const products = [
   ].map((n,i)=>({
     id: 200+i,
     name: `Vazool – ${n}`,
-    price: 60,
+    price: 50,
     category: 'disposable',
     img: `images/vazool/${n.replace(/[^a-zA-Z0-9]/g,'_')}.jpg`
   })),
