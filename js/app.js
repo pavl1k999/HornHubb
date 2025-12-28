@@ -154,11 +154,11 @@ const products = [
     name: `Vazool – ${n}`,
     price: 50,
     category: 'liquid',
-    img: `images/vazool/${n.replace(/[^a-zA-Z0-9]/g,'_')}.jpg`
+    img: `images/vazool/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png`
   })),
 
   // Cartridge
-  {id: 300, name:'Xros Cartridge 0.6Ω', price: 20, category: 'cartridge', img:'images/cart.jpg'}
+  {id: 300, name:'Xros Cartridge 0.6Ω', price: 20, category: 'cartridge', img:'images/cart/xros.png'}
 ];
 
 // State
