@@ -151,7 +151,7 @@ const products = [
     'Sour Apple Ice','Love 777','Mixed Berries','Purple Candy','Dragon Fruit Banana Cherry'
   ].map((n,i)=>({
     id: 200+i,
-    name: `Vazool – ${n}`,
+    name: `Vozol – ${n}`,
     price: 50,
     category: 'liquid',
     img: `images/vazool/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png`
