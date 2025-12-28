@@ -461,16 +461,22 @@ function checkout(){
   if(!cart.length) return alert(i18n[lang].emptyCart);
 
   const orderId = Date.now().toString().slice(-6);
-  let totalPLN = cart.reduce((s,p)=>s+p.price*p.qty,0);
-  const lines = cart.map(p=>`• ${p.name} × ${p.qty} — ${formatPricePLN(p.price*p.qty)}`);
+  let totalPLN = cart.reduce((s,p)=>s + p.price * p.qty, 0);
+
+  const lines = cart.map(p => `• ${p.name} × ${p.qty} — ${formatPricePLN(p.price * p.qty)}`);
   const header = `${i18n[lang].orderNumber}: ${orderId}\n${i18n[lang].consultant}: @${ADMIN_NICK}`;
   const totalLine = `${i18n[lang].total}: ${formatPricePLN(totalPLN)}`;
+
   const orderText = `${header}\n\n${lines.join('\n')}\n\n${totalLine}`;
 
-  // Открываем Telegram с текстом заказа
+  // Сохраняем текст заказа для копирования или модального окна
+  lastOrderText = orderText;
+
+  // Перенаправляем в Telegram с текстом заказа
   const tgUrl = `https://t.me/${ADMIN_NICK}?text=${encodeURIComponent(orderText)}`;
   window.open(tgUrl, '_blank');
 }
+
 
 
 function closeOrderModal(){
