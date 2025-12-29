@@ -140,7 +140,7 @@ const products = [
   ].map((n,i)=>({
     id: 100+i,
     name: `Chaser – ${n}`,
-    price: 50,
+    price: 60,
     category: 'liquid',
     img: `images/chaser/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png`
   })),
