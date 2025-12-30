@@ -123,10 +123,6 @@ const discounts = {
     old: 50,
     new: 35
   },
-  vozol: {
-    old: 50,
-    new: 35
-  },
   chaser: {
     old: 60,
     new: 45
