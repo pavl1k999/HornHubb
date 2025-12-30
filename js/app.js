@@ -169,7 +169,15 @@ const products = [
   })),
 
   // Cartridge
-  {id: 300, name:'Xros Cartridge 0.6Ω', price: discounts.cartridge.old, category: 'cartridge', img:'images/cart/xros.png'}
+  {
+  id: 300,
+  name: 'Xros Cartridge 0.6Ω',
+  brand: 'cartridge',
+  price: discounts.cartridge.old,
+  category: 'cartridge',
+  img: 'images/cart/xros.png'
+}
+
 ];
 
 // State
