@@ -119,19 +119,12 @@ const i18n = {
 let lang = localStorage.getItem('lang') || 'ru';
 
 const discounts = {
-  liquid: {
-    old: 50,
-    new: 35
-  },
-  chaser: {
-    old: 60,
-    new: 45
-  },
-  cartridge: {
-    old: 25,
-    new: 20
-  }
+  elf: { old: 50, new: 35 },
+  vozol: { old: 50, new: 35 },
+  chaser: { old: 60, new: 45 },
+  cartridge: { old: 25, new: 20 }
 };
+
 
 // Products (base prices in PLN)
 const products = [
@@ -143,7 +136,8 @@ const products = [
   ].map((n,i)=>({
     id: i+1,
     name: `Elf Liq – ${n}`,
-    price: discounts.liquid.old,
+    brand: 'elf',
+    price: discounts.elf.old,
     category: 'liquid',
     img: `images/elf/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png` // уникальная картинка по названию
   })),
@@ -155,6 +149,7 @@ const products = [
   ].map((n,i)=>({
     id: 100+i,
     name: `Chaser – ${n}`,
+    brand: 'chaser',
     price: discounts.chaser.old,
     category: 'liquid',
     img: `images/chaser/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png`
@@ -167,7 +162,8 @@ const products = [
   ].map((n,i)=>({
     id: 200+i,
     name: `Vozol – ${n}`,
-    price: discounts.liquid.old,
+    brand: 'vozol',
+    price: discounts.vozol.old,
     category: 'liquid',
     img: `images/vazool/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png`
   })),
@@ -260,7 +256,7 @@ function renderProducts(list = filtered){
   items.forEach(p=>{
     const favActive = favorites.includes(p.id);
 
-    const discount = discounts[p.category];
+    const discount = discounts[p.brand];
     const newPrice = discount ? discount.new : p.price;
 
     productList.innerHTML += `
@@ -321,7 +317,7 @@ function renderCart(){
 // Interactions
 function addToCart(id, btnEl){
   const base = products.find(p=>p.id===id);
-  const discount = discounts[base.category];
+  const discount = discounts[base.brand];
   const finalPrice = discount ? discount.new : base.price;
 
   const exist = cart.find(p=>p.id===id);
