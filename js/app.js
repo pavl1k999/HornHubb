@@ -118,6 +118,25 @@ const i18n = {
 };
 let lang = localStorage.getItem('lang') || 'ru';
 
+const discounts = {
+  liquid: {
+    old: 50,
+    new: 35
+  },
+  vozol: {
+    old: 50,
+    new: 35
+  },
+  chaser: {
+    old: 60,
+    new: 45
+  },
+  cartridge: {
+    old: 25,
+    new: 20
+  }
+};
+
 // Products (base prices in PLN)
 const products = [
   // Elf Liq
@@ -128,7 +147,7 @@ const products = [
   ].map((n,i)=>({
     id: i+1,
     name: `Elf Liq – ${n}`,
-    price: 50,
+    price: discounts.liquid.old,
     category: 'liquid',
     img: `images/elf/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png` // уникальная картинка по названию
   })),
@@ -140,7 +159,7 @@ const products = [
   ].map((n,i)=>({
     id: 100+i,
     name: `Chaser – ${n}`,
-    price: 60,
+    price: discounts.liquid.old,
     category: 'liquid',
     img: `images/chaser/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png`
   })),
@@ -152,13 +171,13 @@ const products = [
   ].map((n,i)=>({
     id: 200+i,
     name: `Vozol – ${n}`,
-    price: 50,
+    price: discounts.liquid.old,
     category: 'liquid',
     img: `images/vazool/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png`
   })),
 
   // Cartridge
-  {id: 300, name:'Xros Cartridge 0.6Ω', price: 20, category: 'cartridge', img:'images/cart/xros.png'}
+  {id: 300, name:'Xros Cartridge 0.6Ω', price: discounts.cartridge.old, category: 'cartridge', img:'images/cart/xros.png'}
 ];
 
 // State
@@ -245,11 +264,16 @@ function renderProducts(list = filtered){
   items.forEach(p=>{
     const favActive = favorites.includes(p.id);
     productList.innerHTML += `
+    const discount = discounts[p.category];
+    const newPrice = discount ? discount.new : p.price;
       <div class="product">
         <img src="${p.img}" onclick="previewImage('${p.img}')" alt="${p.name}">
         <h4>${p.name}</h4>
         <div class="muted">${i18n[lang][p.category] || p.category}</div>
-        <div class="price">${formatPricePLN(p.price)}</div>
+        <div class="price-box">
+          <span class="old-price">${formatPricePLN(p.price)}</span>
+          <span class="new-price">${formatPricePLN(newPrice)}</span>
+        </div>
         <div class="actions">
           <button class="btn btn-primary" onclick="addToCart(${p.id}, this)">
             ${i18n[lang].addToCart}
@@ -296,16 +320,22 @@ function renderCart(){
 // Interactions
 function addToCart(id, btnEl){
   const base = products.find(p=>p.id===id);
+  const discount = discounts[base.category];
+  const finalPrice = discount ? discount.new : base.price;
+
   const exist = cart.find(p=>p.id===id);
   if(exist){ exist.qty++; }
-  else { cart.push({...base, qty:1}); }
+  else { cart.push({...base, price: finalPrice, qty:1}); }
+
   updateCartCount();
   saveCart();
   showToast('addedToCart');
+
   const card = btnEl?.closest('.product');
   const img = card?.querySelector('img');
   if(img) flyToCart(img);
 }
+
 
 function removeFromCart(i){
   cart.splice(i,1);
