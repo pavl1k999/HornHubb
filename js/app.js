@@ -263,22 +263,26 @@ function renderProducts(list = filtered){
 
   items.forEach(p=>{
     const favActive = favorites.includes(p.id);
-    productList.innerHTML += `
+
     const discount = discounts[p.category];
     const newPrice = discount ? discount.new : p.price;
+
+    productList.innerHTML += `
       <div class="product">
         <img src="${p.img}" onclick="previewImage('${p.img}')" alt="${p.name}">
         <h4>${p.name}</h4>
         <div class="muted">${i18n[lang][p.category] || p.category}</div>
+
         <div class="price-box">
-          <span class="old-price">${formatPricePLN(p.price)}</span>
+          ${discount ? `<span class="old-price">${formatPricePLN(p.price)}</span>` : ''}
           <span class="new-price">${formatPricePLN(newPrice)}</span>
         </div>
+
         <div class="actions">
           <button class="btn btn-primary" onclick="addToCart(${p.id}, this)">
             ${i18n[lang].addToCart}
           </button>
-          <button class="btn btn-outline ${favActive?'active':''}" onclick="toggleFavorite(${p.id})">
+          <button class="btn btn-outline ${favActive ? 'active' : ''}" onclick="toggleFavorite(${p.id})">
             ${favActive ? '❤️' : '🤍'}
           </button>
         </div>
@@ -286,6 +290,7 @@ function renderProducts(list = filtered){
     `;
   });
 }
+
 
 function renderCart(){
   const box=document.getElementById('cartItems');
