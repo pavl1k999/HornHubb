@@ -566,6 +566,21 @@ function sendOrderTelegram(){
   window.open(ADMIN_URL, '_blank');
 }
 
+function toggleLiquids(){
+  const btn = document.querySelector('.accordion-btn');
+  const menu = document.getElementById('liquidSubmenu');
+
+  const open = menu.classList.toggle('hidden') === false;
+  btn.classList.toggle('open', open);
+
+  if(open){
+    currentBrand = 'all';
+    filtered = products.filter(p => p.category === 'liquid');
+    renderProducts();
+  }
+}
+
+
 // Init
 window.addEventListener('click', (e)=>{
   if(!document.querySelector('.search-box')?.contains(e.target)){
