@@ -215,23 +215,33 @@ header.compact { height: 58px; }
 .hidden { display: none !important; }
 .cart-page { padding: 88px 12px 16px; }
 .back-btn {
-  color: var(--primary);
-  margin-bottom: 8px;
-  cursor: pointer;
-}
-.cart-item{
-  display: flex;
-  justify-content: space-between;
+  display: inline-flex;
   align-items: center;
-  padding: 12px;
-  border-radius: 18px;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.06),
-    rgba(255,255,255,0.02)
-  );
-  margin-bottom: 10px;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
+.back-btn:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateX(-2px);
+}
+
+.cart-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.03);
+  margin-bottom: 12px;
+}
+
 .cart-item img {
   width: 64px; height: 64px; border-radius: 12px; object-fit: cover;
 }
@@ -250,18 +260,36 @@ header.compact { height: 58px; }
   gap: 6px;
 }
 
-.qty-controls button{
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+.qty-controls button {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   font-size: 16px;
-  background: rgba(139,92,246,0.2);
+  background: var(--bg-1);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--txt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.qty-controls button:hover {
+  background: rgba(255,255,255,0.06);
 }
 
 .remove-btn {
-  background: none; border: none; color: var(--danger);
-  cursor: pointer; margin-left: 8px;
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: opacity 0.2s ease;
 }
+.remove-btn:hover { opacity: 0.85; }
+
 .cart-total{
   margin-top: 14px;
   padding: 14px;
