@@ -37,14 +37,16 @@
 <div class="sidebar" id="sidebar">
   <div class="sidebar-title" data-i18n="categories">Категории</div>
   <button onclick="filterCategory('all')" data-i18n="allProducts">Все товары</button>
-  <button onclick="filterCategory('liquid')" data-i18n="liquids">Жидкости</button>
-  <div id="brandFilter" class="brand-filter hidden">
-    <div class="sidebar-title">Бренд</div>
-      <button onclick="filterBrand('all', this)" class="active">Все</button>
-      <button onclick="filterBrand('elf', this)">Elf Liq</button>
-      <button onclick="filterBrand('chaser', this)">Chaser</button>
-      <button onclick="filterBrand('vozol', this)">Vozol</button>
-    </div>
+  <button class="accordion-btn" onclick="toggleLiquids()">
+    <span>Жидкости</span>
+    <span class="chevron">›</span>
+  </button>
+  <div id="liquidSubmenu" class="submenu hidden">
+    <button onclick="filterBrand('all', this)" class="active">Все</button>
+    <button onclick="filterBrand('elf', this)">Elf Liq</button>
+    <button onclick="filterBrand('chaser', this)">Chaser</button>
+    <button onclick="filterBrand('vozol', this)">Vozol</button>
+  </div>
   <button onclick="filterCategory('disposable')" data-i18n="disposable">Одноразки</button>
   <button onclick="filterCategory('cartridge')" data-i18n="cartridges">Картриджи</button>
   <div class="divider"></div>
