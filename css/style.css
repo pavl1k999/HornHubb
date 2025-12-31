@@ -212,23 +212,23 @@ header.compact { height: 58px; }
 }
 
 /* Cart page */
-.hidden { display: none !important; }
+/* Cart page */
 .cart-page {
-  padding: 120px 16px 24px; /* сверху увеличено для кнопки назад */
+  padding: 120px 20px 24px; /* сверху больше места под хедер */
   display: flex;
   flex-direction: column;
-  gap: 20px; /* расстояние между кнопкой назад и карточками */
+  gap: 24px; /* расстояние между кнопкой Назад и карточками */
 }
 
 .back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
+  gap: 8px;
+  padding: 10px 16px;
   background: rgba(255,255,255,0.05);
-  border-radius: 12px;
+  border-radius: 14px;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--primary);
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
@@ -237,20 +237,23 @@ header.compact { height: 58px; }
   background: rgba(255,255,255,0.1);
   transform: translateX(-2px);
 }
+
+/* Cart items */
 .cart-item {
   display: flex;
   align-items: center;
-  gap: 18px; /* больше воздуха между фото, текстом и контролами */
-  padding: 16px 18px; /* увеличено внутреннее пространство */
+  gap: 20px;
+  padding: 18px 20px;
   border-radius: 18px;
   background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-  margin-bottom: 18px; /* расстояние между карточками */
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
 }
 
 .cart-item img {
-  width: 75px;  /* увеличенное фото */
-  height: 75px;
-  border-radius: 12px;
+  width: 80px;
+  height: 80px;
+  border-radius: 14px;
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -259,24 +262,30 @@ header.compact { height: 58px; }
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px; /* чуть больше расстояния между названием и ценой */
-  flex: 1; 
+  gap: 8px;
+  flex: 1; /* занимает оставшееся место */
 }
 
-.cart-item-name { font-weight: 500; font-size: 16px; }
-.cart-item-price { font-size: 14px; opacity: 0.85; }
+.cart-item-name {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.2;
+}
 
-.cart-item .line { color: var(--muted); margin-bottom: 6px; font-size: 13px; }
+.cart-item-price {
+  font-size: 15px;
+  opacity: 0.85;
+}
 
+/* Quantity controls */
 .qty-controls {
   display: flex;
   align-items: center;
-  gap: 10px; /* больше промежутка между +/- и кнопкой удалить */
+  gap: 10px;
 }
 
-
 .qty-controls button {
-  width: 38px;   
+  width: 38px;
   height: 38px;
   border-radius: 12px;
   font-size: 16px;
@@ -285,24 +294,69 @@ header.compact { height: 58px; }
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: background 0.2s;
 }
-.qty-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px; /* увеличиваем промежуток между кнопками */
+
+.qty-controls button:hover {
+  background: rgba(139,92,246,0.35);
 }
+
+/* Remove button */
 .remove-btn {
   background: var(--danger);
   color: #fff;
   border: none;
-  border-radius: 12px;
-  padding: 6px 18px; /* ширина под полное слово "Удалить" */
+  border-radius: 14px;
+  padding: 8px 18px; /* под слово "Удалить" */
   cursor: pointer;
-  font-size: 13px;
-  margin-left: 12px; /* увеличено расстояние от qty-controls */
+  font-size: 14px;
+  margin-left: 16px;
+  white-space: nowrap;
   transition: opacity 0.2s ease;
 }
 .remove-btn:hover { opacity: 0.85; }
+
+/* Cart total & checkout */
+.cart-total {
+  margin-top: 20px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: rgba(139,92,246,0.15);
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checkout-btn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 14px;
+  background: linear-gradient(135deg,var(--accent),var(--accent-2));
+  border: none;
+  border-radius: 18px;
+  font-size: 16px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+.checkout-btn:hover { opacity: 0.92; }
+
+.admin-btn {
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+  padding: 14px;
+  background: var(--telegram);
+  color: #fff;
+  border-radius: 18px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+.admin-btn:hover { opacity: 0.92; }
 
 .cart-total{
   margin-top: 14px;
