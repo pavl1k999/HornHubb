@@ -234,25 +234,25 @@ header.compact { height: 58px; }
 
 .cart-item {
   display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 14px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.03);
-  margin-bottom: 12px;
+  align-items: center; /* было justify-content: space-between, лучше center */
+  gap: 12px;           /* добавляем ровные промежутки между элементами */
+  padding: 10px 14px;  /* чуть уменьшить, чтобы не слишком «воздушно» */
+  border-radius: 16px; /* чуть меньше, чтобы визуально компактнее */
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  margin-bottom: 12px; /* ровные отступы между элементами */
 }
 
 .cart-item img {
-  width: 64px; height: 64px; border-radius: 12px; object-fit: cover;
+  width: 60px;           /* чуть меньше для гармонии */
+  height: 60px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;        /* картинка не сжимается */
 }
-.cart-item-name{
-  font-weight: 500;
-  font-size: 15px;
-}
-.cart-item-price{
-  font-size: 13px;
-  opacity: 0.8;
-}
+
+.cart-item-name { font-weight: 500; font-size: 15px; }
+.cart-item-price { font-size: 13px; opacity: 0.8; }
+
 .cart-item .line { color: var(--muted); margin-bottom: 6px; font-size: 13px; }
 .qty-controls{
   display: flex;
@@ -263,20 +263,16 @@ header.compact { height: 58px; }
 .qty-controls button {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
   font-size: 16px;
-  background: var(--bg-1);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: var(--txt);
+  border-radius: 8px;              /* меньше скругление */
+  background: rgba(139,92,246,0.25); /* чуть ярче, чтобы было видно */
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
-.qty-controls button:hover {
-  background: rgba(255,255,255,0.06);
-}
+.qty-controls { gap: 6px; }
+
 
 .remove-btn {
   background: var(--danger);
