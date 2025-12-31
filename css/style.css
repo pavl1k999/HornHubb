@@ -214,10 +214,10 @@ header.compact { height: 58px; }
 /* Cart page */
 .hidden { display: none !important; }
 .cart-page {
-  padding: 100px 16px 24px; /* сверху больше, слева/справа чуть больше, снизу стандарт */
+  padding: 120px 16px 24px; /* сверху увеличено для кнопки назад */
   display: flex;
   flex-direction: column;
-  gap: 16px; /* расстояние между кнопкой назад и карточками */
+  gap: 20px; /* расстояние между кнопкой назад и карточками */
 }
 
 .back-btn {
@@ -237,20 +237,19 @@ header.compact { height: 58px; }
   background: rgba(255,255,255,0.1);
   transform: translateX(-2px);
 }
-
 .cart-item {
   display: flex;
   align-items: center;
-  gap: 16px; /* увеличиваем расстояние между фото, текстом и контролами */
-  padding: 14px 16px; /* чуть больше, чтобы "воздуха" внутри */
-  border-radius: 16px;
+  gap: 18px; /* больше воздуха между фото, текстом и контролами */
+  padding: 16px 18px; /* увеличено внутреннее пространство */
+  border-radius: 18px;
   background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-  margin-bottom: 16px; /* расстояние между карточками */
+  margin-bottom: 18px; /* расстояние между карточками */
 }
 
 .cart-item img {
-  width: 70px;  /* чуть больше фото */
-  height: 70px;
+  width: 75px;  /* увеличенное фото */
+  height: 75px;
   border-radius: 12px;
   object-fit: cover;
   flex-shrink: 0;
@@ -260,8 +259,8 @@ header.compact { height: 58px; }
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 6px;
-  flex: 1; /* занимает оставшееся место */
+  gap: 8px; /* чуть больше расстояния между названием и ценой */
+  flex: 1; 
 }
 
 .cart-item-name { font-weight: 500; font-size: 16px; }
@@ -272,14 +271,14 @@ header.compact { height: 58px; }
 .qty-controls {
   display: flex;
   align-items: center;
-  gap: 8px; /* увеличиваем промежуток между кнопками */
+  gap: 10px; /* больше промежутка между +/- и кнопкой удалить */
 }
 
 
 .qty-controls button {
-  width: 36px;   /* чуть больше кнопки */
-  height: 36px;
-  border-radius: 10px;
+  width: 38px;   
+  height: 38px;
+  border-radius: 12px;
   font-size: 16px;
   background: rgba(139,92,246,0.25);
   display: flex;
@@ -297,10 +296,10 @@ header.compact { height: 58px; }
   color: #fff;
   border: none;
   border-radius: 12px;
-  padding: 6px 14px; /* увеличиваем ширину под слово "Удалить" */
+  padding: 6px 18px; /* ширина под полное слово "Удалить" */
   cursor: pointer;
   font-size: 13px;
-  margin-left: 8px; /* увеличиваем расстояние от qty-controls */
+  margin-left: 12px; /* увеличено расстояние от qty-controls */
   transition: opacity 0.2s ease;
 }
 .remove-btn:hover { opacity: 0.85; }
