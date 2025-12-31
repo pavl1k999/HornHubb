@@ -354,6 +354,13 @@ header.compact { height: 58px; }
   text-shadow: 0 0 6px rgba(34,197,94,0.25);
 }
 
+body.menu-open #mainPage,
+body.menu-open header{
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+
 .menu-btn{
   font-size: 22px;
   cursor: pointer;
