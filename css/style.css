@@ -456,6 +456,31 @@ body.menu-open .menu-btn{
   display: none;
 }
 
+.sidebar-close{
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.06);
+  transition: background .2s ease, transform .1s ease;
+}
+
+.sidebar-close:hover{
+  background: rgba(255,255,255,0.12);
+}
+
+.sidebar-close:active{
+  transform: scale(0.96);
+}
+
+
 .order-details { color: #ddd; font-size: 14px; margin: 8px 0; }
 .order-details ul { margin: 6px 0 0 16px; }
 .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
