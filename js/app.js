@@ -386,13 +386,13 @@ function filterCategory(cat){
   renderProducts();
 }
 
-function filterBrand(brand){
+function filterBrand(brand, btn){
   currentBrand = brand;
 
   document.querySelectorAll('.brand-filter button')
     .forEach(b => b.classList.remove('active'));
 
-  event.target.classList.add('active');
+  btn.classList.add('active');
 
   if(brand === 'all'){
     filtered = products.filter(p => p.category === 'liquid');
@@ -404,7 +404,6 @@ function filterBrand(brand){
 
   renderProducts();
 }
-
 
 function searchProducts(q){
   backAllBtn.classList.add('hidden');
