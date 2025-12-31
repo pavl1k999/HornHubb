@@ -10,6 +10,7 @@ const currencyRates = {
 };
 const currencySymbols = { PLN: 'zł', EUR: '€', UAH: '₴' };
 let currency = localStorage.getItem('currency') || 'PLN';
+let currentBrand = 'all';
 
 // I18n dictionary
 const i18n = {
@@ -368,13 +369,42 @@ function closeCart(){
 // Filtering & search
 function filterCategory(cat){
   toggleMenu(false);
-  backAllBtn.classList.add('hidden');
   showingFavorites = false;
-  if(cat==='all'){ filtered = [...products]; }
-  else { filtered = products.filter(p=>p.category===cat); }
-  applyPriceFilter(true);
+  backAllBtn.classList.add('hidden');
+
+  document.getElementById('brandFilter')
+    .classList.toggle('hidden', cat !== 'liquid');
+
+  currentBrand = 'all';
+
+  if(cat === 'all'){
+    filtered = [...products];
+  } else {
+    filtered = products.filter(p => p.category === cat);
+  }
+
   renderProducts();
 }
+
+function filterBrand(brand){
+  currentBrand = brand;
+
+  document.querySelectorAll('.brand-filter button')
+    .forEach(b => b.classList.remove('active'));
+
+  event.target.classList.add('active');
+
+  if(brand === 'all'){
+    filtered = products.filter(p => p.category === 'liquid');
+  } else {
+    filtered = products.filter(
+      p => p.category === 'liquid' && p.brand === brand
+    );
+  }
+
+  renderProducts();
+}
+
 
 function searchProducts(q){
   backAllBtn.classList.add('hidden');
