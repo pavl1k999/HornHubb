@@ -395,7 +395,40 @@ body.menu-open .menu-btn{
   background: rgba(139,92,246,0.18);
 }
 
+.accordion-btn{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
+.accordion-btn .chevron{
+  font-size: 20px;
+  transition: transform 0.25s ease;
+  opacity: 0.7;
+}
+
+/* раскрыто */
+.accordion-btn.open .chevron{
+  transform: rotate(90deg);
+}
+
+.submenu{
+  margin-left: 10px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.submenu button{
+  font-size: 14px;
+  opacity: 0.9;
+  background: rgba(255,255,255,0.04);
+}
+
+.submenu.hidden{
+  display: none;
+}
 
 .order-details { color: #ddd; font-size: 14px; margin: 8px 0; }
 .order-details ul { margin: 6px 0 0 16px; }
