@@ -443,17 +443,22 @@ function backToAll(){
 function toggleMenu(force){
   const sidebar = document.getElementById('sidebar');
   const btn = document.getElementById('menuBtn');
+  const overlay = document.getElementById('overlay');
 
   if(force === false){
     sidebar.classList.remove('active');
+    overlay.classList.add('hidden');
     btn.textContent = '☰';
     return;
   }
 
-  sidebar.classList.toggle('active');
-  btn.textContent = sidebar.classList.contains('active') ? '✕' : '☰';
+  const open = sidebar.classList.toggle('active');
+  overlay.classList.toggle('hidden', !open);
+  btn.textContent = open ? '✕' : '☰';
 }
-
+document.getElementById('overlay').addEventListener('click', ()=>{
+  toggleMenu(false);
+});
 
 // Header compact
 window.addEventListener('scroll',()=>{
