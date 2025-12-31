@@ -387,7 +387,8 @@ function filterCategory(cat){
 function filterBrand(brand, btn){
   currentBrand = brand;
 
-  document.querySelectorAll('.brand-filter button')
+  // ✅ ПРАВИЛЬНЫЙ селектор
+  document.querySelectorAll('#liquidSubmenu button')
     .forEach(b => b.classList.remove('active'));
 
   btn.classList.add('active');
@@ -398,9 +399,9 @@ function filterBrand(brand, btn){
 
   renderProducts();
 
-  // ⬅️ ЗАКРЫВАЕМ МЕНЮ
-  toggleMenu(false);
+  toggleMenu(false); // ← теперь ДОХОДИТ
 }
+
 
 
 function searchProducts(q){
