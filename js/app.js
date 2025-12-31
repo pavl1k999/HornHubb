@@ -477,16 +477,15 @@ function toggleMenu(force){
     sidebar.classList.remove('active');
     overlay.classList.add('hidden');
     document.body.classList.remove('menu-open');
-    btn.textContent = '☰';
+    btn.textContent = '☰'; // ← ВСЕГДА ☰
     return;
   }
 
   const open = sidebar.classList.toggle('active');
   overlay.classList.toggle('hidden', !open);
   document.body.classList.toggle('menu-open', open);
-  btn.textContent = open ? '✕' : '☰';
+  btn.textContent = '☰'; // ← НИКОГДА не ✕
 }
-
 
 // Header compact
 window.addEventListener('scroll',()=>{
