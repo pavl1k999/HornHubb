@@ -354,31 +354,22 @@ header.compact { height: 58px; }
   text-shadow: 0 0 6px rgba(34,197,94,0.25);
 }
 
-body.menu-open #mainPage,
-body.menu-open header{
+body.menu-open #mainPage{
   filter: blur(6px);
   pointer-events: none;
 }
 
+header{
+  z-index: 400;
+}
 
 .menu-btn{
-  font-size: 22px;
-  cursor: pointer;
-  z-index: 500;
+  position: relative;
+  z-index: 600;
 }
 
 /* крестик при открытом меню */
 body.menu-open .menu-btn{
-  position: fixed;
-  right: 14px;
-  top: 14px;
-  background: rgba(20,20,25,0.95);
-  border-radius: 12px;
-  padding: 8px 12px;
-}
-
-/* когда меню открыто */
-.sidebar.active ~ header .menu-btn{
   position: fixed;
   right: 14px;
   top: 14px;
