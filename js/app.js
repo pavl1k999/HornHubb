@@ -10,7 +10,6 @@ const currencyRates = {
 };
 const currencySymbols = { PLN: 'zł', EUR: '€', UAH: '₴' };
 let currency = localStorage.getItem('currency') || 'PLN';
-let currentBrand = 'all';
 
 // I18n dictionary
 const i18n = {
@@ -368,41 +367,14 @@ function closeCart(){
 
 // Filtering & search
 function filterCategory(cat){
-  showingFavorites = false;
+  toggleMenu(false);
   backAllBtn.classList.add('hidden');
-
-  // закрываем accordion жидкостей
-  document.getElementById('liquidSubmenu')?.classList.add('hidden');
-  document.querySelector('.accordion-btn')?.classList.remove('open');
-
-  filtered = cat === 'all'
-    ? [...products]
-    : products.filter(p => p.category === cat);
-
+  showingFavorites = false;
+  if(cat==='all'){ filtered = [...products]; }
+  else { filtered = products.filter(p=>p.category===cat); }
+  applyPriceFilter(true);
   renderProducts();
-
-  toggleMenu(false); // ← ЗАКРЫВАЕМ МЕНЮ ВСЕГДА
 }
-
-function filterBrand(brand, btn){
-  currentBrand = brand;
-
-  // ✅ ПРАВИЛЬНЫЙ селектор
-  document.querySelectorAll('#liquidSubmenu button')
-    .forEach(b => b.classList.remove('active'));
-
-  btn.classList.add('active');
-
-  filtered = brand === 'all'
-    ? products.filter(p => p.category === 'liquid')
-    : products.filter(p => p.category === 'liquid' && p.brand === brand);
-
-  renderProducts();
-
-  toggleMenu(false); // ← теперь ДОХОДИТ
-}
-
-
 
 function searchProducts(q){
   backAllBtn.classList.add('hidden');
@@ -470,22 +442,18 @@ function backToAll(){
 // Sidebar toggle
 function toggleMenu(force){
   const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('overlay');
   const btn = document.getElementById('menuBtn');
 
   if(force === false){
     sidebar.classList.remove('active');
-    overlay.classList.add('hidden');
-    document.body.classList.remove('menu-open');
-    btn.textContent = '☰'; // ← ВСЕГДА ☰
+    btn.textContent = '☰';
     return;
   }
 
-  const open = sidebar.classList.toggle('active');
-  overlay.classList.toggle('hidden', !open);
-  document.body.classList.toggle('menu-open', open);
-  btn.textContent = '☰'; // ← НИКОГДА не ✕
+  sidebar.classList.toggle('active');
+  btn.textContent = sidebar.classList.contains('active') ? '✕' : '☰';
 }
+
 
 // Header compact
 window.addEventListener('scroll',()=>{
@@ -557,21 +525,6 @@ function sendOrderTelegram(){
   window.open(ADMIN_URL, '_blank');
 }
 
-function toggleLiquids(){
-  const btn = document.querySelector('.accordion-btn');
-  const menu = document.getElementById('liquidSubmenu');
-
-  const open = menu.classList.toggle('hidden') === false;
-  btn.classList.toggle('open', open);
-
-  if(open){
-    currentBrand = 'all';
-    filtered = products.filter(p => p.category === 'liquid');
-    renderProducts();
-  }
-}
-
-
 // Init
 window.addEventListener('click', (e)=>{
   if(!document.querySelector('.search-box')?.contains(e.target)){
@@ -588,4 +541,5 @@ window.addEventListener('load', ()=>{
   renderProducts();
   updateCartCount();
 });
+
 
