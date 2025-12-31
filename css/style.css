@@ -375,6 +375,15 @@ header.compact { height: 58px; }
 }
 .overlay.hidden{ display:none; }
 
+.brand-filter button{
+  font-size: 15px;
+  opacity: 0.9;
+}
+.brand-filter button.active{
+  background: rgba(139,92,246,0.18);
+}
+
+
 
 .order-details { color: #ddd; font-size: 14px; margin: 8px 0; }
 .order-details ul { margin: 6px 0 0 16px; }
