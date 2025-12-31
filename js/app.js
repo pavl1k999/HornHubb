@@ -371,27 +371,18 @@ function filterCategory(cat){
   showingFavorites = false;
   backAllBtn.classList.add('hidden');
 
-  const brandBox = document.getElementById('brandFilter');
+  // закрываем accordion жидкостей
+  document.getElementById('liquidSubmenu')?.classList.add('hidden');
+  document.querySelector('.accordion-btn')?.classList.remove('open');
 
-  if(cat === 'liquid'){
-    // ЖИДКОСТИ — меню НЕ закрываем
-    brandBox.classList.remove('hidden');
-    currentBrand = 'all';
-    filtered = products.filter(p => p.category === 'liquid');
-  } 
-  else {
-    // ВСЕ ОСТАЛЬНЫЕ — меню закрываем
-    brandBox.classList.add('hidden');
-    filtered = cat === 'all'
-      ? [...products]
-      : products.filter(p => p.category === cat);
-
-    toggleMenu(false); // ← ВОТ ЭТОГО НЕ ХВАТАЛО
-  }
+  filtered = cat === 'all'
+    ? [...products]
+    : products.filter(p => p.category === cat);
 
   renderProducts();
-}
 
+  toggleMenu(false); // ← ЗАКРЫВАЕМ МЕНЮ ВСЕГДА
+}
 
 function filterBrand(brand, btn){
   currentBrand = brand;
