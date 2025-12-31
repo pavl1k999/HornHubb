@@ -212,33 +212,6 @@ header.compact { height: 58px; }
 }
 
 /* Cart page */
-/* Cart page */
-.cart-page {
-  padding: 120px 20px 24px; /* сверху больше места под хедер */
-  display: flex;
-  flex-direction: column;
-  gap: 24px; /* расстояние между кнопкой Назад и карточками */
-}
-
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 14px;
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--primary);
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-.back-btn:hover {
-  background: rgba(255,255,255,0.1);
-  transform: translateX(-2px);
-}
-
-/* Cart items */
 .hidden { display: none !important; }
 .cart-page { padding: 88px 12px 16px; }
 .back-btn {
