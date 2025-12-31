@@ -364,7 +364,17 @@ body.menu-open header{
 .menu-btn{
   font-size: 22px;
   cursor: pointer;
-  z-index: 400;
+  z-index: 500;
+}
+
+/* крестик при открытом меню */
+body.menu-open .menu-btn{
+  position: fixed;
+  right: 14px;
+  top: 14px;
+  background: rgba(20,20,25,0.95);
+  border-radius: 12px;
+  padding: 8px 12px;
 }
 
 /* когда меню открыто */
