@@ -354,6 +354,28 @@ header.compact { height: 58px; }
   text-shadow: 0 0 6px rgba(34,197,94,0.25);
 }
 
+.menu-btn{
+  position: relative;
+  z-index: 300;
+}
+
+/* Когда сайдбар открыт — кнопка справа */
+.sidebar.active ~ header .menu-btn{
+  position: fixed;
+  right: 14px;
+  top: 18px;
+}
+
+.overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+  z-index: 150;
+}
+.overlay.hidden{ display:none; }
+
+
 .order-details { color: #ddd; font-size: 14px; margin: 8px 0; }
 .order-details ul { margin: 6px 0 0 16px; }
 .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
