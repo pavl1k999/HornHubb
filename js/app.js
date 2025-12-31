@@ -397,16 +397,16 @@ function filterBrand(brand, btn){
 
   btn.classList.add('active');
 
-  if(brand === 'all'){
-    filtered = products.filter(p => p.category === 'liquid');
-  } else {
-    filtered = products.filter(
-      p => p.category === 'liquid' && p.brand === brand
-    );
-  }
+  filtered = brand === 'all'
+    ? products.filter(p => p.category === 'liquid')
+    : products.filter(p => p.category === 'liquid' && p.brand === brand);
 
   renderProducts();
+
+  // ⬅️ ЗАКРЫВАЕМ МЕНЮ
+  toggleMenu(false);
 }
+
 
 function searchProducts(q){
   backAllBtn.classList.add('hidden');
