@@ -38,6 +38,13 @@
   <div class="sidebar-title" data-i18n="categories">Категории</div>
   <button onclick="filterCategory('all')" data-i18n="allProducts">Все товары</button>
   <button onclick="filterCategory('liquid')" data-i18n="liquids">Жидкости</button>
+  <div id="brandFilter" class="brand-filter hidden">
+    <div class="sidebar-title">Бренд</div>
+      <button onclick="filterBrand('all')">Все</button>
+      <button onclick="filterBrand('elf')">Elf Liq</button>
+      <button onclick="filterBrand('chaser')">Chaser</button>
+      <button onclick="filterBrand('vozol')">Vozol</button>
+    </div>
   <button onclick="filterCategory('disposable')" data-i18n="disposable">Одноразки</button>
   <button onclick="filterCategory('cartridge')" data-i18n="cartridges">Картриджи</button>
   <button onclick="showFavorites()" data-i18n="favorites">Избранное ❤️</button>
