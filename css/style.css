@@ -213,7 +213,13 @@ header.compact { height: 58px; }
 
 /* Cart page */
 .hidden { display: none !important; }
-.cart-page { padding: 88px 12px 16px; }
+.cart-page {
+  padding: 100px 16px 24px; /* сверху больше, слева/справа чуть больше, снизу стандарт */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* расстояние между кнопкой назад и карточками */
+}
+
 .back-btn {
   display: inline-flex;
   align-items: center;
@@ -234,54 +240,67 @@ header.compact { height: 58px; }
 
 .cart-item {
   display: flex;
-  align-items: center; /* было justify-content: space-between, лучше center */
-  gap: 12px;           /* добавляем ровные промежутки между элементами */
-  padding: 10px 14px;  /* чуть уменьшить, чтобы не слишком «воздушно» */
-  border-radius: 16px; /* чуть меньше, чтобы визуально компактнее */
+  align-items: center;
+  gap: 16px; /* увеличиваем расстояние между фото, текстом и контролами */
+  padding: 14px 16px; /* чуть больше, чтобы "воздуха" внутри */
+  border-radius: 16px;
   background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-  margin-bottom: 12px; /* ровные отступы между элементами */
+  margin-bottom: 16px; /* расстояние между карточками */
 }
 
 .cart-item img {
-  width: 60px;           /* чуть меньше для гармонии */
-  height: 60px;
+  width: 70px;  /* чуть больше фото */
+  height: 70px;
   border-radius: 12px;
   object-fit: cover;
-  flex-shrink: 0;        /* картинка не сжимается */
+  flex-shrink: 0;
 }
 
-.cart-item-name { font-weight: 500; font-size: 15px; }
-.cart-item-price { font-size: 13px; opacity: 0.8; }
+.cart-item-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  flex: 1; /* занимает оставшееся место */
+}
+
+.cart-item-name { font-weight: 500; font-size: 16px; }
+.cart-item-price { font-size: 14px; opacity: 0.85; }
 
 .cart-item .line { color: var(--muted); margin-bottom: 6px; font-size: 13px; }
-.qty-controls{
+
+.qty-controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px; /* увеличиваем промежуток между кнопками */
 }
 
+
 .qty-controls button {
-  width: 32px;
-  height: 32px;
+  width: 36px;   /* чуть больше кнопки */
+  height: 36px;
+  border-radius: 10px;
   font-size: 16px;
-  border-radius: 8px;              /* меньше скругление */
-  background: rgba(139,92,246,0.25); /* чуть ярче, чтобы было видно */
+  background: rgba(139,92,246,0.25);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
-.qty-controls { gap: 6px; }
-
-
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* увеличиваем промежуток между кнопками */
+}
 .remove-btn {
   background: var(--danger);
   color: #fff;
   border: none;
   border-radius: 12px;
-  padding: 6px 12px;
+  padding: 6px 14px; /* увеличиваем ширину под слово "Удалить" */
   cursor: pointer;
   font-size: 13px;
+  margin-left: 8px; /* увеличиваем расстояние от qty-controls */
   transition: opacity 0.2s ease;
 }
 .remove-btn:hover { opacity: 0.85; }
