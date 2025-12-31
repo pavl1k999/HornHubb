@@ -472,23 +472,23 @@ function backToAll(){
 // Sidebar toggle
 function toggleMenu(force){
   const sidebar = document.getElementById('sidebar');
-  const btn = document.getElementById('menuBtn');
   const overlay = document.getElementById('overlay');
+  const btn = document.getElementById('menuBtn');
 
   if(force === false){
     sidebar.classList.remove('active');
     overlay.classList.add('hidden');
+    document.body.classList.remove('menu-open');
     btn.textContent = '☰';
     return;
   }
 
   const open = sidebar.classList.toggle('active');
   overlay.classList.toggle('hidden', !open);
+  document.body.classList.toggle('menu-open', open);
   btn.textContent = open ? '✕' : '☰';
 }
-document.getElementById('overlay').addEventListener('click', ()=>{
-  toggleMenu(false);
-});
+
 
 // Header compact
 window.addEventListener('scroll',()=>{
