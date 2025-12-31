@@ -368,23 +368,26 @@ function closeCart(){
 
 // Filtering & search
 function filterCategory(cat){
-  toggleMenu(false);
   showingFavorites = false;
   backAllBtn.classList.add('hidden');
 
-  document.getElementById('brandFilter')
-    .classList.toggle('hidden', cat !== 'liquid');
+  const brandBox = document.getElementById('brandFilter');
 
-  currentBrand = 'all';
-
-  if(cat === 'all'){
-    filtered = [...products];
-  } else {
-    filtered = products.filter(p => p.category === cat);
+  if(cat === 'liquid'){
+    brandBox.classList.remove('hidden');
+    currentBrand = 'all';
+    filtered = products.filter(p => p.category === 'liquid');
+  } 
+  else {
+    brandBox.classList.add('hidden');
+    filtered = cat === 'all'
+      ? [...products]
+      : products.filter(p => p.category === cat);
   }
 
   renderProducts();
 }
+
 
 function filterBrand(brand, btn){
   currentBrand = brand;
