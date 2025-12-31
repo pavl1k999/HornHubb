@@ -355,15 +355,19 @@ header.compact { height: 58px; }
 }
 
 .menu-btn{
-  position: relative;
-  z-index: 300;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 400;
 }
 
-/* Когда сайдбар открыт — кнопка справа */
+/* когда меню открыто */
 .sidebar.active ~ header .menu-btn{
   position: fixed;
   right: 14px;
-  top: 18px;
+  top: 14px;
+  background: rgba(20,20,25,0.95);
+  border-radius: 12px;
+  padding: 8px 12px;
 }
 
 .overlay{
