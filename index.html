@@ -10,8 +10,6 @@
 </head>
 <body>
 
-<div id="overlay" class="overlay hidden"></div>
-
 <header id="header">
   <div class="menu-btn" id="menuBtn" onclick="toggleMenu()">☰</div>
   <div class="title">HORN HUB</div>
@@ -35,22 +33,11 @@
 </header>
 
 <div class="sidebar" id="sidebar">
-  <div class="sidebar-close" onclick="toggleMenu(false)">✕</div>
   <div class="sidebar-title" data-i18n="categories">Категории</div>
   <button onclick="filterCategory('all')" data-i18n="allProducts">Все товары</button>
-  <button class="accordion-btn" onclick="toggleLiquids()">
-    <span>Жидкости</span>
-    <span class="chevron">›</span>
-  </button>
-  <div id="liquidSubmenu" class="submenu hidden">
-    <button onclick="filterBrand('all', this)" class="active">Все</button>
-    <button onclick="filterBrand('elf', this)">Elf Liq</button>
-    <button onclick="filterBrand('chaser', this)">Chaser</button>
-    <button onclick="filterBrand('vozol', this)">Vozol</button>
-  </div>
+  <button onclick="filterCategory('liquid')" data-i18n="liquids">Жидкости</button>
   <button onclick="filterCategory('disposable')" data-i18n="disposable">Одноразки</button>
   <button onclick="filterCategory('cartridge')" data-i18n="cartridges">Картриджи</button>
-  <div class="divider"></div>
   <button onclick="showFavorites()" data-i18n="favorites">Избранное ❤️</button>
   <button id="backAllBtn" class="hidden" onclick="backToAll()" data-i18n="backToAll">Все товары</button>
 </div>
@@ -77,7 +64,7 @@
 </main>
 
 <section id="cartPage" class="cart-page hidden">
-  <div class="back-btn" onclick="closeCart()" data-i18n="back">←</div>
+  <div class="back-btn" onclick="closeCart()" data-i18n="back">← Назад</div>
   <h3 data-i18n="cart">Корзина</h3>
   <div id="cartItems"></div>
   <div id="cartTotal" class="cart-total"></div>
