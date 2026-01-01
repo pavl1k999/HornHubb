@@ -10,6 +10,31 @@
 </head>
 <body>
 
+<div id="orderModal" class="order-modal hidden">
+  <div class="order-card">
+    <div class="order-header">
+      <div class="order-title">🧾 Ваш заказ</div>
+      <button class="order-close" onclick="closeOrderModal()">✕</button>
+    </div>
+
+    <div class="order-meta">
+      <span id="orderNumberLabel"></span>
+    </div>
+
+    <textarea id="orderText" readonly></textarea>
+
+    <div class="order-actions">
+      <button class="btn btn-primary" onclick="copyAndOpenTelegram()">
+        📋 Скопировать и открыть Telegram
+      </button>
+      <button class="btn btn-outline" onclick="closeOrderModal()">
+        Закрыть
+      </button>
+    </div>
+  </div>
+</div>
+
+
 <header id="header">
   <div class="menu-btn" id="menuBtn" onclick="toggleMenu()">☰</div>
   <div class="title">HORN HUB</div>
