@@ -503,8 +503,11 @@ function checkout(){
   lastOrderText = orderText;
 
   // Перенаправляем в Telegram с текстом заказа
-  const tgUrl = `https://t.me/${ADMIN_NICK}?text=${encodeURIComponent(orderText)}`;
-  window.open(tgUrl, '_blank');
+const tgUrl =
+  `https://t.me/${ADMIN_NICK}?text=${encodeURIComponent(orderText)}&t=${Date.now()}`;
+
+window.open(tgUrl, '_blank');
+
 }
 
 function closeOrderModal(){
