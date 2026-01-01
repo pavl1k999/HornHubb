@@ -486,40 +486,47 @@ function setCurrency(c){
 }
 
 // Checkout modal
-let lastOrderText = '';
 function checkout(){
   if(!cart.length) return alert(i18n[lang].emptyCart);
 
   const orderId = Date.now().toString().slice(-6);
-  let totalPLN = cart.reduce((s,p)=>s + p.price * p.qty, 0);
+  const totalPLN = cart.reduce((s,p)=>s + p.price * p.qty, 0);
 
-  const lines = cart.map(p => `• ${p.name} × ${p.qty} — ${formatPricePLN(p.price * p.qty)}`);
-  const header = `${i18n[lang].orderNumber}: ${orderId}\n${i18n[lang].consultant}: @${ADMIN_NICK}`;
-  const totalLine = `${i18n[lang].total}: ${formatPricePLN(totalPLN)}`;
+  const lines = cart.map(p =>
+    `• ${p.name} × ${p.qty} — ${formatPricePLN(p.price * p.qty)}`
+  );
 
-  const orderText = `${header}\n\n${lines.join('\n')}\n\n${totalLine}`;
+  lastOrderText =
+`${i18n[lang].orderNumber}: ${orderId}
+${i18n[lang].consultant}: @${ADMIN_NICK}
 
-  // Сохраняем текст заказа для копирования или модального окна
-  lastOrderText = orderText;
+${lines.join('\n')}
 
-  // Перенаправляем в Telegram с текстом заказа
-const tgUrl =
-  `https://t.me/${ADMIN_NICK}?text=${encodeURIComponent(orderText)}&t=${Date.now()}`;
+${i18n[lang].total}: ${formatPricePLN(totalPLN)}`;
 
-window.open(tgUrl, '_blank');
+  document.getElementById('orderText').value = lastOrderText;
+  document.getElementById('orderNumberLabel').textContent =
+    `${i18n[lang].orderNumber}: #${orderId}`;
 
+  openOrderModal();
+}
+
+function openOrderModal(){
+  document.getElementById('orderModal').classList.remove('hidden');
+  closeCart();
 }
 
 function closeOrderModal(){
   document.getElementById('orderModal').classList.add('hidden');
 }
 
-async function copyOrder(){
-  try {
+async function copyAndOpenTelegram(){
+  try{
     await navigator.clipboard.writeText(lastOrderText);
     showToast(lang==='ua'?'Скопійовано':'Скопировано');
-  } catch {
-    showToast(lang==='ua'?'Помилка копіювання':'Ошибка копирования');
+    window.open(ADMIN_URL,'_blank');
+  }catch{
+    showToast('Ошибка копирования');
   }
 }
 
