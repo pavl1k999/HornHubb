@@ -125,6 +125,19 @@ const discounts = {
   cartridge: { old: 25, new: 20 }
 };
 
+const outOfStockNames = [
+  // Elf Q
+  'Elf Liq – Sour Watermelon Gummy',
+  'Elf Liq – Pink Lemonade Soda',
+  'Elf Liq – Blackcurrant Aniseed',
+  'Elf Liq – Grape Cherry',
+  'Elf Liq – P&B Cloud',
+  'Elf Liq – Blueberry Raspberry Pomegranate',
+
+  // Vozol
+  'Vozol – Dragon Fruit Banana Cherry',
+  'Vozol – Watermelon Ice'
+];
 
 // Products (base prices in PLN)
 const products = [
@@ -179,6 +192,12 @@ const products = [
 }
 
 ];
+
+products.forEach(p => {
+  if (outOfStockNames.includes(p.name)) {
+    p.outOfStock = true;
+  }
+});
 
 // State
 let cart = [];
@@ -254,7 +273,17 @@ function updateCartCount(){
 
 function renderProducts(list = filtered){
   productList.innerHTML = '';
-  const items = showingFavorites ? list.filter(p=>favorites.includes(p.id)) : list;
+  let items = showingFavorites 
+  ? list.filter(p=>favorites.includes(p.id)) 
+  : list;
+
+// сортировка: в наличии сверху, нет в наличии внизу
+items = items.sort((a,b)=>{
+  if (a.outOfStock && !b.outOfStock) return 1;
+  if (!a.outOfStock && b.outOfStock) return -1;
+  return 0;
+});
+
 
   if(!items.length){
     productList.innerHTML = `<p class="empty">${i18n[lang].emptyProducts}</p>`;
@@ -278,14 +307,22 @@ function renderProducts(list = filtered){
           <span class="new-price">${formatPricePLN(newPrice)}</span>
         </div>
 
-        <div class="actions">
-          <button class="btn btn-primary" onclick="addToCart(${p.id}, this)">
-            ${i18n[lang].addToCart}
-          </button>
-          <button class="btn btn-outline ${favActive ? 'active' : ''}" onclick="toggleFavorite(${p.id})">
-            ${favActive ? '❤️' : '🤍'}
-          </button>
-        </div>
+<div class="actions">
+  <button 
+    class="btn btn-primary" 
+    onclick="${p.outOfStock ? '' : `addToCart(${p.id}, this)`}"
+    ${p.outOfStock ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}
+  >
+    ${p.outOfStock ? 'Нет в наличии' : i18n[lang].addToCart}
+  </button>
+
+  <button 
+    class="btn btn-outline ${favActive ? 'active' : ''}" 
+    onclick="toggleFavorite(${p.id})">
+    ${favActive ? '❤️' : '🤍'}
+  </button>
+</div>
+
       </div>
     `;
   });
