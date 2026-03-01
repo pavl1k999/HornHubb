@@ -133,10 +133,22 @@ const outOfStockNames = [
   'Elf Liq – Grape Cherry',
   'Elf Liq – P&B Cloud',
   'Elf Liq – Blueberry Raspberry Pomegranate',
+  'Elf Liq – Strawberry Cherry Lemon',
+  'Elf Liq – Pineapple Colada',
+  'Elf Liq – Lemon Lime',
+  'Elf Liq – Apple Pear',
+  'Elf Liq – Strawberry Snoow'
 
   // Vozol
-  'Vozol – Dragon Fruit Banana Cherry',
-  'Vozol – Watermelon Ice'
+  'Vozol – Grape Ice',
+  'Vozol – Watermelon Ice',
+  'Vozol – Kiwi Passion Guava',
+  'Vozol – Strawberry Ice Cream',
+  'Vozol – Sour Apple Ice',
+  'Vozol – Love 777',
+  'Vozol – Mixed Berries',
+  'Vozol – Purple Candy',
+  'Vozol – Dragon Fruit Banana Cherry'
 ];
 
 // Products (base prices in PLN)
