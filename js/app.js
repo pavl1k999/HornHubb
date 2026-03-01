@@ -137,7 +137,7 @@ const outOfStockNames = [
   'Elf Liq – Pineapple Colada',
   'Elf Liq – Lemon Lime',
   'Elf Liq – Apple Pear',
-  'Elf Liq – Strawberry Snoow'
+  'Elf Liq – Strawberry Snoow',
 
   // Vozol
   'Vozol – Grape Ice',
