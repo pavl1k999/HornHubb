@@ -126,6 +126,11 @@ const discounts = {
 };
 
 const outOfStockNames = [
+  'Chaser – Grape Mint',
+  'Chaser – Blackberry Lemonade',
+  'Chaser – Coconut Melon',
+  'Chaser – Grape Mint',
+  
   // Elf Q
   'Elf Liq – Sour Watermelon Gummy',
   'Elf Liq – Pink Lemonade Soda',
