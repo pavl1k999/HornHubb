@@ -153,7 +153,9 @@ const outOfStockNames = [
   'Vozol – Love 777',
   'Vozol – Mixed Berries',
   'Vozol – Purple Candy',
-  'Vozol – Dragon Fruit Banana Cherry'
+  'Vozol – Dragon Fruit Banana Cherry',
+  
+  'Xros Cartridge 0.6Ω'
 ];
 
 // Products (base prices in PLN)
