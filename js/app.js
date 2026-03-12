@@ -119,10 +119,13 @@ const i18n = {
 let lang = localStorage.getItem('lang') || 'ru';
 
 const discounts = {
-  elf: { old: 50, new: 40 },
-  vozol: { old: 50, new: 40 },
-  chaser: { old: 60, new: 40 },
-  cartridge: { old: 25, new: 20 }
+  elf:       { old: 50, new: 40 },
+  vozol:     { old: 50, new: 40 },
+  chaser:    { old: 60, new: 40 },
+  cartridge: { old: 25, new: 20 },
+  elfking:   { old: 50, new: 40 },  // ← Elf King 40k
+  vozolreve: { old: 50, new: 40 },  // ← Vozol Reve 40k
+  bcpro:     { old: 50, new: 40 },  // ← BC Pro 40k
 };
 
 const outOfStockNames = [
