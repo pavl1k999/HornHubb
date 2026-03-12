@@ -129,50 +129,11 @@ const outOfStockNames = [
   'Chaser – Grape Mint',
   'Chaser – Blackberry Lemonade',
   'Chaser – Coconut Melon',
-  'Chaser – Grape Mint',
-  
-  // Elf Q
-  'Elf Liq – Sour Watermelon Gummy',
-  'Elf Liq – Pink Lemonade Soda',
-  'Elf Liq – Blackcurrant Aniseed',
-  'Elf Liq – Grape Cherry',
-  'Elf Liq – P&B Cloud',
-  'Elf Liq – Blueberry Raspberry Pomegranate',
-  'Elf Liq – Strawberry Cherry Lemon',
-  'Elf Liq – Pineapple Colada',
-  'Elf Liq – Lemon Lime',
-  'Elf Liq – Apple Pear',
-  'Elf Liq – Strawberry Snoow',
-
-  // Vozol
-  'Vozol – Grape Ice',
-  'Vozol – Watermelon Ice',
-  'Vozol – Kiwi Passion Guava',
-  'Vozol – Strawberry Ice Cream',
-  'Vozol – Sour Apple Ice',
-  'Vozol – Love 777',
-  'Vozol – Mixed Berries',
-  'Vozol – Purple Candy',
-  'Vozol – Dragon Fruit Banana Cherry',
-  
-  'Xros Cartridge 0.6Ω'
+  'Chaser – Grape Mint'
 ];
 
 // Products (base prices in PLN)
 const products = [
-  // Elf Liq
-  ...[
-    'Strawberry Cherry Lemon','Sour Watermelon Gummy','Pink Lemonade Soda',
-    'Pineapple Colada','Lemon Lime','Blueberry Raspberry Pomegranate',
-    'Apple Pear','Strawberry Snoow','Blackcurrant Aniseed','P&B Cloud','Grape Cherry'
-  ].map((n,i)=>({
-    id: i+1,
-    name: `Elf Liq – ${n}`,
-    brand: 'elf',
-    price: discounts.elf.old,
-    category: 'liquid',
-    img: `images/elf/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png` // уникальная картинка по названию
-  })),
 
   // Chaser
   ...[
@@ -187,17 +148,91 @@ const products = [
     img: `images/chaser/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png`
   })),
 
-  // Vazool
+    // ── Elf Liq (жижа) ──────────────────────
   ...[
-    'Grape Ice','Watermelon Ice','Kiwi Passion Guava','Strawberry Ice Cream',
-    'Sour Apple Ice','Love 777','Mixed Berries','Purple Candy','Dragon Fruit Banana Cherry'
-  ].map((n,i)=>({
-    id: 200+i,
+    'Blackcurrant Aniseed',
+    'Pina Colada Strawberry Snoow',
+    'Blue Razz Lemonade',
+    'Green Grape Rose',
+    'Sour Strawberry Gummy',
+    'Strawberry Banana',
+    'Blueberry Raspberry Pomegranate',
+    'P&B Cloud',
+  ].map((n, i) => ({
+    id: i + 1,
+    name: `Elf Liq – ${n}`,
+    brand: 'elf',
+    price: discounts.elf.old,
+    category: 'liquid',
+    img: `images/elf/${n.replace(/[^a-zA-Z0-9]/g, '_')}.png`
+  })),
+
+// ── Vozol (жижа) ────────────────────────
+  ...[
+    'Dragon Fruit Banana Cherry',
+    'Purple Candy',
+    'Pineapple Passion Fruit Lime',
+    'Strawberry Kiwi',
+    'Love 777',
+    'Grape Ice',
+    'Watermelon Bubblegum',
+    'Pomegranate Lemonade',
+    'Mint Ice',
+  ].map((n, i) => ({
+    id: 200 + i,
     name: `Vozol – ${n}`,
     brand: 'vozol',
     price: discounts.vozol.old,
     category: 'liquid',
-    img: `images/vazool/${n.replace(/[^a-zA-Z0-9]/g,'_')}.png`
+    img: `images/vazool/${n.replace(/[^a-zA-Z0-9]/g, '_')}.png`
+  })),
+
+   // ── Elf King 40k (одноразка) ─────────────
+  ...[
+    'Milki Oolong',
+    'Blue Razz Ice',
+    'Sour Apple Ice',
+    'Sour Pineapple Ice',
+    'Sour Strawberry Dragonfruit',
+  ].map((n, i) => ({
+    id: 400 + i,
+    name: `Elf King 40k – ${n}`,
+    brand: 'elfking',
+    price: discounts.elfking.old,
+    category: 'disposable',
+    img: `images/elfking/${n.replace(/[^a-zA-Z0-9]/g, '_')}.png`
+  })),
+
+   // ── BC Pro 40k (одноразка) ───────────────
+  ...[
+    'Pineapple Rom',
+    'Grape Twist',
+    'Strawberry Raspberry Frost',
+    'Strawberry Kiwi',
+    'Aurora Berries',
+  ].map((n, i) => ({
+    id: 600 + i,
+    name: `BC Pro 40k – ${n}`,
+    brand: 'bcpro',
+    price: discounts.bcpro.old,
+    category: 'disposable',
+    img: `images/bcpro/${n.replace(/[^a-zA-Z0-9]/g, '_')}.png`
+  })),
+
+   // ── Vozol Reve 40k (одноразка) ───────────
+  ...[
+    'Watermelon Bubblegum',
+    'Strawberry Mango',
+    'Kiwi Passion Fruit',
+    'Mango Ice',
+    'Grape Ice',
+  ].map((n, i) => ({
+    id: 500 + i,
+    name: `Vozol Reve 40k – ${n}`,
+    brand: 'vozolreve',
+    price: discounts.vozolreve.old,
+    category: 'disposable',
+    img: `images/vozolreve/${n.replace(/[^a-zA-Z0-9]/g, '_')}.png`
   })),
 
   // Cartridge
