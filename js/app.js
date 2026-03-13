@@ -154,7 +154,7 @@ const products = [
     // ── Elf Liq (жижа) ──────────────────────
   ...[
     'Blackcurrant Aniseed',
-    'Pina Colada',
+    'Pineapple Colada',
     'Strawberry Snoow',
     'Blue Razz Lemonade',
     'Green Grape Rose',
