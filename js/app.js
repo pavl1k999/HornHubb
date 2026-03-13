@@ -158,7 +158,7 @@ const products = [
     'Strawberry Snoow',
     'Blue Razz Lemonade',
     'Green Grape Rose',
-    'Sour Strawberry Gummy',
+    'Sour Watermelon Gummy',
     'Strawberry Banana',
     'Blueberry Raspberry Pomegranate',
     'P&B Cloud',
