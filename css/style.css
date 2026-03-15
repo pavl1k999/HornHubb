@@ -66,7 +66,7 @@ header.compact { height: 58px; }
   left: -280px; top: 0;
   width: 280px; height: 100%;
   background: rgba(18,18,22,0.98);
-  padding: 18px;
+  padding: 80px 18px 18px; /* ← замени 18px на 80px сверху */
   transition: .3s ease;
   z-index: 200;
   border-right: 1px solid rgba(255,255,255,0.06);
