@@ -268,12 +268,6 @@ const mainPage = document.getElementById('mainPage');
 const cartPage = document.getElementById('cartPage');
 const productList = document.getElementById('productList');
 const cartCount = document.getElementById('cartCount');
-const searchInput = document.getElementById('searchInput');
-const autocompleteBox = document.getElementById('autocomplete');
-const sortSelect = document.getElementById('sortSelect');
-const priceMinEl = document.getElementById('priceMin');
-const priceMaxEl = document.getElementById('priceMax');
-const backAllBtn = document.getElementById('backAllBtn');
 
 // Utils
 function formatPricePLN(pln){
@@ -460,7 +454,6 @@ function closeCart(){
   mainPage.classList.remove('hidden');
 }
 
-// Filtering & search
 // ── Фильтр категорий + брендов ───────────────
 let currentCategory = 'all';
 let currentBrand = null;
@@ -476,19 +469,9 @@ function filterCategory(cat) {
   document.querySelectorAll('.category-btn')
     .forEach(b => b.classList.toggle('active', b.dataset.category === cat));
 
-function filterBrand(brand) {
-  // Повторный клик — сброс
-  if (currentBrand === brand) {
-    currentBrand = null;
-    document.querySelectorAll('.brand-btn')
-      .forEach(b => b.classList.remove('active'));
-  } else {
-    currentBrand = brand;
-    document.querySelectorAll('.brand-btn')
-      .forEach(b => b.classList.toggle('active', b.dataset.brand === brand));
-  }
-  applyFilters();
-}
+  // Сброс активного бренда
+  document.querySelectorAll('.brand-btn')
+    .forEach(b => b.classList.remove('active'));
 
   // Показываем/скрываем нужные бренды
   const liquidBrands     = document.querySelectorAll('.liquid-brand');
@@ -504,28 +487,23 @@ function filterBrand(brand) {
     disposableBrands.forEach(b => b.style.display = '');
   } else {
     brandFilter.style.display = 'none';
-    liquidBrands.forEach(b => b.style.display = '');
-    disposableBrands.forEach(b => b.style.display = 'none');
   }
 
   applyFilters();
 }
 
-// Клики по брендам
-document.querySelectorAll('.brand-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    // Если кликнули на уже активный — сбрасываем
-    if (currentBrand === btn.dataset.brand) {
-      currentBrand = null;
-      btn.classList.remove('active');
-    } else {
-      currentBrand = btn.dataset.brand;
-      document.querySelectorAll('.brand-btn')
-        .forEach(b => b.classList.toggle('active', b === btn));
-    }
-    applyFilters();
-  });
-});
+function filterBrand(brand) {
+  if (currentBrand === brand) {
+    currentBrand = null;
+    document.querySelectorAll('.brand-btn')
+      .forEach(b => b.classList.remove('active'));
+  } else {
+    currentBrand = brand;
+    document.querySelectorAll('.brand-btn')
+      .forEach(b => b.classList.toggle('active', b.dataset.brand === brand));
+  }
+  applyFilters();
+}
 
 function applyFilters() {
   let list = [...products];
@@ -539,45 +517,6 @@ function applyFilters() {
 
   filtered = list;
   renderProducts(filtered);
-}
-
-function searchProducts(q){
-  backAllBtn.classList.add('hidden');
-  showingFavorites = false;
-  const v = q.toLowerCase();
-  const candidates = products.filter(p=>p.name.toLowerCase().includes(v));
-  filtered = candidates;
-  renderProducts();
-
-  // autocomplete
-  if(q.trim().length && candidates.length){
-    autocompleteBox.innerHTML = candidates.slice(0,6).map(p=>(
-      `<div class="autocomplete-item" onclick="selectSearch('${p.name.replace(/'/g,"\\'")}')">${p.name}</div>`
-    )).join('');
-    autocompleteBox.classList.add('active');
-  } else {
-    autocompleteBox.classList.remove('active');
-  }
-}
-function selectSearch(name){
-  searchInput.value = name;
-  autocompleteBox.classList.remove('active');
-  filtered = products.filter(p=>p.name===name);
-  renderProducts();
-}
-
-function sortProducts(t){
-  if(t==='low') filtered.sort((a,b)=>a.price-b.price);
-  else if(t==='high') filtered.sort((a,b)=>b.price-a.price);
-  else if(t==='name') filtered.sort((a,b)=>a.name.localeCompare(b.name));
-  renderProducts();
-}
-
-function applyPriceFilter(skipRender){
-  const min = Number(priceMinEl?.value)||0;
-  const max = Number(priceMaxEl?.value)||Infinity;
-  filtered = filtered.filter(p=>p.price>=min && p.price<=max);
-  if(!skipRender) renderProducts();
 }
 
 // Favorites
