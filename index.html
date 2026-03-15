@@ -68,21 +68,19 @@
   
 <div class="category-panel">
   <div class="categories">
-    <button class="category-btn active" data-category="all" data-i18n="allProducts">Все товары</button>
-    <button class="category-btn" data-category="liquid" data-i18n="liquid">Жидкости</button>
-    <button class="category-btn" data-category="disposable" data-i18n="disposable">Одноразки</button>
-    <button class="category-btn" data-category="cartridge" data-i18n="cartridge">Картриджи</button>
+    <button class="category-btn active" data-category="all" onclick="filterCategory('all')" data-i18n="allProducts">Все товары</button>
+    <button class="category-btn" data-category="liquid" onclick="filterCategory('liquid')" data-i18n="liquid">Жидкости</button>
+    <button class="category-btn" data-category="disposable" onclick="filterCategory('disposable')" data-i18n="disposable">Одноразки</button>
+    <button class="category-btn" data-category="cartridge" onclick="filterCategory('cartridge')" data-i18n="cartridge">Картриджи</button>
   </div>
 
   <div class="brands" id="brandFilter" style="display:none;">
-    <!-- Жидкости -->
-    <button class="brand-btn liquid-brand" data-brand="chaser">Chaser LUX</button>
-    <button class="brand-btn liquid-brand" data-brand="elf">Elf Liq</button>
-    <button class="brand-btn liquid-brand" data-brand="vozol">Vozol</button>
-    <!-- Одноразки -->
-    <button class="brand-btn disposable-brand" data-brand="elfking" style="display:none;">Elf King</button>
-    <button class="brand-btn disposable-brand" data-brand="bcpro" style="display:none;">BC Pro</button>
-    <button class="brand-btn disposable-brand" data-brand="vozolreve" style="display:none;">Vozol Reve</button>
+    <button class="brand-btn liquid-brand" data-brand="chaser" onclick="filterBrand('chaser')">Chaser LUX</button>
+    <button class="brand-btn liquid-brand" data-brand="elf" onclick="filterBrand('elf')">Elf Liq</button>
+    <button class="brand-btn liquid-brand" data-brand="vozol" onclick="filterBrand('vozol')">Vozol</button>
+    <button class="brand-btn disposable-brand" data-brand="elfking" onclick="filterBrand('elfking')" style="display:none;">Elf King</button>
+    <button class="brand-btn disposable-brand" data-brand="bcpro" onclick="filterBrand('bcpro')" style="display:none;">BC Pro</button>
+    <button class="brand-btn disposable-brand" data-brand="vozolreve" onclick="filterBrand('vozolreve')" style="display:none;">Vozol Reve</button>
   </div>
 </div>
 
