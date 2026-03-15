@@ -461,14 +461,74 @@ function closeCart(){
 }
 
 // Filtering & search
-function filterCategory(cat){
+// ── Фильтр категорий + брендов ───────────────
+let currentCategory = 'all';
+let currentBrand = null;
+const brandFilter = document.getElementById('brandFilter');
+
+function filterCategory(cat) {
   toggleMenu(false);
-  backAllBtn.classList.add('hidden');
   showingFavorites = false;
-  if(cat==='all'){ filtered = [...products]; }
-  else { filtered = products.filter(p=>p.category===cat); }
-  applyPriceFilter(true);
-  renderProducts();
+  currentCategory = cat;
+  currentBrand = null;
+
+  // Активная кнопка категории
+  document.querySelectorAll('.category-btn')
+    .forEach(b => b.classList.toggle('active', b.dataset.category === cat));
+
+  // Сброс активного бренда
+  document.querySelectorAll('.brand-btn')
+    .forEach(b => b.classList.remove('active'));
+
+  // Показываем/скрываем нужные бренды
+  const liquidBrands     = document.querySelectorAll('.liquid-brand');
+  const disposableBrands = document.querySelectorAll('.disposable-brand');
+
+  if (cat === 'liquid') {
+    brandFilter.style.display = 'flex';
+    liquidBrands.forEach(b => b.style.display = '');
+    disposableBrands.forEach(b => b.style.display = 'none');
+  } else if (cat === 'disposable') {
+    brandFilter.style.display = 'flex';
+    liquidBrands.forEach(b => b.style.display = 'none');
+    disposableBrands.forEach(b => b.style.display = '');
+  } else {
+    brandFilter.style.display = 'none';
+    liquidBrands.forEach(b => b.style.display = '');
+    disposableBrands.forEach(b => b.style.display = 'none');
+  }
+
+  applyFilters();
+}
+
+// Клики по брендам
+document.querySelectorAll('.brand-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Если кликнули на уже активный — сбрасываем
+    if (currentBrand === btn.dataset.brand) {
+      currentBrand = null;
+      btn.classList.remove('active');
+    } else {
+      currentBrand = btn.dataset.brand;
+      document.querySelectorAll('.brand-btn')
+        .forEach(b => b.classList.toggle('active', b === btn));
+    }
+    applyFilters();
+  });
+});
+
+function applyFilters() {
+  let list = [...products];
+
+  if (currentCategory !== 'all') {
+    list = list.filter(p => p.category === currentCategory);
+  }
+  if (currentBrand) {
+    list = list.filter(p => p.brand === currentBrand);
+  }
+
+  filtered = list;
+  renderProducts(filtered);
 }
 
 function searchProducts(q){
