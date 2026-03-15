@@ -492,6 +492,56 @@ header{
 }
 .order-actions .btn{flex:1}
 
+/* Панель категорий */
+.category-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.category-panel .categories,
+.category-panel .brands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.category-btn, .brand-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 500;
+}
+
+.category-btn.active, .brand-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 8px var(--primary);
+}
+
+.category-btn:hover, .brand-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Бренды — маленькие чипсы */
+.brand-btn {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+}
+
+.category-panel .brands {
+  gap: 6px;
+}
+
 
 
 .order-details { color: #ddd; font-size: 14px; margin: 8px 0; }
