@@ -72,18 +72,25 @@
     <img src="images/banner.png" alt="Promo banner">
   </div>
   
-  <div class="search-sort">
-    <div class="search-box">
-      <input id="searchInput" type="text" data-i18n-placeholder="search" oninput="searchProducts(this.value)">
-      <div id="autocomplete" class="autocomplete"></div>
-    </div>
-    <select id="sortSelect" onchange="sortProducts(this.value)">
-      <option value="default" data-i18n="sort">Сортировка</option>
-      <option value="low" data-i18n="priceAsc">Цена ↑</option>
-      <option value="high" data-i18n="priceDesc">Цена ↓</option>
-      <option value="name" data-i18n="byName">По названию</option>
-    </select>
+<div class="category-panel">
+  <div class="categories">
+    <button class="category-btn active" data-category="all" data-i18n="allProducts">Все товары</button>
+    <button class="category-btn" data-category="liquid" data-i18n="liquid">Жидкости</button>
+    <button class="category-btn" data-category="disposable" data-i18n="disposable">Одноразки</button>
+    <button class="category-btn" data-category="cartridge" data-i18n="cartridge">Картриджи</button>
   </div>
+
+  <div class="brands" id="brandFilter" style="display:none;">
+    <!-- Жидкости -->
+    <button class="brand-btn liquid-brand" data-brand="chaser">Chaser LUX</button>
+    <button class="brand-btn liquid-brand" data-brand="elf">Elf Liq</button>
+    <button class="brand-btn liquid-brand" data-brand="vozol">Vozol</button>
+    <!-- Одноразки -->
+    <button class="brand-btn disposable-brand" data-brand="elfking" style="display:none;">Elf King</button>
+    <button class="brand-btn disposable-brand" data-brand="bcpro" style="display:none;">BC Pro</button>
+    <button class="brand-btn disposable-brand" data-brand="vozolreve" style="display:none;">Vozol Reve</button>
+  </div>
+</div>
 
   <div class="products" id="productList"></div>
 </main>
