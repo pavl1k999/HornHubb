@@ -476,9 +476,19 @@ function filterCategory(cat) {
   document.querySelectorAll('.category-btn')
     .forEach(b => b.classList.toggle('active', b.dataset.category === cat));
 
-  // Сброс активного бренда
-  document.querySelectorAll('.brand-btn')
-    .forEach(b => b.classList.remove('active'));
+function filterBrand(brand) {
+  // Повторный клик — сброс
+  if (currentBrand === brand) {
+    currentBrand = null;
+    document.querySelectorAll('.brand-btn')
+      .forEach(b => b.classList.remove('active'));
+  } else {
+    currentBrand = brand;
+    document.querySelectorAll('.brand-btn')
+      .forEach(b => b.classList.toggle('active', b.dataset.brand === brand));
+  }
+  applyFilters();
+}
 
   // Показываем/скрываем нужные бренды
   const liquidBrands     = document.querySelectorAll('.liquid-brand');
