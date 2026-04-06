@@ -129,10 +129,40 @@ const discounts = {
 };
 
 const outOfStockNames = [
+
+  // Chaser
   'Chaser – Grape Mint',
+  'Chaser – Berry Lemonade',
   'Chaser – Blackberry Lemonade',
+  'Chaser – Sour Apple',
+  'Chaser – Vitamin',
   'Chaser – Coconut Melon',
-  'Chaser – Grape Mint'
+  'Chaser – Energetic',
+  'Chaser – Strawberry Cream',
+  'Chaser – Watermelon Raspberry',
+  'Chaser – Kiwi Passion Guava',
+
+  // Elf Liq
+  'Elf Liq – Blackcurrant Aniseed',
+  'Elf Liq – Pineapple Colada',
+  'Elf Liq – Strawberry Snoow',
+  'Elf Liq – Blue Razz Lemonade',
+  'Elf Liq – Green Grape Rose',
+  'Elf Liq – Sour Watermelon Gummy',
+  'Elf Liq – Strawberry Banana',
+  'Elf Liq – Blueberry Raspberry Pomegranate',
+  'Elf Liq – P&B Cloud',
+
+  // Vozol
+  'Vozol – Dragon Fruit Banana Cherry',
+  'Vozol – Purple Candy',
+  'Vozol – Pineapple Passion Fruit Lime',
+  'Vozol – Strawberry Kiwi',
+  'Vozol – Love 777',
+  'Vozol – Grape Ice',
+  'Vozol – Watermelon Bubblegum',
+  'Vozol – Pomegranate Lemonade',
+  'Vozol – Mint Ice'
 ];
 
 // Products (base prices in PLN)
