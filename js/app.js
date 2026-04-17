@@ -122,7 +122,7 @@ const discounts = {
   elf:       { old: 60, new: 50 },
   vozol:     { old: 60, new: 50 },
   chaser:    { old: 70, new: 60 },
-  cartridge: { old: 25, new: 20 },
+  cartridge: { old: 35, new: 30 },
   elfking:   { old: 130, new: 110 },  // ← Elf King 40k
   vozolreve: { old: 130, new: 110 },  // ← Vozol Reve 40k
   bcpro:     { old: 130, new: 110 },  // ← BC Pro 40k
