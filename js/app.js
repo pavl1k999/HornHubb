@@ -6,7 +6,7 @@ const ADMIN_URL = `https://t.me/${ADMIN_NICK}`;
 const currencyRates = {
   PLN: 1,     // base
   EUR: 0.24,  // approximate Dec 2025
-  UAH: 11.7    // approximate Dec 2025
+  UAH: 12.6 // approximate Dec 2025
 };
 const currencySymbols = { PLN: 'zł', EUR: '€', UAH: '₴' };
 let currency = localStorage.getItem('currency') || 'PLN';
@@ -119,13 +119,13 @@ const i18n = {
 let lang = localStorage.getItem('lang') || 'ru';
 
 const discounts = {
-  elf:       { old: 60, new: 50 },
-  vozol:     { old: 60, new: 50 },
-  chaser:    { old: 70, new: 60 },
+  elf:       { old: 50, new: 35 },
+  vozol:     { old: 50, new: 35 },
+  chaser:    { old: 60, new: 35 },
   cartridge: { old: 35, new: 30 },
-  elfking:   { old: 130, new: 110 },  // ← Elf King 40k
-  vozolreve: { old: 130, new: 110 },  // ← Vozol Reve 40k
-  bcpro:     { old: 130, new: 110 },  // ← BC Pro 40k
+  elfking:   { old: 110, new: 80 },  // ← Elf King 40k
+  vozolreve: { old: 110, new: 80 },  // ← Vozol Reve 40k
+  bcpro:     { old: 110, new: 80 },  // ← BC Pro 40k
 };
 
 const outOfStockNames = [
@@ -141,17 +141,6 @@ const outOfStockNames = [
   'Chaser – Strawberry Cream',
   'Chaser – Watermelon Raspberry',
   'Chaser – Kiwi Passion Guava',
-
-  // Elf Liq
-  'Elf Liq – Blackcurrant Aniseed',
-  'Elf Liq – Pineapple Colada',
-  'Elf Liq – Strawberry Snoow',
-  'Elf Liq – Blue Razz Lemonade',
-  'Elf Liq – Green Grape Rose',
-  'Elf Liq – Sour Watermelon Gummy',
-  'Elf Liq – Strawberry Banana',
-  'Elf Liq – Blueberry Raspberry Pomegranate',
-  'Elf Liq – P&B Cloud',
 
   // Vozol
   'Vozol – Dragon Fruit Banana Cherry',
