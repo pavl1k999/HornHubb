@@ -151,10 +151,7 @@ const outOfStockNames = [
   'Vozol – Grape Ice',
   'Vozol – Watermelon Bubblegum',
   'Vozol – Pomegranate Lemonade',
-  'Vozol – Mint Ice',
-
-  'Elf Liq – Blackcurrant Aniseed'
-
+  'Vozol – Mint Ice'
 ];
 
 // Products (base prices in PLN)
