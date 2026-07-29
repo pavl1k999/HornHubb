@@ -181,6 +181,7 @@ const products = [
     'Strawberry Banana',
     'Blueberry Raspberry Pomegranate',
     'P&B Cloud',
+    'Spearmint',
   ].map((n, i) => ({
     id: i + 1,
     name: `Elf Liq – ${n}`,
