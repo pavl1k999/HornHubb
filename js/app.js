@@ -140,18 +140,7 @@ const outOfStockNames = [
   'Chaser – Energetic',
   'Chaser – Strawberry Cream',
   'Chaser – Watermelon Raspberry',
-  'Chaser – Kiwi Passion Guava',
-
-  // Vozol
-  'Vozol – Dragon Fruit Banana Cherry',
-  'Vozol – Purple Candy',
-  'Vozol – Pineapple Passion Fruit Lime',
-  'Vozol – Strawberry Kiwi',
-  'Vozol – Love 777',
-  'Vozol – Grape Ice',
-  'Vozol – Watermelon Bubblegum',
-  'Vozol – Pomegranate Lemonade',
-  'Vozol – Mint Ice'
+  'Chaser – Kiwi Passion Guava'
 ];
 
 // Products (base prices in PLN)
