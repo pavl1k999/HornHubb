@@ -524,8 +524,8 @@ function favHTML(id) {
 
 // Заглушка, если картинки товара ещё нет (или она не загрузилась)
 const PLACEHOLDER_IMG = 'data:image/svg+xml,' + encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">'
-  + '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+  '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">'
+  + '<defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="163" y1="92" x2="237" y2="242">'
   + '<stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#ff5fa2"/></linearGradient></defs>'
   + '<rect width="400" height="400" fill="#1f1c29"/>'
   + '<rect x="163" y="92" width="74" height="150" rx="26" fill="none" stroke="url(#g)" stroke-width="10"/>'
