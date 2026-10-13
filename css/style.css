@@ -167,7 +167,7 @@ img { display: block; max-width: 100%; }
 /* ── Filters ──────────────────────────────────────────── */
 .filters {
   position: sticky; top: var(--top-offset); z-index: 40;
-  padding: 10px 12px 6px;
+  padding: 6px 12px;
   background: linear-gradient(180deg, rgba(11, 10, 16, .96) 70%, rgba(11, 10, 16, .0));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -175,7 +175,7 @@ img { display: block; max-width: 100%; }
 .chips {
   display: flex; gap: 8px;
   position: relative;
-  margin: 6px -12px -6px; padding: 4px 12px 10px;
+  margin: 0 -12px -6px; padding: 4px 12px 10px;
   overflow-x: auto; scrollbar-width: none;
 }
 .chips::-webkit-scrollbar { display: none; }
@@ -351,6 +351,7 @@ img { display: block; max-width: 100%; }
   background: currentColor; box-shadow: 0 0 8px currentColor;
 }
 .card-stock.is-out { color: var(--red); }
+@media (max-width: 340px) { .card-stock { font-size: 11px; } }
 .price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 7px; margin: 6px 0 10px; }
 .price-new { font-size: 17px; font-weight: 700; letter-spacing: -.2px; }
 .price-old { color: var(--muted); font-size: 12.5px; text-decoration: line-through; text-decoration-color: rgba(255, 92, 122, .8); }

@@ -341,7 +341,7 @@ const saveFavorites = () => storage.set('favorites', JSON.stringify([...favorite
 const $ = (id) => document.getElementById(id);
 const els = {
   shopView: $('shopView'), cartView: $('cartView'),
-  heroPill: $('heroPill'), listAnchor: $('listAnchor'),
+  heroPill: $('heroPill'), listAnchor: $('listAnchor'), filters: $('filters'),
   categoryChips: $('categoryChips'), brandChips: $('brandChips'),
   listHead: $('listHead'), grid: $('productGrid'),
   favBadge: $('favBadge'), cartBadge: $('cartBadge'), cartBtn: $('cartBtn'),
@@ -461,9 +461,8 @@ function renderNavActive() {
 
 /* ── Рендер: фильтры ──────────────────────────────────── */
 function renderChips() {
-  const filtersHidden = state.favoritesOnly;
-  els.categoryChips.hidden = filtersHidden;
-  els.brandChips.hidden = filtersHidden;
+  // в избранном фильтров нет — прячем всю панель, чтобы не висела пустая полоса
+  els.filters.hidden = state.favoritesOnly;
 
   const counts = { all: products.length };
   CATEGORIES.forEach((c) => { counts[c] = products.filter((p) => p.category === c).length; });
