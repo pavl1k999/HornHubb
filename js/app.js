@@ -131,6 +131,16 @@ const CATALOG = [
     soldOut: [],
   },
 
+  // ── Pod-системы ───────────────────────────
+  {
+    brand: 'vaporesso', title: 'Vaporesso', category: 'pod', folder: 'pod',
+    firstId: 700, price: 140,
+    flavors: [
+      'XROS 6 Mini Black',
+    ],
+    soldOut: [],
+  },
+
   // ── Картриджи ─────────────────────────────
   {
     brand: 'cartridge', title: 'Xros', category: 'cartridge', folder: 'cart',
@@ -142,15 +152,15 @@ const CATALOG = [
   },
 ];
 
-const CATEGORIES = ['liquid', 'disposable', 'cartridge'];
-const CATEGORY_ICONS = { all: 'i-grid', liquid: 'i-drop', disposable: 'i-zap', cartridge: 'i-pod' };
+const CATEGORIES = ['liquid', 'disposable', 'pod', 'cartridge'];
+const CATEGORY_ICONS = { all: 'i-grid', liquid: 'i-drop', disposable: 'i-zap', pod: 'i-podsys', cartridge: 'i-pod' };
 const MAX_QTY = 99;
 
 /* ── Переводы ─────────────────────────────────────────── */
 const I18N = {
   ru: {
     locale: 'ru-RU',
-    all: 'Все товары', liquid: 'Жидкости', disposable: 'Одноразки', cartridge: 'Картриджи',
+    all: 'Все товары', liquid: 'Жидкости', disposable: 'Одноразки', pod: 'Pod-системы', cartridge: 'Картриджи',
     menu: 'Меню', back: 'Назад', close: 'Закрыть', language: 'Язык', currency: 'Валюта',
     addToCart: 'В корзину', outOfStock: 'Нет в наличии', inStock: 'В наличии',
     favorites: 'Избранное', favEmpty: 'В избранном пусто', favEmptyHint: 'Нажмите ♡ на товаре, чтобы сохранить его здесь',
@@ -174,7 +184,7 @@ const I18N = {
   },
   ua: {
     locale: 'uk-UA',
-    all: 'Всі товари', liquid: 'Рідини', disposable: 'Одноразки', cartridge: 'Картриджі',
+    all: 'Всі товари', liquid: 'Рідини', disposable: 'Одноразки', pod: 'Pod-системи', cartridge: 'Картриджі',
     menu: 'Меню', back: 'Назад', close: 'Закрити', language: 'Мова', currency: 'Валюта',
     addToCart: 'До кошика', outOfStock: 'Немає в наявності', inStock: 'В наявності',
     favorites: 'Обране', favEmpty: 'В обраному порожньо', favEmptyHint: 'Натисніть ♡ на товарі, щоб зберегти його тут',
@@ -198,7 +208,7 @@ const I18N = {
   },
   en: {
     locale: 'en-GB',
-    all: 'All products', liquid: 'Liquids', disposable: 'Disposables', cartridge: 'Cartridges',
+    all: 'All products', liquid: 'Liquids', disposable: 'Disposables', pod: 'Pod systems', cartridge: 'Cartridges',
     menu: 'Menu', back: 'Back', close: 'Close', language: 'Language', currency: 'Currency',
     addToCart: 'Add to cart', outOfStock: 'Out of stock', inStock: 'In stock',
     favorites: 'Favorites', favEmpty: 'No favorites yet', favEmptyHint: 'Tap ♡ on a product to save it here',
@@ -512,8 +522,25 @@ function favHTML(id) {
     aria-pressed="${on}" aria-label="${esc(t('favorites'))}">${icon('i-heart')}</button>`;
 }
 
+// Заглушка, если картинки товара ещё нет (или она не загрузилась)
+const PLACEHOLDER_IMG = 'data:image/svg+xml,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">'
+  + '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+  + '<stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#ff5fa2"/></linearGradient></defs>'
+  + '<rect width="400" height="400" fill="#1f1c29"/>'
+  + '<rect x="163" y="92" width="74" height="150" rx="26" fill="none" stroke="url(#g)" stroke-width="10"/>'
+  + '<path d="M188 128h24" stroke="url(#g)" stroke-width="10" stroke-linecap="round"/>'
+  + '<circle cx="200" cy="200" r="9" fill="url(#g)"/>'
+  + '<text x="200" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-weight="800"'
+  + ' font-size="34" letter-spacing="2" fill="#cdc8da">HORN HUB</text></svg>');
+
+function imgFallback(img) {
+  img.onerror = null;
+  img.src = PLACEHOLDER_IMG;
+}
+
 const IMG_EVENTS = `onload="this.classList.add('is-loaded');this.parentNode.classList.add('is-ready')"
-  onerror="this.classList.add('is-error');this.parentNode.classList.add('is-ready')"`;
+  onerror="imgFallback(this)"`;
 
 function cardHTML(p, index) {
   const eager = index < 4;
@@ -629,7 +656,7 @@ function cartItemHTML({ id, qty }) {
   const p = productById.get(id);
   return `
   <div class="cart-item ${p.outOfStock ? 'is-soldout' : ''}" data-id="${id}">
-    <img src="${esc(p.img)}" alt="${esc(p.name)}" width="76" height="76" decoding="async" data-action="open">
+    <img src="${esc(p.img)}" alt="${esc(p.name)}" width="76" height="76" decoding="async" data-action="open" onerror="imgFallback(this)">
     <div class="ci-info">
       <div class="card-brand">${esc(p.brandTitle)}</div>
       <div class="ci-name">${esc(p.flavor)}</div>
@@ -684,7 +711,7 @@ function renderSheet() {
 
   els.sheetBody.innerHTML = `
     <div class="sheet-media ${p.outOfStock ? 'is-soldout' : ''}">
-      <img src="${esc(p.img)}" alt="${esc(p.name)}" width="800" height="800" decoding="async">
+      <img src="${esc(p.img)}" alt="${esc(p.name)}" width="800" height="800" decoding="async" onerror="imgFallback(this)">
       ${p.discount && !p.outOfStock ? `<span class="tag tag-sale">−${p.discount}%</span>` : ''}
     </div>
     <div class="sheet-info">

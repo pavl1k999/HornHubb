@@ -280,7 +280,6 @@ img { display: block; max-width: 100%; }
   transition: opacity .35s ease, transform .5s var(--ease), filter .3s;
 }
 .media img.is-loaded { opacity: 1; }
-.media img.is-error { opacity: 0; }
 
 .tag {
   position: absolute; z-index: 1;
