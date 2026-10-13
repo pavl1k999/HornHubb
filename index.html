@@ -2,116 +2,265 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vape Shop — Premium</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0a10">
+  <meta name="format-detection" content="telephone=no">
+  <title>HORN HUB — Vape Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="images/banner.png" fetchpriority="high">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<div id="orderModal" class="order-modal hidden">
-  <div class="order-card">
-    <div class="order-header">
-      <div class="order-title">🧾 Ваш заказ</div>
-      <button class="order-close" onclick="closeOrderModal()">✕</button>
-    </div>
+<!-- Иконки -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.7s-6 6.3-6 11.3a6 6 0 0 0 12 0c0-5-6-11.3-6-11.3z"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+  <symbol id="i-pod" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M7 8h10M10 13h4"/></symbol>
+  <symbol id="i-sort" viewBox="0 0 24 24"><path d="M3 6h18M6 12h12M10 18h4"/></symbol>
+  <symbol id="i-sad" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01"/></symbol>
+</svg>
 
-    <div class="order-meta">
-      <span id="orderNumberLabel"></span>
-    </div>
-
-    <textarea id="orderText" readonly></textarea>
-
-    <div class="order-actions">
-      <button class="btn btn-primary" onclick="copyAndOpenTelegram()">
-        📋 Скопировать и открыть Telegram
+<header class="topbar" id="topbar">
+  <div class="topbar-inner">
+    <button class="icon-btn" data-action="menu" data-i18n-aria="menu">
+      <svg class="ic"><use href="#i-menu"/></svg>
+    </button>
+    <button class="logo" data-action="home" aria-label="HORN HUB">
+      HORN<span>HUB</span>
+    </button>
+    <div class="topbar-actions">
+      <button class="icon-btn" data-action="favorites" data-i18n-aria="favorites">
+        <svg class="ic"><use href="#i-heart"/></svg>
+        <span class="badge" id="favBadge" hidden></span>
       </button>
-      <button class="btn btn-outline" onclick="closeOrderModal()">
-        Закрыть
+      <button class="icon-btn" id="cartBtn" data-action="cart" data-i18n-aria="cart">
+        <svg class="ic"><use href="#i-bag"/></svg>
+        <span class="badge badge-accent" id="cartBadge" hidden></span>
       </button>
-    </div>
-  </div>
-</div>
-
-
-<header id="header">
-  <div class="menu-btn" id="menuBtn" onclick="toggleMenu()">☰</div>
-  <div class="title">HORN HUB</div>
-  <div class="header-actions">
-    <div class="lang-currency">
-      <select id="langSelect" onchange="setLang(this.value)">
-        <option value="ru" selected>RU</option>
-        <option value="ua">UA</option>
-        <option value="en">EN</option>
-      </select>
-      <select id="currencySelect" onchange="setCurrency(this.value)">
-        <option value="PLN" selected>zł</option>
-        <option value="EUR">€</option>
-        <option value="UAH">₴</option>
-      </select>
-    </div>
-    <div class="cart-btn" onclick="openCart()">
-      🛒 <span class="cart-count" id="cartCount">0</span>
     </div>
   </div>
 </header>
 
-<div class="sidebar" id="sidebar">
-  <button onclick="showFavorites()" data-i18n="favorites">Избранное ❤️</button>
-</div>
+<main class="app">
 
-<main id="mainPage" class="page">
-  <div class="promo-banner">
-    <img src="images/banner.png" alt="Promo banner">
-  </div>
-  
-<div class="category-panel">
-  <div class="categories">
-    <button class="category-btn active" data-category="all" onclick="filterCategory('all')" data-i18n="allProducts">Все товары</button>
-    <button class="category-btn" data-category="liquid" onclick="filterCategory('liquid')" data-i18n="liquid">Жидкости</button>
-    <button class="category-btn" data-category="disposable" onclick="filterCategory('disposable')" data-i18n="disposable">Одноразки</button>
-    <button class="category-btn" data-category="cartridge" onclick="filterCategory('cartridge')" data-i18n="cartridge">Картриджи</button>
-  </div>
+  <!-- ── Каталог ───────────────────────────────────── -->
+  <section id="shopView" class="view">
+    <div class="hero">
+      <img src="images/banner.png" alt="HORN HUB" width="1536" height="667" fetchpriority="high" decoding="async">
+      <div class="hero-pill" id="heroPill" hidden></div>
+    </div>
 
-  <div class="brands" id="brandFilter" style="display:none;">
-    <button class="brand-btn liquid-brand" data-brand="chaser" onclick="filterBrand('chaser')">Chaser LUX</button>
-    <button class="brand-btn liquid-brand" data-brand="elf" onclick="filterBrand('elf')">Elf Liq</button>
-    <button class="brand-btn liquid-brand" data-brand="vozol" onclick="filterBrand('vozol')">Vozol</button>
-    <button class="brand-btn disposable-brand" data-brand="elfking" onclick="filterBrand('elfking')" style="display:none;">Elf King</button>
-    <button class="brand-btn disposable-brand" data-brand="bcpro" onclick="filterBrand('bcpro')" style="display:none;">BC Pro</button>
-    <button class="brand-btn disposable-brand" data-brand="vozolreve" onclick="filterBrand('vozolreve')" style="display:none;">Vozol Reve</button>
-  </div>
-</div>
+    <div id="listAnchor"></div>
+    <div class="filters" id="filters">
+      <div class="toolbar">
+        <label class="search">
+          <svg class="ic"><use href="#i-search"/></svg>
+          <input id="searchInput" type="search" autocomplete="off" enterkeyhint="search" data-i18n-ph="search">
+          <button type="button" class="search-clear" id="searchClear" data-action="clear-search" data-i18n-aria="close" hidden>
+            <svg class="ic"><use href="#i-x"/></svg>
+          </button>
+        </label>
+        <div class="sort" id="sortWrap">
+          <svg class="ic"><use href="#i-sort"/></svg>
+          <select id="sortSelect" data-i18n-aria="sort">
+            <option value="default" data-i18n="sortDefault"></option>
+            <option value="price-asc" data-i18n="sortPriceAsc"></option>
+            <option value="price-desc" data-i18n="sortPriceDesc"></option>
+            <option value="name" data-i18n="sortName"></option>
+          </select>
+        </div>
+      </div>
+      <div class="chips" id="categoryChips"></div>
+      <div class="chips chips-sm" id="brandChips"></div>
+    </div>
 
-  <div class="products" id="productList"></div>
+    <div class="list-head" id="listHead"></div>
+    <div class="grid" id="productGrid"></div>
+
+    <footer class="footer">
+      <div class="footer-logo">HORN<span>HUB</span></div>
+      <p data-i18n="ageNote"></p>
+    </footer>
+  </section>
+
+  <!-- ── Корзина ───────────────────────────────────── -->
+  <section id="cartView" class="view" hidden>
+    <div class="view-head">
+      <button class="icon-btn" data-action="back" data-i18n-aria="back">
+        <svg class="ic"><use href="#i-back"/></svg>
+      </button>
+      <h1 class="view-title" data-i18n="cart"></h1>
+      <span class="view-sub" id="cartHeadCount"></span>
+      <button class="text-btn" id="clearCartBtn" data-action="clear-cart" data-i18n="clearCart"></button>
+    </div>
+
+    <div id="cartEmpty" class="empty" hidden>
+      <div class="empty-icon"><svg class="ic"><use href="#i-bag"/></svg></div>
+      <div class="empty-title" data-i18n="emptyCart"></div>
+      <div class="empty-hint" data-i18n="emptyCartHint"></div>
+      <button class="btn btn-primary" data-action="back" data-i18n="toCatalog"></button>
+    </div>
+
+    <div id="cartFilled">
+      <div id="cartList" class="cart-list"></div>
+
+      <div class="panel">
+        <label class="field-label" for="orderComment" data-i18n="comment"></label>
+        <textarea id="orderComment" rows="3" maxlength="500" data-i18n-ph="commentPh"></textarea>
+      </div>
+
+      <div class="panel summary">
+        <div class="sum-row"><span id="sumCountLabel"></span><span id="sumFull"></span></div>
+        <div class="sum-row sum-save" id="sumSaveRow"><span data-i18n="discount"></span><span id="sumSaved"></span></div>
+        <div class="sum-row sum-total"><span data-i18n="total"></span><span id="sumTotal"></span></div>
+        <button class="btn btn-primary btn-lg" id="checkoutBtn" data-action="checkout">
+          <span data-i18n="checkout"></span>
+          <svg class="ic"><use href="#i-arrow"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-lg" data-action="contact">
+          <svg class="ic"><use href="#i-chat"/></svg>
+          <span data-i18n="contactAdmin"></span>
+        </button>
+      </div>
+    </div>
+  </section>
 </main>
 
-<section id="cartPage" class="cart-page hidden">
-  <div class="back-btn" onclick="closeCart()" data-i18n="back">← Назад</div>
-  <h3 data-i18n="cart">Корзина</h3>
-  <div id="cartItems"></div>
-  <div id="cartTotal" class="cart-total"></div>
+<!-- Плашка корзины внизу -->
+<button class="cart-bar" id="cartBar" data-action="cart" tabindex="-1" aria-hidden="true">
+  <span class="cart-bar-icon">
+    <svg class="ic"><use href="#i-bag"/></svg>
+    <span class="cart-bar-qty" id="cartBarQty"></span>
+  </span>
+  <span class="cart-bar-info">
+    <span class="cart-bar-total" id="cartBarTotal"></span>
+    <span class="cart-bar-save" id="cartBarSave"></span>
+  </span>
+  <span class="cart-bar-cta">
+    <span data-i18n="toCart"></span>
+    <svg class="ic"><use href="#i-arrow"/></svg>
+  </span>
+</button>
 
-  <button class="checkout-btn" onclick="checkout()" data-i18n="checkout">Оформить заказ</button>
-  <a class="admin-btn" id="adminBtn" target="_blank" data-i18n="contactAdmin">Написать админу</a>
-</section>
+<!-- Меню -->
+<aside class="drawer" id="drawer" inert aria-hidden="true">
+  <div class="drawer-head">
+    <div class="logo">HORN<span>HUB</span></div>
+    <button class="icon-btn" data-action="close" data-i18n-aria="close">
+      <svg class="ic"><use href="#i-x"/></svg>
+    </button>
+  </div>
 
-<div id="toast" class="toast"></div>
+  <nav class="drawer-nav">
+    <button class="nav-item" data-action="nav-category" data-value="all">
+      <svg class="ic"><use href="#i-grid"/></svg><span data-i18n="all"></span><span class="nav-count" data-count="all"></span>
+    </button>
+    <button class="nav-item" data-action="nav-category" data-value="liquid">
+      <svg class="ic"><use href="#i-drop"/></svg><span data-i18n="liquid"></span><span class="nav-count" data-count="liquid"></span>
+    </button>
+    <button class="nav-item" data-action="nav-category" data-value="disposable">
+      <svg class="ic"><use href="#i-zap"/></svg><span data-i18n="disposable"></span><span class="nav-count" data-count="disposable"></span>
+    </button>
+    <button class="nav-item" data-action="nav-category" data-value="cartridge">
+      <svg class="ic"><use href="#i-pod"/></svg><span data-i18n="cartridge"></span><span class="nav-count" data-count="cartridge"></span>
+    </button>
+    <div class="nav-sep"></div>
+    <button class="nav-item" data-action="favorites">
+      <svg class="ic"><use href="#i-heart"/></svg><span data-i18n="favorites"></span><span class="nav-count" data-count="fav"></span>
+    </button>
+    <button class="nav-item" data-action="cart">
+      <svg class="ic"><use href="#i-bag"/></svg><span data-i18n="cart"></span><span class="nav-count" data-count="cart"></span>
+    </button>
+  </nav>
 
-<!-- Modal: order details -->
-<div id="orderModal" class="modal hidden">
-  <div class="modal-content">
-    <h3 data-i18n="orderTitle">Ваш заказ</h3>
-    <div id="orderDetails" class="order-details"></div>
+  <div class="drawer-section">
+    <div class="drawer-label" data-i18n="language"></div>
+    <div class="segmented" id="langSeg">
+      <button data-action="lang" data-value="ru">RU</button>
+      <button data-action="lang" data-value="ua">UA</button>
+      <button data-action="lang" data-value="en">EN</button>
+    </div>
+  </div>
+
+  <div class="drawer-section">
+    <div class="drawer-label" data-i18n="currency"></div>
+    <div class="segmented" id="curSeg">
+      <button data-action="currency" data-value="PLN">zł</button>
+      <button data-action="currency" data-value="EUR">€</button>
+      <button data-action="currency" data-value="UAH">₴</button>
+    </div>
+  </div>
+
+  <div class="drawer-foot">
+    <button class="btn btn-tg btn-lg" data-action="contact">
+      <svg class="ic"><use href="#i-chat"/></svg>
+      <span data-i18n="contactAdmin"></span>
+    </button>
+    <p class="drawer-note" data-i18n="ageNote"></p>
+  </div>
+</aside>
+
+<div class="backdrop" id="backdrop" data-action="close"></div>
+
+<!-- Карточка товара -->
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" inert aria-hidden="true">
+  <div class="sheet-grip"></div>
+  <button class="icon-btn sheet-close" data-action="close" data-i18n-aria="close">
+    <svg class="ic"><use href="#i-x"/></svg>
+  </button>
+  <div class="sheet-body" id="sheetBody"></div>
+</div>
+
+<!-- Оформление заказа -->
+<div class="modal" id="orderModal" role="dialog" aria-modal="true" inert aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" data-i18n="orderTitle"></div>
+        <div class="modal-sub" id="orderMeta"></div>
+      </div>
+      <button class="icon-btn" data-action="close" data-i18n-aria="close">
+        <svg class="ic"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <ol class="order-steps">
+      <li data-i18n="step1"></li>
+      <li data-i18n="step2"></li>
+    </ol>
+    <textarea id="orderText" readonly rows="8"></textarea>
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="copyOrder()" data-i18n="copyOrder">Скопировать заказ</button>
-      <button class="btn btn-primary" onclick="sendOrderTelegram()" data-i18n="sendTelegram">Открыть Telegram</button>
-      <button class="btn btn-outline" onclick="closeOrderModal()" data-i18n="close">Закрыть</button>
+      <button class="btn btn-primary btn-lg" data-action="send-order">
+        <svg class="ic"><use href="#i-send"/></svg>
+        <span data-i18n="sendTelegram"></span>
+      </button>
+      <button class="btn btn-ghost btn-lg" data-action="copy-order">
+        <svg class="ic"><use href="#i-copy"/></svg>
+        <span data-i18n="copy"></span>
+      </button>
     </div>
   </div>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
