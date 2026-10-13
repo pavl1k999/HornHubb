@@ -60,13 +60,7 @@ const CATALOG = [
     ],
     soldOut: [
       'Dragon Fruit Banana Cherry',
-      'Purple Candy',
-      'Pineapple Passion Fruit Lime',
-      'Strawberry Kiwi',
       'Love 777',
-      'Grape Ice',
-      'Watermelon Bubblegum',
-      'Pomegranate Lemonade',
       'Mint Ice',
     ],
   },
