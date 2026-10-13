@@ -58,7 +58,17 @@ const CATALOG = [
       'Pomegranate Lemonade',
       'Mint Ice',
     ],
-    soldOut: [],
+    soldOut: [
+      'Dragon Fruit Banana Cherry',
+      'Purple Candy',
+      'Pineapple Passion Fruit Lime',
+      'Strawberry Kiwi',
+      'Love 777',
+      'Grape Ice',
+      'Watermelon Bubblegum',
+      'Pomegranate Lemonade',
+      'Mint Ice',
+    ],
   },
   {
     brand: 'chaser', title: 'Chaser LUX', category: 'liquid', folder: 'chaser',
@@ -148,12 +158,10 @@ const I18N = {
     locale: 'ru-RU',
     all: 'Все товары', liquid: 'Жидкости', disposable: 'Одноразки', cartridge: 'Картриджи',
     menu: 'Меню', back: 'Назад', close: 'Закрыть', language: 'Язык', currency: 'Валюта',
-    search: 'Поиск по вкусу или бренду', sort: 'Сортировка',
-    sortDefault: 'По умолчанию', sortPriceAsc: 'Сначала дешевле', sortPriceDesc: 'Сначала дороже', sortName: 'По названию',
     addToCart: 'В корзину', outOfStock: 'Нет в наличии', inStock: 'В наличии',
     favorites: 'Избранное', favEmpty: 'В избранном пусто', favEmptyHint: 'Нажмите ♡ на товаре, чтобы сохранить его здесь',
     favAdded: 'Добавлено в избранное', favRemoved: 'Убрано из избранного',
-    toCatalog: 'В каталог', notFound: 'Ничего не найдено', notFoundHint: 'Попробуйте другой запрос или сбросьте фильтры',
+    toCatalog: 'В каталог', notFound: 'Ничего не найдено', notFoundHint: 'Попробуйте сбросить фильтры',
     resetFilters: 'Сбросить фильтры',
     cart: 'Корзина', toCart: 'Корзина', emptyCart: 'Корзина пуста', emptyCartHint: 'Добавьте вкусы из каталога — они появятся здесь',
     clearCart: 'Очистить', cartCleared: 'Корзина очищена', undo: 'Вернуть',
@@ -174,12 +182,10 @@ const I18N = {
     locale: 'uk-UA',
     all: 'Всі товари', liquid: 'Рідини', disposable: 'Одноразки', cartridge: 'Картриджі',
     menu: 'Меню', back: 'Назад', close: 'Закрити', language: 'Мова', currency: 'Валюта',
-    search: 'Пошук за смаком або брендом', sort: 'Сортування',
-    sortDefault: 'За замовчуванням', sortPriceAsc: 'Спочатку дешевші', sortPriceDesc: 'Спочатку дорожчі', sortName: 'За назвою',
     addToCart: 'До кошика', outOfStock: 'Немає в наявності', inStock: 'В наявності',
     favorites: 'Обране', favEmpty: 'В обраному порожньо', favEmptyHint: 'Натисніть ♡ на товарі, щоб зберегти його тут',
     favAdded: 'Додано в обране', favRemoved: 'Прибрано з обраного',
-    toCatalog: 'До каталогу', notFound: 'Нічого не знайдено', notFoundHint: 'Спробуйте інший запит або скиньте фільтри',
+    toCatalog: 'До каталогу', notFound: 'Нічого не знайдено', notFoundHint: 'Спробуйте скинути фільтри',
     resetFilters: 'Скинути фільтри',
     cart: 'Кошик', toCart: 'Кошик', emptyCart: 'Кошик порожній', emptyCartHint: 'Додайте смаки з каталогу — вони з’являться тут',
     clearCart: 'Очистити', cartCleared: 'Кошик очищено', undo: 'Повернути',
@@ -200,12 +206,10 @@ const I18N = {
     locale: 'en-GB',
     all: 'All products', liquid: 'Liquids', disposable: 'Disposables', cartridge: 'Cartridges',
     menu: 'Menu', back: 'Back', close: 'Close', language: 'Language', currency: 'Currency',
-    search: 'Search flavor or brand', sort: 'Sort',
-    sortDefault: 'Default', sortPriceAsc: 'Price: low to high', sortPriceDesc: 'Price: high to low', sortName: 'By name',
     addToCart: 'Add to cart', outOfStock: 'Out of stock', inStock: 'In stock',
     favorites: 'Favorites', favEmpty: 'No favorites yet', favEmptyHint: 'Tap ♡ on a product to save it here',
     favAdded: 'Added to favorites', favRemoved: 'Removed from favorites',
-    toCatalog: 'Browse catalog', notFound: 'Nothing found', notFoundHint: 'Try another search or reset the filters',
+    toCatalog: 'Browse catalog', notFound: 'Nothing found', notFoundHint: 'Try resetting the filters',
     resetFilters: 'Reset filters',
     cart: 'Cart', toCart: 'Cart', emptyCart: 'Your cart is empty', emptyCartHint: 'Add flavors from the catalog and they will show up here',
     clearCart: 'Clear', cartCleared: 'Cart cleared', undo: 'Undo',
@@ -246,8 +250,6 @@ const products = CATALOG.flatMap((b) => b.flavors.map((f, i) => {
 products.forEach((p, i) => {
   p.order = i;
   p.discount = p.sale < p.price ? Math.round((1 - p.sale / p.price) * 100) : 0;
-  // строка для поиска: бренд, вкус и названия категории на всех языках
-  p.haystack = normalize([p.brandTitle, p.flavor, p.brand, ...Object.values(I18N).map((d) => d[p.category])].join(' '));
 });
 const productById = new Map(products.map((p) => [p.id, p]));
 
@@ -319,8 +321,6 @@ const state = {
   currency: CURRENCIES[storage.get('currency')] ? storage.get('currency') : 'PLN',
   category: 'all',
   brand: null,
-  query: '',
-  sort: 'default',
   favoritesOnly: false,
   view: 'shop',
 };
@@ -342,8 +342,6 @@ const $ = (id) => document.getElementById(id);
 const els = {
   shopView: $('shopView'), cartView: $('cartView'),
   heroPill: $('heroPill'), listAnchor: $('listAnchor'),
-  search: $('searchInput'), searchClear: $('searchClear'),
-  sortWrap: $('sortWrap'), sort: $('sortSelect'),
   categoryChips: $('categoryChips'), brandChips: $('brandChips'),
   listHead: $('listHead'), grid: $('productGrid'),
   favBadge: $('favBadge'), cartBadge: $('cartBadge'), cartBtn: $('cartBtn'),
@@ -386,10 +384,6 @@ function money(pln, cur = state.currency) {
   return `${value} ${c.symbol}`;
 }
 
-function normalize(s) {
-  return String(s).toLowerCase().replace(/ё/g, 'е').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
-}
-
 function esc(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
@@ -421,18 +415,8 @@ function visibleProducts() {
     if (state.brand) list = list.filter((p) => p.brand === state.brand);
   }
 
-  const tokens = normalize(state.query).split(' ').filter(Boolean);
-  if (tokens.length) list = list.filter((p) => tokens.every((tk) => p.haystack.includes(tk)));
-
-  const by = {
-    'price-asc': (a, b) => a.sale - b.sale,
-    'price-desc': (a, b) => b.sale - a.sale,
-    name: (a, b) => a.name.localeCompare(b.name),
-  }[state.sort];
-
-  // в наличии — всегда сверху
-  return [...list].sort((a, b) =>
-    (a.outOfStock - b.outOfStock) || (by ? by(a, b) : 0) || (a.order - b.order));
+  // в наличии — сверху, дальше порядок как в каталоге
+  return [...list].sort((a, b) => (a.outOfStock - b.outOfStock) || (a.order - b.order));
 }
 
 function brandsOf(category) {
@@ -497,10 +481,6 @@ function renderChips() {
 
   revealActiveChip(els.categoryChips);
   revealActiveChip(els.brandChips);
-
-  els.sortWrap.classList.toggle('is-active', state.sort !== 'default');
-  els.sort.value = state.sort;
-  els.searchClear.hidden = !state.query;
 }
 
 function revealActiveChip(row) {
@@ -556,6 +536,7 @@ function cardHTML(p, index) {
     <div class="card-body">
       <div class="card-brand">${esc(p.brandTitle)}</div>
       <h3 class="card-title" data-action="open">${esc(p.flavor)}</h3>
+      <div class="card-stock ${p.outOfStock ? 'is-out' : ''}">${esc(t(p.outOfStock ? 'outOfStock' : 'inStock'))}</div>
       <div class="price">
         <span class="price-new">${money(p.sale)}</span>
         ${p.discount ? `<span class="price-old">${money(p.price)}</span>` : ''}
@@ -582,7 +563,7 @@ function renderGrid() {
   renderListHead(list.length);
 
   if (!list.length) {
-    const fav = state.favoritesOnly && !state.query;
+    const fav = state.favoritesOnly;
     els.grid.innerHTML = `
       <div class="empty">
         <div class="empty-icon">${icon(fav ? 'i-heart' : 'i-sad')}</div>
@@ -861,10 +842,7 @@ function exitFavorites() {
 function resetFilters() {
   state.category = 'all';
   state.brand = null;
-  state.query = '';
-  state.sort = 'default';
   state.favoritesOnly = false;
-  els.search.value = '';
   renderChips();
   renderGrid();
   renderNavActive();
@@ -1095,7 +1073,6 @@ const actions = {
   category: (id, el) => { setCategory(el.dataset.value); haptic.select(); },
   brand: (id, el) => { setBrand(el.dataset.value); haptic.select(); },
   'reset-filters': () => resetFilters(),
-  'clear-search': () => { els.search.value = ''; state.query = ''; renderChips(); renderGrid(); els.search.focus(); },
   open: (id) => {
     if (!productById.has(id)) return;
     ui.sheetId = id;
@@ -1136,27 +1113,6 @@ document.addEventListener('click', (e) => {
   if (!handler) return;
   const id = Number(el.dataset.id ?? el.closest('[data-id]')?.dataset.id);
   handler(id, el, e);
-});
-
-let searchTimer = null;
-els.search.addEventListener('input', () => {
-  clearTimeout(searchTimer);
-  els.searchClear.hidden = !els.search.value;
-  searchTimer = setTimeout(() => {
-    state.query = els.search.value;
-    renderGrid();
-  }, 120);
-});
-els.search.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') els.search.blur();
-});
-
-els.sort.addEventListener('change', () => {
-  state.sort = els.sort.value;
-  renderChips();
-  renderGrid();
-  scrollToResults();
-  haptic.select();
 });
 
 els.comment.value = storage.get('orderComment') || '';
