@@ -152,7 +152,7 @@ const CATALOG = [
   // ── Pod-системы ───────────────────────────
   {
     brand: 'vaporesso', title: 'Vaporesso', category: 'pod', folder: 'pod',
-    firstId: 700, price: 140,
+    firstId: 700, price: 180, sale: 140,
     flavors: [
       'XROS 6 Mini Black',
     ],
