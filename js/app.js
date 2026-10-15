@@ -18,6 +18,9 @@
 const ADMIN_NICK = 'gystds';
 const ADMIN_URL = `https://t.me/${ADMIN_NICK}`;
 
+// Районы доставки — покупатель обязан выбрать один при оформлении заказа
+const DISTRICTS = ['Bemowo', 'Ożarów'];
+
 // Курсы относительно злотого
 const CURRENCIES = {
   PLN: { rate: 1,    symbol: 'zł', decimals: 0 },
@@ -188,7 +191,8 @@ const I18N = {
     cart: 'Корзина', toCart: 'Корзина', emptyCart: 'Корзина пуста', emptyCartHint: 'Добавьте вкусы из каталога — они появятся здесь',
     clearCart: 'Очистить', cartCleared: 'Корзина очищена', undo: 'Вернуть',
     addedToCart: 'Добавлено в корзину', removedFromCart: 'Товар удалён',
-    comment: 'Комментарий к заказу', commentPh: 'Адрес, удобное время, пожелания…',
+    comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
+    district: 'Район', districtTitle: 'Выберите район', districtRequired: 'Выберите район, чтобы оформить заказ',
     itemsSum: 'Товары, {n} шт.', discount: 'Скидка', total: 'Итого', checkout: 'Оформить заказ',
     contactAdmin: 'Написать консультанту', unavailable: 'Нет в наличии — не войдёт в заказ',
     orderTitle: 'Ваш заказ', orderNo: 'Заказ', step1: 'Нажмите «Отправить» — откроется чат с консультантом.',
@@ -212,7 +216,8 @@ const I18N = {
     cart: 'Кошик', toCart: 'Кошик', emptyCart: 'Кошик порожній', emptyCartHint: 'Додайте смаки з каталогу — вони з’являться тут',
     clearCart: 'Очистити', cartCleared: 'Кошик очищено', undo: 'Повернути',
     addedToCart: 'Додано до кошика', removedFromCart: 'Товар видалено',
-    comment: 'Коментар до замовлення', commentPh: 'Адреса, зручний час, побажання…',
+    comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
+    district: 'Район', districtTitle: 'Оберіть район', districtRequired: 'Оберіть район, щоб оформити замовлення',
     itemsSum: 'Товари, {n} шт.', discount: 'Знижка', total: 'Разом', checkout: 'Оформити замовлення',
     contactAdmin: 'Написати консультанту', unavailable: 'Немає в наявності — не увійде в замовлення',
     orderTitle: 'Ваше замовлення', orderNo: 'Замовлення', step1: 'Натисніть «Надіслати» — відкриється чат з консультантом.',
@@ -236,7 +241,8 @@ const I18N = {
     cart: 'Cart', toCart: 'Cart', emptyCart: 'Your cart is empty', emptyCartHint: 'Add flavors from the catalog and they will show up here',
     clearCart: 'Clear', cartCleared: 'Cart cleared', undo: 'Undo',
     addedToCart: 'Added to cart', removedFromCart: 'Item removed',
-    comment: 'Order comment', commentPh: 'Address, preferred time, wishes…',
+    comment: 'Order comment', commentPh: 'Preferred time, wishes…',
+    district: 'District', districtTitle: 'Choose your district', districtRequired: 'Choose a district to place the order',
     itemsSum: 'Items, {n} pcs', discount: 'Discount', total: 'Total', checkout: 'Checkout',
     contactAdmin: 'Message consultant', unavailable: 'Out of stock — won’t be ordered',
     orderTitle: 'Your order', orderNo: 'Order', step1: 'Tap “Send” — a chat with the consultant will open.',
@@ -345,6 +351,7 @@ const state = {
   brand: null,
   favoritesOnly: false,
   view: 'shop',
+  district: DISTRICTS.includes(storage.get('district')) ? storage.get('district') : null,
 };
 let cart = loadCart();
 const favorites = loadFavorites();
@@ -371,6 +378,7 @@ const els = {
   cartHeadCount: $('cartHeadCount'), clearCartBtn: $('clearCartBtn'),
   cartEmpty: $('cartEmpty'), cartFilled: $('cartFilled'), cartList: $('cartList'),
   comment: $('orderComment'),
+  districtPanel: $('districtPanel'), districtOptions: $('districtOptions'), districtError: $('districtError'),
   sumCountLabel: $('sumCountLabel'), sumFull: $('sumFull'), sumSaveRow: $('sumSaveRow'),
   sumSaved: $('sumSaved'), sumTotal: $('sumTotal'), checkoutBtn: $('checkoutBtn'),
   drawer: $('drawer'), backdrop: $('backdrop'),
@@ -991,6 +999,7 @@ function buildOrder(existingId) {
     `🧾 ${t('orderNo')} #${id}`,
     `📅 ${date}`,
     client ? `👤 ${t('client')}: ${client}` : null,
+    `📍 ${t('district')}: ${state.district}`,
     '',
     ...items.map((i, n) => `${n + 1}. ${i.p.name} × ${i.qty} — ${money(i.p.sale * i.qty)}`),
     '',
@@ -1001,7 +1010,7 @@ function buildOrder(existingId) {
   ].filter((l) => l !== null);
 
   ui.order = { id, text: lines.join('\n') };
-  els.orderMeta.textContent = `#${id} · ${itemsText(count)} · ${money(total)}`;
+  els.orderMeta.textContent = `#${id} · ${state.district} · ${itemsText(count)} · ${money(total)}`;
   els.orderText.value = ui.order.text;
   return ui.order;
 }
@@ -1009,6 +1018,10 @@ function buildOrder(existingId) {
 function checkout() {
   if (!cartTotals().count) {
     showToast(t('emptyCart'));
+    return;
+  }
+  if (!state.district) {
+    showDistrictError();
     return;
   }
   buildOrder();
@@ -1050,6 +1063,37 @@ function sendOrder() {
   copyText(text).then((ok) => showToast(t(ok ? 'copied' : 'copyFailed')));
   haptic.success();
   openTelegramLink(`${ADMIN_URL}?text=${encodeURIComponent(text)}`);
+}
+
+/* ── Район доставки ───────────────────────────────────── */
+function renderDistricts() {
+  els.districtOptions.innerHTML = DISTRICTS.map((d) => {
+    const on = state.district === d;
+    return `<button class="district-btn ${on ? 'is-active' : ''}" role="radio" aria-checked="${on}"
+      data-action="district" data-value="${esc(d)}">${icon('i-pin')}<span>${esc(d)}</span></button>`;
+  }).join('');
+}
+
+function setDistrict(district) {
+  if (!DISTRICTS.includes(district)) return;
+  state.district = district;
+  storage.set('district', district);
+  if (!els.districtError.hidden) hideToast(); // убираем подсказку «выберите район»
+  els.districtPanel.classList.remove('is-invalid');
+  els.districtError.hidden = true;
+  renderDistricts();
+  haptic.select();
+}
+
+function showDistrictError() {
+  const panel = els.districtPanel;
+  els.districtError.hidden = false;
+  panel.classList.remove('is-invalid');
+  void panel.offsetWidth; // перезапуск анимации
+  panel.classList.add('is-invalid');
+  panel.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' });
+  showToast(t('districtRequired'));
+  haptic.warn();
 }
 
 /* ── Тост ─────────────────────────────────────────────── */
@@ -1142,6 +1186,7 @@ const actions = {
   'send-order': () => sendOrder(),
   contact: () => openTelegramLink(ADMIN_URL),
   'clear-cart': () => clearCart(),
+  district: (id, el) => setDistrict(el.dataset.value),
 };
 
 document.addEventListener('click', (e) => {
@@ -1153,6 +1198,7 @@ document.addEventListener('click', (e) => {
   handler(id, el, e);
 });
 
+renderDistricts();
 els.comment.value = storage.get('orderComment') || '';
 els.comment.addEventListener('input', () => storage.set('orderComment', els.comment.value));
 

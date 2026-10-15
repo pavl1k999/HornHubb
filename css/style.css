@@ -498,6 +498,30 @@ img { display: block; max-width: 100%; }
 .panel textarea:focus { border-color: rgba(139, 92, 246, .6); }
 .panel textarea::placeholder { color: var(--muted); }
 
+.req { color: var(--pink); }
+.district-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.district-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  height: 48px; padding: 0 12px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  color: var(--text-2);
+  font-weight: 600; font-size: 15px;
+  transition: background .2s, border-color .2s, color .2s, box-shadow .2s, transform .1s;
+}
+.district-btn .ic { width: 18px; height: 18px; color: var(--muted); transition: color .2s; }
+.district-btn:active { transform: scale(.97); }
+.district-btn.is-active { background: rgba(139, 92, 246, .16); border-color: var(--violet); color: #fff; box-shadow: 0 0 0 3px rgba(139, 92, 246, .15); }
+.district-btn.is-active .ic { color: var(--pink); }
+@media (hover: hover) { .district-btn:not(.is-active):hover { border-color: rgba(139, 92, 246, .5); color: #fff; } }
+.field-error { margin-top: 8px; color: var(--red); font-size: 13px; font-weight: 600; }
+.panel.is-invalid { border-color: rgba(255, 92, 122, .7); animation: shake .4s var(--ease); }
+@keyframes shake {
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
 .summary { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 .sum-row { display: flex; justify-content: space-between; gap: 12px; color: var(--text-2); font-size: 14px; font-variant-numeric: tabular-nums; }
 .sum-save span:last-child { color: var(--green); font-weight: 600; }
