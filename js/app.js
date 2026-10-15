@@ -826,6 +826,7 @@ function showView(view) {
   els.shopView.hidden = view !== 'shop';
   els.cartView.hidden = view !== 'cart';
   if (view === 'cart') {
+    clearDistrictError();
     renderCart();
     window.scrollTo(0, 0);
   } else {
@@ -1066,33 +1067,50 @@ function sendOrder() {
 }
 
 /* ── Район доставки ───────────────────────────────────── */
+// Кнопки создаются один раз, дальше только переключаем состояние — так не теряется фокус
 function renderDistricts() {
-  els.districtOptions.innerHTML = DISTRICTS.map((d) => {
-    const on = state.district === d;
-    return `<button class="district-btn ${on ? 'is-active' : ''}" role="radio" aria-checked="${on}"
-      data-action="district" data-value="${esc(d)}">${icon('i-pin')}<span>${esc(d)}</span></button>`;
-  }).join('');
+  els.districtOptions.innerHTML = DISTRICTS.map((d) => `
+    <button class="district-btn" role="radio" data-action="district" data-value="${esc(d)}">
+      ${icon('i-pin')}<span>${esc(d)}</span></button>`).join('');
+  syncDistricts();
+}
+
+function syncDistricts() {
+  const buttons = [...els.districtOptions.querySelectorAll('.district-btn')];
+  buttons.forEach((b) => {
+    const on = b.dataset.value === state.district;
+    b.classList.toggle('is-active', on);
+    b.setAttribute('aria-checked', String(on));
+  });
+  // «бегающий» tabindex: в группу попадаем одним Tab, внутри — стрелками
+  const current = buttons.find((b) => b.dataset.value === state.district) || buttons[0];
+  buttons.forEach((b) => { b.tabIndex = b === current ? 0 : -1; });
 }
 
 function setDistrict(district) {
   if (!DISTRICTS.includes(district)) return;
   state.district = district;
   storage.set('district', district);
-  if (!els.districtError.hidden) hideToast(); // убираем подсказку «выберите район»
-  els.districtPanel.classList.remove('is-invalid');
-  els.districtError.hidden = true;
-  renderDistricts();
+  clearDistrictError();
+  syncDistricts();
   haptic.select();
+}
+
+function clearDistrictError() {
+  els.districtPanel.classList.remove('is-invalid', 'shake');
+  els.districtOptions.removeAttribute('aria-invalid');
+  els.districtError.hidden = true;
 }
 
 function showDistrictError() {
   const panel = els.districtPanel;
-  els.districtError.hidden = false;
-  panel.classList.remove('is-invalid');
+  els.districtError.hidden = false; // role="alert" — экранный диктор зачитает текст
+  els.districtOptions.setAttribute('aria-invalid', 'true');
+  panel.classList.remove('shake');
   void panel.offsetWidth; // перезапуск анимации
-  panel.classList.add('is-invalid');
+  panel.classList.add('is-invalid', 'shake');
+  els.districtOptions.querySelector('[tabindex="0"]')?.focus({ preventScroll: true });
   panel.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' });
-  showToast(t('districtRequired'));
   haptic.warn();
 }
 
@@ -1199,6 +1217,16 @@ document.addEventListener('click', (e) => {
 });
 
 renderDistricts();
+els.districtPanel.addEventListener('animationend', () => els.districtPanel.classList.remove('shake'));
+els.districtOptions.addEventListener('keydown', (e) => {
+  const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+  if (!step) return;
+  e.preventDefault();
+  const i = DISTRICTS.indexOf(state.district);
+  const next = DISTRICTS[(i + step + DISTRICTS.length) % DISTRICTS.length];
+  setDistrict(next);
+  els.districtOptions.querySelector('[tabindex="0"]')?.focus();
+});
 els.comment.value = storage.get('orderComment') || '';
 els.comment.addEventListener('input', () => storage.set('orderComment', els.comment.value));
 

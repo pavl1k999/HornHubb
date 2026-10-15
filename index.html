@@ -104,9 +104,10 @@
       <div id="cartList" class="cart-list"></div>
 
       <div class="panel" id="districtPanel">
-        <div class="field-label" id="districtLabel"><span data-i18n="districtTitle"></span> <span class="req">*</span></div>
-        <div class="district-options" id="districtOptions" role="radiogroup" aria-labelledby="districtLabel"></div>
-        <div class="field-error" id="districtError" data-i18n="districtRequired" hidden></div>
+        <div class="field-label" id="districtLabel"><span data-i18n="districtTitle"></span> <span class="req" aria-hidden="true">*</span></div>
+        <div class="district-options" id="districtOptions" role="radiogroup" aria-labelledby="districtLabel"
+          aria-required="true" aria-describedby="districtError"></div>
+        <div class="field-error" id="districtError" role="alert" data-i18n="districtRequired" hidden></div>
       </div>
 
       <div class="panel">
