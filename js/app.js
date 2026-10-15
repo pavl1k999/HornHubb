@@ -104,7 +104,13 @@ const CATALOG = [
       'Sour Pineapple Ice',
       'Sour Strawberry Dragonfruit',
     ],
-    soldOut: [],
+    soldOut: [
+       'Milki Oolong',
+       'Blue Razz Ice',
+       'Sour Apple Ice',
+       'Sour Pineapple Ice',
+       'Sour Strawberry Dragonfruit',
+    ],
   },
   {
     brand: 'bcpro', title: 'BC Pro 40k', short: 'BC Pro', category: 'disposable', folder: 'bcpro',
@@ -116,7 +122,13 @@ const CATALOG = [
       'Strawberry Kiwi',
       'Aurora Berries',
     ],
-    soldOut: [],
+    soldOut: [
+       'Pineapple Rom',
+       'Grape Twist',
+       'Strawberry Raspberry Frost',
+       'Strawberry Kiwi',
+       'Aurora Berries',
+    ],
   },
   {
     brand: 'vozolreve', title: 'Vozol Reve 40k', short: 'Vozol Reve', category: 'disposable', folder: 'vozolreve',
@@ -128,7 +140,13 @@ const CATALOG = [
       'Mango Ice',
       'Grape Ice',
     ],
-    soldOut: [],
+    soldOut: [
+       'Watermelon Bubblegum',
+       'Strawberry Mango',
+       'Kiwi Passion Fruit',
+       'Mango Ice',
+       'Grape Ice',
+    ],
   },
 
   // ── Pod-системы ───────────────────────────
