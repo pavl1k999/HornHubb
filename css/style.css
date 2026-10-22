@@ -202,6 +202,18 @@ img { display: block; max-width: 100%; }
   letter-spacing: .2px;
 }
 
+/* Хэллоуин: фото товаров в тёплых тонах темы, но без потери яркости.
+   Мягкий оранжевый свет (soft-light) + чуть больше сочности и контраста.
+   Сами файлы картинок не меняются. */
+[data-theme="halloween"] :is(.media, .sheet-media, .ci-media) { isolation: isolate; }
+[data-theme="halloween"] :is(.media, .sheet-media, .ci-media) img { filter: saturate(1.15) contrast(1.05); }
+[data-theme="halloween"] :is(.media, .sheet-media, .ci-media)::after {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(180deg, rgba(255, 150, 60, .2) 0%, rgba(255, 100, 20, .42) 100%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
 /* Летучие мыши над баннером (только в теме «Хэллоуин») */
 .bats { display: none; }
 [data-theme="halloween"] .bats { display: block; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
