@@ -238,6 +238,24 @@ img { display: block; max-width: 100%; }
 }
 @keyframes bat-flap { to { transform: scaleY(.45); } }
 
+/* Паутина на фоне каталога: в углах экрана, за карточками */
+.bg-webs { display: none; }
+[data-theme="halloween"] .bg-webs {
+  display: block;
+  position: fixed; inset: 0; z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.bg-web {
+  position: absolute;
+  width: clamp(170px, 52vw, 380px); height: auto; aspect-ratio: 1;
+  fill: none; stroke: rgba(255, 225, 200, .2); stroke-width: 1.2;
+}
+.bg-web-tl { top: calc(var(--top-offset) - 20px); left: -8px; }
+.bg-web-tr { top: calc(var(--top-offset) - 20px); right: -8px; transform: scaleX(-1); width: clamp(200px, 62vw, 440px); }
+.bg-web-bl { bottom: -8px; left: -8px; transform: scaleY(-1); width: clamp(150px, 44vw, 320px); }
+.bg-web-br { bottom: -8px; right: -8px; transform: scale(-1, -1); }
+
 /* Паутина в углу окна выбора района */
 .cobweb { display: none; }
 [data-theme="halloween"] .cobweb {

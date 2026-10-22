@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
   <!-- ?v= — версия файлов: меняйте её, когда меняете вместе index.html и js/css,
        иначе Telegram может взять старый файл из кэша -->
-  <link rel="stylesheet" href="css/style.css?v=2026-10-22-8">
+  <link rel="stylesheet" href="css/style.css?v=2026-10-22-9">
 </head>
 <body>
 
@@ -34,10 +34,19 @@
   <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
   <symbol id="i-podsys" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="4"/><path d="M10.5 6h3"/><circle cx="12" cy="15" r="1.5"/></symbol>
   <symbol id="i-bat" viewBox="0 0 64 28"><path d="M29 12C22 6 12 4 2 7c4 2 5 5 4 8 3-2 6-2 8 1 2-3 5-3 7 1 2-2 5-2 7 1l4 4 4-4c2-3 5-3 7-1 2-4 5-4 7-1 2-3 5-3 8-1-1-3 0-6 4-8-10-3-20-1-27 5l-.5-5-1.7 2.5h-1.6L29.5 7z"/></symbol>
+  <symbol id="i-web2" viewBox="0 0 100 100"><path vector-effect="non-scaling-stroke" d="M0 0L90.6 0.0M0 0L93.2 18.9M0 0L83.2 35.2M0 0L72.5 60.4M0 0L60.7 67.4M0 0L39.0 82.1M0 0L22.7 91.5M0 0L0.0 98.3M11.5 0.0Q10.2 1.0 11.4 2.3Q9.6 3.0 11.2 4.7Q8.8 5.4 9.7 8.1Q7.4 7.1 8.1 9.0Q5.6 8.4 5.1 10.7Q3.7 10.2 3.1 12.3Q1.2 10.0 0.0 11.3M24.2 0.0Q20.7 2.1 23.9 4.8Q19.4 6.0 21.8 9.2Q17.7 10.8 18.6 15.4Q14.5 13.9 15.2 16.9Q10.6 16.0 9.8 20.5Q6.8 19.1 5.6 22.5Q2.5 20.7 0.0 24.5M35.9 0.0Q31.1 3.1 36.6 7.4Q31.3 9.7 34.2 14.5Q26.9 16.4 29.7 24.7Q23.7 22.8 25.4 28.3Q16.9 25.4 15.5 32.6Q11.1 30.9 9.4 38.0Q4.0 32.6 0.0 35.3M51.4 0.0Q46.7 4.7 52.2 10.6Q42.3 13.1 45.9 19.4Q38.0 23.2 40.1 33.4Q30.8 29.7 34.5 38.3Q25.1 37.6 22.1 46.5Q15.0 42.0 12.2 49.2Q5.7 46.3 0.0 53.1M68.5 0.0Q54.5 5.5 63.0 12.8Q54.5 16.8 60.0 25.4Q47.0 28.6 51.7 43.1Q39.2 37.7 41.6 46.2Q30.2 45.3 28.2 59.3Q19.3 54.1 15.3 61.5Q6.3 51.8 0.0 63.0M81.5 0.0Q72.7 7.3 80.8 16.4Q72.1 22.3 79.0 33.4Q60.7 37.0 65.4 54.5Q51.3 49.4 57.3 63.6Q38.5 57.7 34.3 72.1Q22.7 63.6 19.5 78.8Q8.4 69.0 0.0 80.6"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
   <symbol id="i-pod" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M7 8h10M10 13h4"/></symbol>
   <symbol id="i-sad" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01"/></symbol>
 </svg>
+
+<!-- Паутина на фоне (только в теме «Хэллоуин») -->
+<div class="bg-webs" aria-hidden="true">
+  <svg class="bg-web bg-web-tl" viewBox="0 0 100 100"><use href="#i-web2"/></svg>
+  <svg class="bg-web bg-web-tr" viewBox="0 0 100 100"><use href="#i-web2"/></svg>
+  <svg class="bg-web bg-web-bl" viewBox="0 0 100 100"><use href="#i-web2"/></svg>
+  <svg class="bg-web bg-web-br" viewBox="0 0 100 100"><use href="#i-web2"/></svg>
+</div>
 
 <header class="topbar" id="topbar">
   <div class="topbar-inner">
@@ -283,6 +292,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="js/app.js?v=2026-10-22-8"></script>
+<script src="js/app.js?v=2026-10-22-9"></script>
 </body>
 </html>
