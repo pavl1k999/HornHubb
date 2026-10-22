@@ -633,6 +633,8 @@ img { display: block; max-width: 100%; }
   border: 1px solid var(--line);
   border-radius: 14px;
 }
+/* районов может стать много — переносим на новые строки */
+.segmented-wrap { grid-auto-flow: row; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); }
 .segmented button {
   height: 36px; border-radius: 10px;
   font-weight: 600; font-size: 14px; color: var(--text-2);
@@ -870,7 +872,7 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
 .gate-options { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
 .gate-btn {
   display: flex; align-items: center; gap: 12px;
-  min-height: 64px; padding: 10px 14px 10px 10px;
+  min-height: 60px; padding: 8px 14px 8px 8px;
   border-radius: 18px;
   background: var(--surface-2);
   border: 1px solid var(--line-2);
@@ -885,9 +887,7 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
   background: rgba(139, 92, 246, .16);
   color: var(--pink);
 }
-.gate-btn-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.gate-btn-name { font: 600 17px/1.2 var(--font-display); color: #fff; }
-.gate-btn-hint { color: var(--green); font-size: 13px; font-weight: 600; }
+.gate-btn-name { flex: 1; min-width: 0; font: 600 17px/1.2 var(--font-display); color: #fff; overflow-wrap: anywhere; }
 .gate-btn > .ic { width: 20px; height: 20px; color: var(--muted); }
 .gate-btn.is-active { border-color: var(--violet); background: rgba(139, 92, 246, .14); box-shadow: 0 0 0 3px rgba(139, 92, 246, .15); }
 @media (hover: hover) { .gate-btn:hover { border-color: rgba(139, 92, 246, .6); } }

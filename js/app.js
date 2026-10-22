@@ -8,7 +8,8 @@
      Если скидки нет — просто не указывайте sale.
    • Цена зависит от района — укажите sale по районам:
        sale: { 'Bemowo': 40, 'Ożarów': 50 }
-     Названия районов — точно как в DISTRICTS.
+     Названия районов — точно как в DISTRICTS. Если для района цена
+     не указана, берётся цена первого района из списка DISTRICTS.
    • Новый вкус — допишите название В КОНЕЦ списка flavors и
      положите картинку в images/<folder>/. Имя файла — это
      название, где всё кроме латиницы и цифр заменено на "_":
@@ -21,8 +22,9 @@
 const ADMIN_NICK = 'gystds';
 const ADMIN_URL = `https://t.me/${ADMIN_NICK}`;
 
-// Районы Варшавы — покупатель выбирает район при входе (от него зависят цены),
-// район попадает в текст заказа
+// Районы Варшавы. Окно выбора района показывается при каждом входе на сайт,
+// от района зависят цены (см. sale в CATALOG), район попадает в текст заказа.
+// Новый район — просто допишите название в список.
 const DISTRICTS = ['Bemowo', 'Ożarów'];
 
 // Курсы относительно злотого
@@ -197,8 +199,8 @@ const I18N = {
     addedToCart: 'Добавлено в корзину', removedFromCart: 'Товар удалён',
     comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
-    gateTitle: 'Выберите ваш район', gateSub: 'Варшава · цены зависят от района', gateHint: 'Жидкости — {price}',
-    changeDistrict: 'Сменить район', districtChanged: 'Цены обновлены для района {d}',
+    gateTitle: 'Выберите ваш район', gateSub: 'Варшава',
+    changeDistrict: 'Сменить район', districtChanged: 'Район: {d}',
     itemsSum: 'Товары, {n} шт.', discount: 'Скидка', total: 'Итого', checkout: 'Оформить заказ',
     contactAdmin: 'Написать консультанту', unavailable: 'Нет в наличии — не войдёт в заказ',
     orderTitle: 'Ваш заказ', orderNo: 'Заказ', step1: 'Нажмите «Отправить» — откроется чат с консультантом.',
@@ -224,8 +226,8 @@ const I18N = {
     addedToCart: 'Додано до кошика', removedFromCart: 'Товар видалено',
     comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
-    gateTitle: 'Оберіть ваш район', gateSub: 'Варшава · ціни залежать від району', gateHint: 'Рідини — {price}',
-    changeDistrict: 'Змінити район', districtChanged: 'Ціни оновлено для району {d}',
+    gateTitle: 'Оберіть ваш район', gateSub: 'Варшава',
+    changeDistrict: 'Змінити район', districtChanged: 'Район: {d}',
     itemsSum: 'Товари, {n} шт.', discount: 'Знижка', total: 'Разом', checkout: 'Оформити замовлення',
     contactAdmin: 'Написати консультанту', unavailable: 'Немає в наявності — не увійде в замовлення',
     orderTitle: 'Ваше замовлення', orderNo: 'Замовлення', step1: 'Натисніть «Надіслати» — відкриється чат з консультантом.',
@@ -251,8 +253,8 @@ const I18N = {
     addedToCart: 'Added to cart', removedFromCart: 'Item removed',
     comment: 'Order comment', commentPh: 'Preferred time, wishes…',
     district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
-    gateTitle: 'Choose your district', gateSub: 'Warsaw · prices depend on the district', gateHint: 'Liquids — {price}',
-    changeDistrict: 'Change district', districtChanged: 'Prices updated for {d}',
+    gateTitle: 'Choose your district', gateSub: 'Warsaw',
+    changeDistrict: 'Change district', districtChanged: 'District: {d}',
     itemsSum: 'Items, {n} pcs', discount: 'Discount', total: 'Total', checkout: 'Checkout',
     contactAdmin: 'Message consultant', unavailable: 'Out of stock — won’t be ordered',
     orderTitle: 'Your order', orderNo: 'Order', step1: 'Tap “Send” — a chat with the consultant will open.',
@@ -793,7 +795,6 @@ function renderSheet() {
 
 function renderAll() {
   renderStatic();
-  renderGate();
   syncDistricts();
   renderChips();
   renderGrid();
@@ -1102,17 +1103,13 @@ function renderDistricts() {
   syncDistricts();
 }
 
-// Окно выбора района: цена-подсказка зависит от языка и валюты, поэтому перерисовываем
+// Окно выбора района (показывается при входе)
 function renderGate() {
-  els.gateOptions.innerHTML = DISTRICTS.map((d) => {
-    const liquids = CATALOG.filter((b) => b.category === 'liquid');
-    const from = Math.min(...liquids.map((b) => districtPrice(b.sale, b.price, d)));
-    return `<button class="gate-btn" data-action="district" data-value="${esc(d)}">
+  els.gateOptions.innerHTML = DISTRICTS.map((d) => `
+    <button class="gate-btn" data-action="district" data-value="${esc(d)}">
       <span class="gate-btn-icon">${icon('i-pin')}</span>
-      <span class="gate-btn-text"><span class="gate-btn-name">${esc(d)}</span>
-      ${Number.isFinite(from) ? `<span class="gate-btn-hint">${esc(t('gateHint', { price: money(from) }))}</span>` : ''}</span>
-      ${icon('i-arrow')}</button>`;
-  }).join('');
+      <span class="gate-btn-name">${esc(d)}</span>
+      ${icon('i-arrow')}</button>`).join('');
   syncDistricts();
 }
 
@@ -1317,4 +1314,4 @@ window.addEventListener('storage', (e) => {
 /* ── Старт ────────────────────────────────────────────── */
 initTelegram();
 renderAll();
-if (!state.district) openDistrictGate();
+openDistrictGate(); // окно выбора района — при каждом входе (прошлый выбор подсвечен)
