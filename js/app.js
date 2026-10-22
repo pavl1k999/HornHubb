@@ -713,7 +713,7 @@ function cartItemHTML({ id, qty }) {
   const p = productById.get(id);
   return `
   <div class="cart-item ${p.outOfStock ? 'is-soldout' : ''}" data-id="${id}">
-    <img src="${esc(p.img)}" alt="${esc(p.name)}" width="76" height="76" decoding="async" data-action="open" onerror="imgFallback(this)">
+    <span class="ci-media" data-action="open"><img src="${esc(p.img)}" alt="${esc(p.name)}" width="76" height="76" decoding="async" onerror="imgFallback(this)"></span>
     <div class="ci-info">
       <div class="card-brand">${esc(p.brandTitle)}</div>
       <div class="ci-name">${esc(p.flavor)}</div>

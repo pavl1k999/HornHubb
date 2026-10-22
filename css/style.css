@@ -202,8 +202,15 @@ img { display: block; max-width: 100%; }
   letter-spacing: .2px;
 }
 
-/* Хэллоуин: плашка скидки справа — слева на баннере тыква */
-[data-theme="halloween"] .hero-pill { left: auto; right: 12px; }
+/* Хэллоуин: тёплый оранжевый оттенок поверх фото товаров, чтобы фиолетовые
+   картинки не спорили с оранжевой темой (сами файлы картинок не меняются) */
+[data-theme="halloween"] :is(.media, .sheet-media, .ci-media) { isolation: isolate; }
+[data-theme="halloween"] :is(.media, .sheet-media, .ci-media)::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255, 140, 40, .2) 0%, rgba(255, 105, 20, .4) 100%);
+  mix-blend-mode: color;
+  pointer-events: none;
+}
 
 /* Летучие мыши над баннером (только в теме «Хэллоуин») */
 .bats { display: none; }
@@ -242,14 +249,23 @@ img { display: block; max-width: 100%; }
 .filters {
   position: sticky; top: var(--top-offset); z-index: 40;
   padding: 6px 12px;
-  background: linear-gradient(180deg, rgba(var(--bg-rgb), .96) 70%, rgba(var(--bg-rgb), .0));
+}
+/* Фон панели — отдельным слоем, который плавно растворяется книзу (без резкой границы размытия) */
+.filters::before {
+  content: ''; position: absolute; z-index: -1;
+  inset: 0 0 -18px;
+  background: linear-gradient(180deg, rgba(var(--bg-rgb), .97) 0%, rgba(var(--bg-rgb), .9) 60%, rgba(var(--bg-rgb), 0) 100%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent);
+  mask-image: linear-gradient(180deg, #000 55%, transparent);
+  pointer-events: none;
 }
 .chips {
   display: flex; gap: 8px;
   position: relative;
-  margin: 0 -12px -6px; padding: 4px 12px 10px;
+  /* запас сверху и снизу, чтобы свечение активной кнопки не обрезалось */
+  margin: -6px -12px -12px; padding: 10px 12px 16px;
   overflow-x: auto; scrollbar-width: none;
 }
 .chips::-webkit-scrollbar { display: none; }
@@ -271,15 +287,15 @@ img { display: block; max-width: 100%; }
 .chip .ic { width: 16px; height: 16px; }
 .chip-count { font-size: 11.5px; font-weight: 600; opacity: .55; }
 .chip.is-active {
-  background: var(--grad);
+  background: var(--grad) border-box;
   border-color: transparent;
   color: #fff;
-  box-shadow: var(--glow);
+  box-shadow: 0 3px 12px rgba(var(--glow-rgb), .45); /* компактное свечение — помещается в ряд */
 }
 .chip.is-active .chip-count { opacity: .85; }
 @media (hover: hover) { .chip:not(.is-active):hover { border-color: var(--line-2); color: #fff; } }
 
-.chips-sm { margin-top: 2px; }
+.chips-sm { margin-top: -4px; }
 .chips-sm .chip { height: 30px; padding: 0 12px; font-size: 12.5px; }
 .chips-sm .chip.is-active {
   background: rgba(var(--accent-rgb), .18);
@@ -532,12 +548,15 @@ img { display: block; max-width: 100%; }
   border-radius: var(--radius);
   animation: cardIn .3s var(--ease) both;
 }
-.cart-item img {
+.ci-media {
+  position: relative;
   width: 76px; height: 76px;
-  border-radius: 13px; object-fit: cover;
+  border-radius: 13px;
+  overflow: hidden;
   background: var(--surface-3);
   cursor: pointer;
 }
+.ci-media img { width: 100%; height: 100%; object-fit: cover; }
 .ci-info { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
 .ci-name { font-weight: 600; font-size: 14px; line-height: 1.3; margin-top: 2px; }
 .ci-price { margin-top: 5px; font-size: 13px; color: var(--text-2); }
