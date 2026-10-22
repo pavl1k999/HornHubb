@@ -6,6 +6,9 @@
    Как обновлять каталог (всё в CATALOG ниже):
    • price — старая цена, sale — цена со скидкой (в злотых).
      Если скидки нет — просто не указывайте sale.
+   • Цена зависит от района — укажите sale по районам:
+       sale: { 'Bemowo': 40, 'Ożarów': 50 }
+     Названия районов — точно как в DISTRICTS.
    • Новый вкус — допишите название В КОНЕЦ списка flavors и
      положите картинку в images/<folder>/. Имя файла — это
      название, где всё кроме латиницы и цифр заменено на "_":
@@ -18,7 +21,8 @@
 const ADMIN_NICK = 'gystds';
 const ADMIN_URL = `https://t.me/${ADMIN_NICK}`;
 
-// Районы доставки — покупатель обязан выбрать один при оформлении заказа
+// Районы Варшавы — покупатель выбирает район при входе (от него зависят цены),
+// район попадает в текст заказа
 const DISTRICTS = ['Bemowo', 'Ożarów'];
 
 // Курсы относительно злотого
@@ -32,7 +36,7 @@ const CATALOG = [
   // ── Жидкости ──────────────────────────────
   {
     brand: 'elf', title: 'Elf Liq', category: 'liquid', folder: 'elf',
-    firstId: 1, price: 50, sale: 40,
+    firstId: 1, price: 50, sale: { 'Bemowo': 40, 'Ożarów': 50 },
     flavors: [
       'Blackcurrant Aniseed',
       'Pineapple Colada',
@@ -49,7 +53,7 @@ const CATALOG = [
   },
   {
     brand: 'vozol', title: 'Vozol', category: 'liquid', folder: 'vazool',
-    firstId: 200, price: 50, sale: 40,
+    firstId: 200, price: 50, sale: { 'Bemowo': 40, 'Ożarów': 50 },
     flavors: [
       'Dragon Fruit Banana Cherry',
       'Purple Candy',
@@ -69,7 +73,7 @@ const CATALOG = [
   },
   {
     brand: 'chaser', title: 'Chaser LUX', category: 'liquid', folder: 'chaser',
-    firstId: 100, price: 60, sale: 40,
+    firstId: 100, price: 60, sale: { 'Bemowo': 40, 'Ożarów': 50 },
     flavors: [
       'Grape Mint',
       'Berry Lemonade',
@@ -192,7 +196,9 @@ const I18N = {
     clearCart: 'Очистить', cartCleared: 'Корзина очищена', undo: 'Вернуть',
     addedToCart: 'Добавлено в корзину', removedFromCart: 'Товар удалён',
     comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
-    district: 'Район', districtTitle: 'Выберите район', districtRequired: 'Выберите район, чтобы оформить заказ',
+    district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
+    gateTitle: 'Выберите ваш район', gateSub: 'Варшава · цены зависят от района', gateHint: 'Жидкости — {price}',
+    changeDistrict: 'Сменить район', districtChanged: 'Цены обновлены для района {d}',
     itemsSum: 'Товары, {n} шт.', discount: 'Скидка', total: 'Итого', checkout: 'Оформить заказ',
     contactAdmin: 'Написать консультанту', unavailable: 'Нет в наличии — не войдёт в заказ',
     orderTitle: 'Ваш заказ', orderNo: 'Заказ', step1: 'Нажмите «Отправить» — откроется чат с консультантом.',
@@ -217,7 +223,9 @@ const I18N = {
     clearCart: 'Очистити', cartCleared: 'Кошик очищено', undo: 'Повернути',
     addedToCart: 'Додано до кошика', removedFromCart: 'Товар видалено',
     comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
-    district: 'Район', districtTitle: 'Оберіть район', districtRequired: 'Оберіть район, щоб оформити замовлення',
+    district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
+    gateTitle: 'Оберіть ваш район', gateSub: 'Варшава · ціни залежать від району', gateHint: 'Рідини — {price}',
+    changeDistrict: 'Змінити район', districtChanged: 'Ціни оновлено для району {d}',
     itemsSum: 'Товари, {n} шт.', discount: 'Знижка', total: 'Разом', checkout: 'Оформити замовлення',
     contactAdmin: 'Написати консультанту', unavailable: 'Немає в наявності — не увійде в замовлення',
     orderTitle: 'Ваше замовлення', orderNo: 'Замовлення', step1: 'Натисніть «Надіслати» — відкриється чат з консультантом.',
@@ -242,7 +250,9 @@ const I18N = {
     clearCart: 'Clear', cartCleared: 'Cart cleared', undo: 'Undo',
     addedToCart: 'Added to cart', removedFromCart: 'Item removed',
     comment: 'Order comment', commentPh: 'Preferred time, wishes…',
-    district: 'District', districtTitle: 'Choose your district', districtRequired: 'Choose a district to place the order',
+    district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
+    gateTitle: 'Choose your district', gateSub: 'Warsaw · prices depend on the district', gateHint: 'Liquids — {price}',
+    changeDistrict: 'Change district', districtChanged: 'Prices updated for {d}',
     itemsSum: 'Items, {n} pcs', discount: 'Discount', total: 'Total', checkout: 'Checkout',
     contactAdmin: 'Message consultant', unavailable: 'Out of stock — won’t be ordered',
     orderTitle: 'Your order', orderNo: 'Order', step1: 'Tap “Send” — a chat with the consultant will open.',
@@ -270,15 +280,25 @@ const products = CATALOG.flatMap((b) => b.flavors.map((f, i) => {
     name: `${b.title} – ${flavor}`,
     category: b.category,
     price: b.price,
-    sale: b.sale ?? b.price,
+    salePrices: b.sale,
     img: `images/${b.folder}/${file}`,
     outOfStock: (b.soldOut || []).includes(flavor),
+    // цена и скидка считаются для выбранного района
+    get sale() { return districtPrice(this.salePrices, this.price); },
+    get discount() {
+      const sale = this.sale;
+      return sale < this.price ? Math.round((1 - sale / this.price) * 100) : 0;
+    },
   };
 }));
-products.forEach((p, i) => {
-  p.order = i;
-  p.discount = p.sale < p.price ? Math.round((1 - p.sale / p.price) * 100) : 0;
-});
+products.forEach((p, i) => { p.order = i; });
+
+// sale: число — одна цена везде; объект { 'Район': цена } — цена по районам
+function districtPrice(sale, price, district = state.district) {
+  if (sale == null) return price;
+  if (typeof sale !== 'object') return sale;
+  return sale[district] ?? sale[DISTRICTS[0]] ?? price;
+}
 const productById = new Map(products.map((p) => [p.id, p]));
 
 /* ── Telegram ─────────────────────────────────────────── */
@@ -379,6 +399,7 @@ const els = {
   cartEmpty: $('cartEmpty'), cartFilled: $('cartFilled'), cartList: $('cartList'),
   comment: $('orderComment'),
   districtPanel: $('districtPanel'), districtOptions: $('districtOptions'), districtError: $('districtError'),
+  gate: $('districtGate'), gateOptions: $('gateOptions'), drawerDistricts: $('drawerDistricts'), heroDistrict: $('heroDistrict'),
   sumCountLabel: $('sumCountLabel'), sumFull: $('sumFull'), sumSaveRow: $('sumSaveRow'),
   sumSaved: $('sumSaved'), sumTotal: $('sumTotal'), checkoutBtn: $('checkoutBtn'),
   drawer: $('drawer'), backdrop: $('backdrop'),
@@ -386,7 +407,7 @@ const els = {
   order: $('orderModal'), orderMeta: $('orderMeta'), orderText: $('orderText'),
   toast: $('toast'),
 };
-const overlays = { drawer: els.drawer, sheet: els.sheet, order: els.order };
+const overlays = { drawer: els.drawer, sheet: els.sheet, order: els.order, gate: els.gate };
 
 /* ── Утилиты ──────────────────────────────────────────── */
 function t(key, vars) {
@@ -460,7 +481,7 @@ function renderStatic() {
   document.querySelectorAll('[data-i18n-ph]').forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
   document.querySelectorAll('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
 
-  document.querySelectorAll('#langSeg button').forEach((b) => b.classList.toggle('is-active', b.dataset.value === state.lang));
+  document.querySelectorAll('[data-action="lang"]').forEach((b) => b.classList.toggle('is-active', b.dataset.value === state.lang));
   document.querySelectorAll('#curSeg button').forEach((b) => b.classList.toggle('is-active', b.dataset.value === state.currency));
 
   const maxSale = Math.max(0, ...products.filter((p) => !p.outOfStock).map((p) => p.discount));
@@ -772,6 +793,8 @@ function renderSheet() {
 
 function renderAll() {
   renderStatic();
+  renderGate();
+  syncDistricts();
   renderChips();
   renderGrid();
   renderBadges();
@@ -796,6 +819,7 @@ function openOverlay(name) {
 
 function closeOverlay() {
   if (!ui.overlay) return;
+  if (ui.overlay === 'gate' && !state.district) return; // без района в магазин не пускаем
   const el = overlays[ui.overlay];
   el.classList.remove('is-open');
   el.inert = true;
@@ -1072,28 +1096,65 @@ function renderDistricts() {
   els.districtOptions.innerHTML = DISTRICTS.map((d) => `
     <button class="district-btn" role="radio" data-action="district" data-value="${esc(d)}">
       ${icon('i-pin')}<span>${esc(d)}</span></button>`).join('');
+  els.drawerDistricts.innerHTML = DISTRICTS.map((d) =>
+    `<button data-action="district" data-value="${esc(d)}">${esc(d)}</button>`).join('');
+  renderGate();
+  syncDistricts();
+}
+
+// Окно выбора района: цена-подсказка зависит от языка и валюты, поэтому перерисовываем
+function renderGate() {
+  els.gateOptions.innerHTML = DISTRICTS.map((d) => {
+    const liquids = CATALOG.filter((b) => b.category === 'liquid');
+    const from = Math.min(...liquids.map((b) => districtPrice(b.sale, b.price, d)));
+    return `<button class="gate-btn" data-action="district" data-value="${esc(d)}">
+      <span class="gate-btn-icon">${icon('i-pin')}</span>
+      <span class="gate-btn-text"><span class="gate-btn-name">${esc(d)}</span>
+      ${Number.isFinite(from) ? `<span class="gate-btn-hint">${esc(t('gateHint', { price: money(from) }))}</span>` : ''}</span>
+      ${icon('i-arrow')}</button>`;
+  }).join('');
   syncDistricts();
 }
 
 function syncDistricts() {
-  const buttons = [...els.districtOptions.querySelectorAll('.district-btn')];
-  buttons.forEach((b) => {
+  const radios = [...els.districtOptions.querySelectorAll('.district-btn')];
+  radios.forEach((b) => {
     const on = b.dataset.value === state.district;
     b.classList.toggle('is-active', on);
     b.setAttribute('aria-checked', String(on));
   });
   // «бегающий» tabindex: в группу попадаем одним Tab, внутри — стрелками
-  const current = buttons.find((b) => b.dataset.value === state.district) || buttons[0];
-  buttons.forEach((b) => { b.tabIndex = b === current ? 0 : -1; });
+  const current = radios.find((b) => b.dataset.value === state.district) || radios[0];
+  radios.forEach((b) => { b.tabIndex = b === current ? 0 : -1; });
+
+  document.querySelectorAll('#drawerDistricts button, #gateOptions button').forEach((b) => {
+    b.classList.toggle('is-active', b.dataset.value === state.district);
+  });
+  els.heroDistrict.hidden = !state.district;
+  els.heroDistrict.querySelector('span').textContent = state.district || '';
+  els.gate.classList.toggle('is-dismissible', Boolean(state.district));
 }
 
 function setDistrict(district) {
   if (!DISTRICTS.includes(district)) return;
+  const prev = state.district;
   state.district = district;
   storage.set('district', district);
   clearDistrictError();
-  syncDistricts();
   haptic.select();
+  if (ui.overlay === 'gate') closeOverlay();
+  if (prev !== district) {
+    renderAll(); // цены зависят от района
+    if (prev) showToast(t('districtChanged', { d: district }));
+  } else {
+    syncDistricts();
+  }
+}
+
+function openDistrictGate() {
+  openOverlay('gate');
+  const btn = els.gateOptions.querySelector('.is-active') || els.gateOptions.querySelector('button');
+  btn?.focus({ preventScroll: true });
 }
 
 function clearDistrictError() {
@@ -1205,6 +1266,7 @@ const actions = {
   contact: () => openTelegramLink(ADMIN_URL),
   'clear-cart': () => clearCart(),
   district: (id, el) => setDistrict(el.dataset.value),
+  'change-district': () => { closeOverlay(); openDistrictGate(); },
 };
 
 document.addEventListener('click', (e) => {
@@ -1236,6 +1298,14 @@ document.addEventListener('keydown', (e) => {
 
 // Синхронизация между вкладками браузера
 window.addEventListener('storage', (e) => {
+  if (e.key === 'district') {
+    if (DISTRICTS.includes(e.newValue) && e.newValue !== state.district) {
+      state.district = e.newValue;
+      if (ui.overlay === 'gate') closeOverlay();
+      renderAll();
+    }
+    return;
+  }
   if (e.key !== 'cart' && e.key !== 'favorites') return;
   cart = loadCart();
   const fresh = loadFavorites();
@@ -1247,3 +1317,4 @@ window.addEventListener('storage', (e) => {
 /* ── Старт ────────────────────────────────────────────── */
 initTelegram();
 renderAll();
+if (!state.district) openDistrictGate();

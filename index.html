@@ -32,6 +32,7 @@
   <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.7s-6 6.3-6 11.3a6 6 0 0 0 12 0c0-5-6-11.3-6-11.3z"/></symbol>
   <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
   <symbol id="i-podsys" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="4"/><path d="M10.5 6h3"/><circle cx="12" cy="15" r="1.5"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
   <symbol id="i-pod" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M7 8h10M10 13h4"/></symbol>
   <symbol id="i-sad" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01"/></symbol>
@@ -65,6 +66,9 @@
     <div class="hero">
       <img src="images/banner.png" alt="HORN HUB" width="1536" height="667" fetchpriority="high" decoding="async">
       <div class="hero-pill" id="heroPill" hidden></div>
+      <button class="hero-district" id="heroDistrict" data-action="change-district" data-i18n-aria="changeDistrict" hidden>
+        <svg class="ic"><use href="#i-pin"/></svg><span></span><svg class="ic ic-sm"><use href="#i-chevron"/></svg>
+      </button>
     </div>
 
     <div id="listAnchor"></div>
@@ -183,6 +187,11 @@
   </nav>
 
   <div class="drawer-section">
+    <div class="drawer-label" data-i18n="district"></div>
+    <div class="segmented" id="drawerDistricts"></div>
+  </div>
+
+  <div class="drawer-section">
     <div class="drawer-label" data-i18n="language"></div>
     <div class="segmented" id="langSeg">
       <button data-action="lang" data-value="ru">RU</button>
@@ -246,6 +255,24 @@
         <svg class="ic"><use href="#i-copy"/></svg>
         <span data-i18n="copy"></span>
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Выбор района при входе -->
+<div class="gate" id="districtGate" role="dialog" aria-modal="true" aria-labelledby="gateTitle" inert aria-hidden="true">
+  <div class="gate-card">
+    <button class="icon-btn gate-close" data-action="close" data-i18n-aria="close">
+      <svg class="ic"><use href="#i-x"/></svg>
+    </button>
+    <div class="logo gate-logo">HORN<span>HUB</span></div>
+    <h2 class="gate-title" id="gateTitle" data-i18n="gateTitle"></h2>
+    <p class="gate-sub" data-i18n="gateSub"></p>
+    <div class="gate-options" id="gateOptions"></div>
+    <div class="segmented gate-lang">
+      <button data-action="lang" data-value="ru">RU</button>
+      <button data-action="lang" data-value="ua">UA</button>
+      <button data-action="lang" data-value="en">EN</button>
     </div>
   </div>
 </div>
