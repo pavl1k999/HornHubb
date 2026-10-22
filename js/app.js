@@ -793,16 +793,21 @@ function renderSheet() {
   els.sheetBody.scrollTop = 0;
 }
 
+// Ошибка в одной части не должна ронять весь магазин
+function safely(fn) {
+  try { fn(); } catch (err) { console.error(err); }
+}
+
 function renderAll() {
-  renderStatic();
-  syncDistricts();
-  renderChips();
-  renderGrid();
-  renderBadges();
-  renderCartBar();
-  if (state.view === 'cart') renderCart();
-  if (ui.overlay === 'sheet') renderSheet();
-  if (ui.overlay === 'order') buildOrder(ui.order?.id);
+  safely(renderStatic);
+  safely(renderChips);
+  safely(renderGrid);
+  safely(renderBadges);
+  safely(renderCartBar);
+  if (state.view === 'cart') safely(renderCart);
+  if (ui.overlay === 'sheet') safely(renderSheet);
+  if (ui.overlay === 'order') safely(() => buildOrder(ui.order?.id));
+  safely(syncDistricts);
 }
 
 /* ── Оверлеи и навигация ──────────────────────────────── */
@@ -1272,7 +1277,7 @@ document.addEventListener('click', (e) => {
   handler(id, el, e);
 });
 
-renderDistricts();
+safely(renderDistricts);
 els.districtPanel.addEventListener('animationend', () => els.districtPanel.classList.remove('shake'));
 els.districtOptions.addEventListener('keydown', (e) => {
   const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
@@ -1309,6 +1314,6 @@ window.addEventListener('storage', (e) => {
 });
 
 /* ── Старт ────────────────────────────────────────────── */
-initTelegram();
+safely(initTelegram);
 renderAll();
-openDistrictGate(); // окно выбора района — при каждом входе (прошлый выбор подсвечен)
+safely(openDistrictGate); // окно выбора района — при каждом входе (прошлый выбор подсвечен)
