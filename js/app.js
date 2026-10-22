@@ -27,6 +27,9 @@ const ADMIN_URL = `https://t.me/${ADMIN_NICK}`;
 // Новый район — просто допишите название в список.
 const DISTRICTS = ['Bemowo', 'Ożarów'];
 
+// Оформление задаётся в index.html: <html data-theme="halloween"> (убрать атрибут — обычный вид)
+const THEME = document.documentElement.dataset.theme || 'default';
+
 // Курсы относительно злотого
 const CURRENCIES = {
   PLN: { rate: 1,    symbol: 'zł', decimals: 0 },
@@ -207,7 +210,7 @@ const I18N = {
     step2: 'Текст заказа уже скопирован. Если он не подставился сам — просто вставьте его в сообщение.',
     sendTelegram: 'Отправить в Telegram', copy: 'Скопировать текст', copied: 'Заказ скопирован ✅',
     copyFailed: 'Не удалось скопировать — выделите текст вручную',
-    client: 'Клиент', pcs: 'шт.', saleUpTo: '🔥 Скидки до −{n}%', moreFlavors: 'Другие вкусы {brand}',
+    client: 'Клиент', pcs: 'шт.', saleUpTo: 'Скидки до −{n}%', moreFlavors: 'Другие вкусы {brand}',
     soldOutGroup: 'Нет в наличии', maxQty: 'Максимум {n} шт.',
     ageNote: '18+ · Продукция содержит никотин и предназначена только для совершеннолетних.',
     items: ['товар', 'товара', 'товаров'],
@@ -234,7 +237,7 @@ const I18N = {
     step2: 'Текст замовлення вже скопійовано. Якщо він не підставився сам — просто вставте його в повідомлення.',
     sendTelegram: 'Надіслати в Telegram', copy: 'Скопіювати текст', copied: 'Замовлення скопійовано ✅',
     copyFailed: 'Не вдалося скопіювати — виділіть текст вручну',
-    client: 'Клієнт', pcs: 'шт.', saleUpTo: '🔥 Знижки до −{n}%', moreFlavors: 'Інші смаки {brand}',
+    client: 'Клієнт', pcs: 'шт.', saleUpTo: 'Знижки до −{n}%', moreFlavors: 'Інші смаки {brand}',
     soldOutGroup: 'Немає в наявності', maxQty: 'Максимум {n} шт.',
     ageNote: '18+ · Продукція містить нікотин і призначена лише для повнолітніх.',
     items: ['товар', 'товари', 'товарів'],
@@ -261,7 +264,7 @@ const I18N = {
     step2: 'The order text is already copied. If it isn’t filled in automatically, just paste it into the message.',
     sendTelegram: 'Send via Telegram', copy: 'Copy text', copied: 'Order copied ✅',
     copyFailed: 'Couldn’t copy — please select the text manually',
-    client: 'Customer', pcs: 'pcs', saleUpTo: '🔥 Up to −{n}% off', moreFlavors: 'More {brand} flavors',
+    client: 'Customer', pcs: 'pcs', saleUpTo: 'Up to −{n}% off', moreFlavors: 'More {brand} flavors',
     soldOutGroup: 'Out of stock', maxQty: 'Max {n} pcs',
     ageNote: '18+ · Products contain nicotine and are intended for adults only.',
     items: ['item', 'items'],
@@ -315,15 +318,20 @@ const haptic = {
   warn()    { if (tgVersion('6.1')) try { tg.HapticFeedback.notificationOccurred('warning'); } catch {} },
 };
 
+// Цвет из текущей темы (css/style.css), чтобы шапка Telegram совпадала с сайтом
+function themeColor(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#0b0a10';
+}
+
 function initTelegram() {
   if (!isTg) return;
   document.documentElement.classList.add('is-tg');
   try { tg.ready(); tg.expand(); } catch {}
   if (tgVersion('6.1')) {
-    try { tg.setHeaderColor('#0b0a10'); tg.setBackgroundColor('#0b0a10'); } catch {}
+    try { tg.setHeaderColor(themeColor('--bg')); tg.setBackgroundColor(themeColor('--bg')); } catch {}
     try { tg.BackButton.onClick(goBack); } catch {}
   }
-  if (tgVersion('7.10')) try { tg.setBottomBarColor('#0b0a10'); } catch {}
+  if (tgVersion('7.10')) try { tg.setBottomBarColor(themeColor('--bg')); } catch {}
   if (tgVersion('7.7')) try { tg.disableVerticalSwipes(); } catch {}
 }
 
@@ -488,7 +496,7 @@ function renderStatic() {
 
   const maxSale = Math.max(0, ...products.filter((p) => !p.outOfStock).map((p) => p.discount));
   els.heroPill.hidden = !maxSale;
-  els.heroPill.textContent = t('saleUpTo', { n: maxSale });
+  els.heroPill.textContent = `${THEME === 'halloween' ? '🎃' : '🔥'} ${t('saleUpTo', { n: maxSale })}`;
 
   document.querySelectorAll('[data-count]').forEach((el) => {
     const key = el.dataset.count;
@@ -575,8 +583,8 @@ function favHTML(id) {
 const PLACEHOLDER_IMG = 'data:image/svg+xml,' + encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">'
   + '<defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="163" y1="92" x2="237" y2="242">'
-  + '<stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#ff5fa2"/></linearGradient></defs>'
-  + '<rect width="400" height="400" fill="#1f1c29"/>'
+  + `<stop offset="0" stop-color="${themeColor('--violet')}"/><stop offset="1" stop-color="${themeColor('--pink')}"/></linearGradient></defs>`
+  + `<rect width="400" height="400" fill="${themeColor('--surface-2')}"/>`
   + '<rect x="163" y="92" width="74" height="150" rx="26" fill="none" stroke="url(#g)" stroke-width="10"/>'
   + '<path d="M188 128h24" stroke="url(#g)" stroke-width="10" stroke-linecap="round"/>'
   + '<circle cx="200" cy="200" r="9" fill="url(#g)"/>'

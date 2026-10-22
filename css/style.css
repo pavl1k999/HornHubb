@@ -18,8 +18,17 @@
   --green: #3ddc97;
   --red: #ff5c7a;
   --tg: #2aabee;
+  --accent-rgb: 139, 92, 246;   /* основной акцент (для полупрозрачных оттенков) */
+  --accent2-rgb: 255, 95, 162;  /* второй акцент */
+  --bg-rgb: 11, 10, 16;
+  --glow-rgb: 160, 80, 240;
+  --accent-soft: #d6c4ff;
+  --accent-ink: #7b3fe4;
   --grad: linear-gradient(135deg, #8b5cf6 0%, #c44ff0 55%, #ff5fa2 100%);
-  --glow: 0 8px 24px rgba(160, 80, 240, .35);
+  --banner: url('../images/banner.png');
+  --banner-ratio: 1536 / 667;
+  --banner-pos: center 18%;
+  --glow: 0 8px 24px rgba(var(--glow-rgb), .35);
   --shadow: 0 14px 36px rgba(0, 0, 0, .5);
   --radius: 18px;
   --radius-sm: 12px;
@@ -37,6 +46,36 @@
   color-scheme: dark;
 }
 
+/* ── Тема «Хэллоуин» ───────────────────────────────────
+   Включается атрибутом data-theme="halloween" у <html> в index.html.
+   Чтобы вернуть обычный вид — просто уберите этот атрибут. */
+:root[data-theme="halloween"] {
+  --bg: #0d0908;
+  --bg-rgb: 13, 9, 8;
+  --bg-elev: #16100d;
+  --surface: #1b1411;
+  --surface-2: #241a16;
+  --surface-3: #33251f;
+  --line: rgba(255, 214, 180, .08);
+  --line-2: rgba(255, 214, 180, .15);
+  --text: #fcf5ee;
+  --text-2: #e0d0c3;
+  --muted: #a08e80;
+  --violet: #ff7a1a;            /* тыквенно-оранжевый */
+  --pink: #b06cff;              /* ведьмин фиолетовый */
+  --green: #9be15d;             /* «зелье» */
+  --red: #ff5a4a;
+  --accent-rgb: 255, 122, 26;
+  --accent2-rgb: 176, 108, 255;
+  --glow-rgb: 255, 110, 20;
+  --accent-soft: #ffc58a;
+  --accent-ink: #c2410c;
+  --grad: linear-gradient(135deg, #ffa133 0%, #f0641c 50%, #c9361a 100%);
+  --banner: url('../images/banner_halloween.webp');
+  --banner-ratio: 2 / 1;
+  --banner-pos: center 30%;
+}
+
 /* ── Base ─────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 [hidden] { display: none !important; }
@@ -46,8 +85,8 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   background:
-    radial-gradient(900px 500px at 0% -10%, rgba(139, 92, 246, .14), transparent 55%),
-    radial-gradient(700px 420px at 100% 0%, rgba(255, 95, 162, .10), transparent 55%),
+    radial-gradient(900px 500px at 0% -10%, rgba(var(--accent-rgb), .14), transparent 55%),
+    radial-gradient(700px 420px at 100% 0%, rgba(var(--accent2-rgb), .10), transparent 55%),
     var(--bg);
   background-attachment: fixed;
   color: var(--text);
@@ -77,7 +116,7 @@ img { display: block; max-width: 100%; }
 .topbar {
   position: sticky; top: 0; z-index: 50;
   padding-top: calc(var(--safe-top) + var(--content-top));
-  background: rgba(11, 10, 16, .78);
+  background: rgba(var(--bg-rgb), .78);
   backdrop-filter: saturate(160%) blur(18px);
   -webkit-backdrop-filter: saturate(160%) blur(18px);
   border-bottom: 1px solid var(--line);
@@ -143,15 +182,14 @@ img { display: block; max-width: 100%; }
   margin: 12px 12px 0;
   border-radius: 22px;
   overflow: hidden;
-  aspect-ratio: 1536 / 667;
-  background: var(--surface);
+  aspect-ratio: var(--banner-ratio);
+  background: var(--banner) var(--banner-pos) / cover no-repeat, var(--surface);
   box-shadow: var(--shadow);
   isolation: isolate;
 }
-.hero img { width: 100%; height: 100%; object-fit: cover; }
 .hero::after {
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(180deg, transparent 55%, rgba(11, 10, 16, .55));
+  background: linear-gradient(180deg, transparent 55%, rgba(var(--bg-rgb), .55));
   pointer-events: none;
 }
 .hero-pill {
@@ -164,11 +202,47 @@ img { display: block; max-width: 100%; }
   letter-spacing: .2px;
 }
 
+/* Хэллоуин: плашка скидки справа — слева на баннере тыква */
+[data-theme="halloween"] .hero-pill { left: auto; right: 12px; }
+
+/* Летучие мыши над баннером (только в теме «Хэллоуин») */
+.bats { display: none; }
+[data-theme="halloween"] .bats { display: block; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.bat {
+  position: absolute; left: 100%;
+  width: 26px; height: 12px;
+  color: #120c0a;
+  filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), .35));
+  animation: bat-fly 14s linear infinite;
+}
+.bat svg { width: 100%; height: 100%; fill: currentColor; animation: bat-flap .22s ease-in-out infinite alternate; transform-origin: 50% 60%; }
+.bat:nth-child(1) { top: 14%; animation-duration: 13s; }
+.bat:nth-child(2) { top: 26%; width: 18px; height: 8px; animation-duration: 17s; animation-delay: -6s; }
+.bat:nth-child(3) { top: 8%; width: 14px; height: 7px; animation-duration: 21s; animation-delay: -12s; }
+.bat:nth-child(2) svg { animation-duration: .18s; }
+@keyframes bat-fly {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-30vw, 10px); }
+  50%  { transform: translate(-60vw, -6px); }
+  75%  { transform: translate(-90vw, 8px); }
+  100% { transform: translate(-125vw, 0); }
+}
+@keyframes bat-flap { to { transform: scaleY(.45); } }
+
+/* Паутина в углу окна выбора района */
+.cobweb { display: none; }
+[data-theme="halloween"] .cobweb {
+  display: block; position: absolute; top: 0; left: 0;
+  width: 92px; height: 92px;
+  fill: none; stroke: rgba(255, 230, 210, .16); stroke-width: 1;
+  pointer-events: none;
+}
+
 /* ── Filters ──────────────────────────────────────────── */
 .filters {
   position: sticky; top: var(--top-offset); z-index: 40;
   padding: 6px 12px;
-  background: linear-gradient(180deg, rgba(11, 10, 16, .96) 70%, rgba(11, 10, 16, .0));
+  background: linear-gradient(180deg, rgba(var(--bg-rgb), .96) 70%, rgba(var(--bg-rgb), .0));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -208,8 +282,8 @@ img { display: block; max-width: 100%; }
 .chips-sm { margin-top: 2px; }
 .chips-sm .chip { height: 30px; padding: 0 12px; font-size: 12.5px; }
 .chips-sm .chip.is-active {
-  background: rgba(139, 92, 246, .18);
-  border-color: rgba(139, 92, 246, .7);
+  background: rgba(var(--accent-rgb), .18);
+  border-color: rgba(var(--accent-rgb), .7);
   box-shadow: none;
 }
 
@@ -254,7 +328,7 @@ img { display: block; max-width: 100%; }
 }
 @keyframes cardIn { from { opacity: 0; transform: translateY(10px) scale(.98); } }
 @media (hover: hover) {
-  .card:hover { transform: translateY(-3px); border-color: rgba(139, 92, 246, .35); box-shadow: var(--shadow); }
+  .card:hover { transform: translateY(-3px); border-color: rgba(var(--accent-rgb), .35); box-shadow: var(--shadow); }
   .card:hover .media img.is-loaded { transform: scale(1.04); }
 }
 
@@ -288,11 +362,11 @@ img { display: block; max-width: 100%; }
   font: 700 11px/1 var(--font);
   letter-spacing: .2px;
 }
-.tag-sale { top: 8px; left: 8px; background: var(--grad); box-shadow: 0 4px 14px rgba(255, 95, 162, .35); }
+.tag-sale { top: 8px; left: 8px; background: var(--grad); box-shadow: 0 4px 14px rgba(var(--accent2-rgb), .35); }
 .tag-soldout {
   left: 50%; top: 50%; transform: translate(-50%, -50%);
   padding: 7px 12px;
-  background: rgba(11, 10, 16, .82);
+  background: rgba(var(--bg-rgb), .82);
   border: 1px solid var(--line-2);
   white-space: nowrap;
 }
@@ -302,7 +376,7 @@ img { display: block; max-width: 100%; }
   width: 36px; height: 36px;
   display: grid; place-items: center;
   border-radius: 12px;
-  background: rgba(11, 10, 16, .55);
+  background: rgba(var(--bg-rgb), .55);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: #fff;
@@ -389,7 +463,7 @@ img { display: block; max-width: 100%; }
   height: 40px;
   border-radius: var(--radius-sm);
   background: var(--surface-3);
-  border: 1px solid rgba(139, 92, 246, .45);
+  border: 1px solid rgba(var(--accent-rgb), .45);
   overflow: hidden;
   animation: pop .25s var(--ease);
 }
@@ -495,7 +569,7 @@ img { display: block; max-width: 100%; }
   font-size: 16px; line-height: 1.4;
   transition: border-color .2s;
 }
-.panel textarea:focus { border-color: rgba(139, 92, 246, .6); }
+.panel textarea:focus { border-color: rgba(var(--accent-rgb), .6); }
 .panel textarea::placeholder { color: var(--muted); }
 
 .req { color: var(--pink); }
@@ -512,9 +586,9 @@ img { display: block; max-width: 100%; }
 }
 .district-btn .ic { width: 18px; height: 18px; color: var(--muted); transition: color .2s; }
 .district-btn:active { transform: scale(.97); }
-.district-btn.is-active { background: rgba(139, 92, 246, .16); border-color: var(--violet); color: #fff; box-shadow: 0 0 0 3px rgba(139, 92, 246, .15); }
+.district-btn.is-active { background: rgba(var(--accent-rgb), .16); border-color: var(--violet); color: #fff; box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .15); }
 .district-btn.is-active .ic { color: var(--pink); }
-@media (hover: hover) { .district-btn:not(.is-active):hover { border-color: rgba(139, 92, 246, .5); color: #fff; } }
+@media (hover: hover) { .district-btn:not(.is-active):hover { border-color: rgba(var(--accent-rgb), .5); color: #fff; } }
 .field-error { margin-top: 8px; color: var(--red); font-size: 13px; font-weight: 600; }
 .panel.is-invalid { border-color: rgba(255, 92, 122, .7); }
 .panel.shake { animation: shake .4s var(--ease); }
@@ -543,7 +617,7 @@ img { display: block; max-width: 100%; }
   display: flex; align-items: center; gap: 12px;
   border-radius: 18px;
   background: var(--grad);
-  box-shadow: 0 14px 34px rgba(120, 50, 220, .45), 0 2px 0 rgba(255, 255, 255, .15) inset;
+  box-shadow: 0 14px 34px rgba(var(--glow-rgb), .45), 0 2px 0 rgba(255, 255, 255, .15) inset;
   color: #fff; text-align: left;
   transform: translateY(calc(100% + 30px));
   opacity: 0;
@@ -564,7 +638,7 @@ img { display: block; max-width: 100%; }
   min-width: 20px; height: 20px; padding: 0 5px;
   display: grid; place-items: center;
   border-radius: 10px;
-  background: #fff; color: #7b3fe4;
+  background: #fff; color: var(--accent-ink);
   font-size: 11px; font-weight: 800;
 }
 .cart-bar-info { display: flex; flex-direction: column; min-width: 0; }
@@ -575,7 +649,7 @@ img { display: block; max-width: 100%; }
   display: flex; align-items: center; gap: 6px;
   height: 44px; padding: 0 14px;
   border-radius: 13px;
-  background: rgba(11, 10, 16, .28);
+  background: rgba(var(--bg-rgb), .28);
   font-weight: 700; font-size: 14px;
 }
 .cart-bar-cta .ic { width: 18px; height: 18px; }
@@ -618,7 +692,7 @@ img { display: block; max-width: 100%; }
   transition: background .2s, color .2s;
 }
 .nav-item .ic { width: 20px; height: 20px; color: var(--muted); }
-.nav-item.is-active { background: rgba(139, 92, 246, .14); color: #fff; }
+.nav-item.is-active { background: rgba(var(--accent-rgb), .14); color: #fff; }
 .nav-item.is-active .ic { color: var(--violet); }
 @media (hover: hover) { .nav-item:hover { background: rgba(255, 255, 255, .05); color: #fff; } }
 .nav-count { margin-left: auto; color: var(--muted); font-size: 13px; font-weight: 600; }
@@ -669,7 +743,7 @@ img { display: block; max-width: 100%; }
 }
 .sheet-close {
   position: absolute; top: 12px; right: 12px; z-index: 3;
-  background: rgba(11, 10, 16, .55);
+  background: rgba(var(--bg-rgb), .55);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -774,8 +848,8 @@ img { display: block; max-width: 100%; }
   width: 22px; height: 22px;
   display: grid; place-items: center;
   border-radius: 7px;
-  background: rgba(139, 92, 246, .18);
-  color: #c4a8ff;
+  background: rgba(var(--accent-rgb), .18);
+  color: var(--accent-soft);
   font-size: 12px; font-weight: 700;
 }
 #orderText {
@@ -813,8 +887,8 @@ img { display: block; max-width: 100%; }
 body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
 .toast-action {
   padding: 6px 10px; border-radius: 9px;
-  background: rgba(139, 92, 246, .2);
-  color: #d6c4ff; font-weight: 700; font-size: 13px;
+  background: rgba(var(--accent-rgb), .2);
+  color: var(--accent-soft); font-weight: 700; font-size: 13px;
   white-space: nowrap;
 }
 
@@ -824,9 +898,9 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
   display: flex; align-items: center; justify-content: center;
   padding: calc(var(--safe-top) + var(--content-top) + 16px) 16px calc(var(--safe-bottom) + 16px);
   background:
-    radial-gradient(600px 400px at 10% 0%, rgba(139, 92, 246, .25), transparent 60%),
-    radial-gradient(500px 360px at 100% 100%, rgba(255, 95, 162, .18), transparent 60%),
-    rgba(11, 10, 16, .94);
+    radial-gradient(600px 400px at 10% 0%, rgba(var(--accent-rgb), .25), transparent 60%),
+    radial-gradient(500px 360px at 100% 100%, rgba(var(--accent2-rgb), .18), transparent 60%),
+    rgba(var(--bg-rgb), .94);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   overflow-y: auto;
@@ -868,13 +942,13 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
   width: 44px; height: 44px; flex: none;
   display: grid; place-items: center;
   border-radius: 14px;
-  background: rgba(139, 92, 246, .16);
+  background: rgba(var(--accent-rgb), .16);
   color: var(--pink);
 }
 .gate-btn-name { flex: 1; min-width: 0; font: 600 17px/1.2 var(--font-display); color: #fff; overflow-wrap: anywhere; }
 .gate-btn > .ic { width: 20px; height: 20px; color: var(--muted); }
-.gate-btn.is-active { border-color: var(--violet); background: rgba(139, 92, 246, .14); box-shadow: 0 0 0 3px rgba(139, 92, 246, .15); }
-@media (hover: hover) { .gate-btn:hover { border-color: rgba(139, 92, 246, .6); } }
+.gate-btn.is-active { border-color: var(--violet); background: rgba(var(--accent-rgb), .14); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .15); }
+@media (hover: hover) { .gate-btn:hover { border-color: rgba(var(--accent-rgb), .6); } }
 .gate-lang { margin-top: 18px; }
 
 /* Fly to cart */
@@ -888,7 +962,7 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
 /* ── Desktop tweaks ───────────────────────────────────── */
 @media (min-width: 720px) {
   .hero { margin: 16px 12px 0; border-radius: 26px; aspect-ratio: auto; height: clamp(240px, 30vw, 340px); }
-  .hero img { object-position: center 18%; }
+  [data-theme="halloween"] .hero { height: clamp(280px, 38vw, 440px); }
   .sheet { bottom: 20px; border-radius: 26px; border-bottom: 1px solid var(--line); }
   .sheet-body { padding-bottom: 20px; }
 }

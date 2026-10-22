@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="halloween">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b0a10">
+  <meta name="theme-color" content="#0d0908">
   <meta name="format-detection" content="telephone=no">
   <title>HORN HUB — Vape Shop</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="images/banner.png" fetchpriority="high">
   <!-- ?v= — версия файлов: меняйте её, когда меняете вместе index.html и js/css,
        иначе Telegram может взять старый файл из кэша -->
-  <link rel="stylesheet" href="css/style.css?v=2026-10-22-2">
+  <link rel="stylesheet" href="css/style.css?v=2026-10-22-3">
 </head>
 <body>
 
@@ -34,6 +33,7 @@
   <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.7s-6 6.3-6 11.3a6 6 0 0 0 12 0c0-5-6-11.3-6-11.3z"/></symbol>
   <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
   <symbol id="i-podsys" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="4"/><path d="M10.5 6h3"/><circle cx="12" cy="15" r="1.5"/></symbol>
+  <symbol id="i-bat" viewBox="0 0 64 28"><path d="M29 12C22 6 12 4 2 7c4 2 5 5 4 8 3-2 6-2 8 1 2-3 5-3 7 1 2-2 5-2 7 1l4 4 4-4c2-3 5-3 7-1 2-4 5-4 7-1 2-3 5-3 8-1-1-3 0-6 4-8-10-3-20-1-27 5l-.5-5-1.7 2.5h-1.6L29.5 7z"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
   <symbol id="i-pod" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M7 8h10M10 13h4"/></symbol>
   <symbol id="i-sad" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01"/></symbol>
@@ -64,8 +64,12 @@
 
   <!-- ── Каталог ───────────────────────────────────── -->
   <section id="shopView" class="view">
-    <div class="hero">
-      <img src="images/banner.png" alt="HORN HUB" width="1536" height="667" fetchpriority="high" decoding="async">
+    <div class="hero" role="img" aria-label="HORN HUB">
+      <div class="bats" aria-hidden="true">
+        <span class="bat"><svg viewBox="0 0 64 28"><use href="#i-bat"/></svg></span>
+        <span class="bat"><svg viewBox="0 0 64 28"><use href="#i-bat"/></svg></span>
+        <span class="bat"><svg viewBox="0 0 64 28"><use href="#i-bat"/></svg></span>
+      </div>
       <div class="hero-pill" id="heroPill" hidden></div>
     </div>
 
@@ -260,6 +264,7 @@
 <!-- Выбор района при входе -->
 <div class="gate" id="districtGate" role="dialog" aria-modal="true" aria-labelledby="gateTitle" inert aria-hidden="true">
   <div class="gate-card">
+    <svg class="cobweb" viewBox="0 0 100 100" aria-hidden="true"><path d="M0 0L100.0 0.0M0 0L95.1 30.9M0 0L80.9 58.8M0 0L58.8 80.9M0 0L30.9 95.1M0 0L0.0 100.0M20.0 0.0Q17.0 2.7 19.0 6.2Q15.3 7.8 16.2 11.8Q12.2 12.2 11.8 16.2Q7.8 15.3 6.2 19.0Q2.7 17.0 0.0 20.0M40.0 0.0Q34.0 5.4 38.0 12.4Q30.7 15.6 32.4 23.5Q24.3 24.3 23.5 32.4Q15.6 30.7 12.4 38.0Q5.4 34.0 0.0 40.0M60.0 0.0Q51.0 8.1 57.1 18.5Q46.0 23.4 48.5 35.3Q36.5 36.5 35.3 48.5Q23.4 46.0 18.5 57.1Q8.1 51.0 0.0 60.0M80.0 0.0Q68.0 10.8 76.1 24.7Q61.3 31.2 64.7 47.0Q48.6 48.6 47.0 64.7Q31.2 61.3 24.7 76.1Q10.8 68.0 0.0 80.0"/></svg>
     <button class="icon-btn gate-close" data-action="close" data-i18n-aria="close">
       <svg class="ic"><use href="#i-x"/></svg>
     </button>
@@ -278,6 +283,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="js/app.js?v=2026-10-22-2"></script>
+<script src="js/app.js?v=2026-10-22-3"></script>
 </body>
 </html>
