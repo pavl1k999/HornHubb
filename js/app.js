@@ -22,8 +22,8 @@
 const ADMIN_NICK = 'gystds';
 const ADMIN_URL = `https://t.me/${ADMIN_NICK}`;
 
-// Районы Варшавы. Окно выбора района показывается при каждом входе на сайт,
-// от района зависят цены (см. sale в CATALOG), район попадает в текст заказа.
+// Районы Варшавы. Окно выбора района показывается при первом входе, дальше район
+// запоминается. От района зависят цены (см. sale в CATALOG), район попадает в текст заказа.
 // Новый район — просто допишите название в список.
 const DISTRICTS = ['Bemowo', 'Ożarów'];
 
@@ -1135,11 +1135,26 @@ function syncDistricts() {
   els.gate.classList.toggle('is-dismissible', Boolean(state.district));
 }
 
+// В Telegram район дополнительно хранится в облаке Telegram: не теряется,
+// даже если приложение очистит данные сайта, и переносится на другие устройства
+function saveDistrictToCloud(district) {
+  if (tgVersion('6.9')) try { tg.CloudStorage.setItem('district', district); } catch {}
+}
+
+function loadDistrictFromCloud(done) {
+  if (!tgVersion('6.9') || !tg.CloudStorage) { done(null); return; }
+  let finished = false;
+  const finish = (value) => { if (!finished) { finished = true; done(value); } };
+  setTimeout(() => finish(null), 1500); // облако не ответило — просто спросим район
+  try { tg.CloudStorage.getItem('district', (err, value) => finish(err ? null : value)); } catch { finish(null); }
+}
+
 function setDistrict(district) {
   if (!DISTRICTS.includes(district)) return;
   const prev = state.district;
   state.district = district;
   storage.set('district', district);
+  saveDistrictToCloud(district);
   clearDistrictError();
   haptic.select();
   if (ui.overlay === 'gate') closeOverlay();
@@ -1316,4 +1331,16 @@ window.addEventListener('storage', (e) => {
 /* ── Старт ────────────────────────────────────────────── */
 safely(initTelegram);
 renderAll();
-safely(openDistrictGate); // окно выбора района — при каждом входе (прошлый выбор подсвечен)
+// Окно выбора района — только если район ещё не выбран (обычно при первом входе)
+if (!state.district) {
+  loadDistrictFromCloud((saved) => {
+    if (state.district) return; // уже выбрали, пока ждали облако
+    if (DISTRICTS.includes(saved)) {
+      state.district = saved;
+      storage.set('district', saved);
+      renderAll();
+    } else {
+      safely(openDistrictGate);
+    }
+  });
+}
