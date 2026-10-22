@@ -819,22 +819,6 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
 }
 
 /* ── Выбор района (при входе) ─────────────────────────── */
-.hero-district {
-  position: absolute; bottom: 12px; right: 12px; z-index: 1;
-  display: inline-flex; align-items: center; gap: 6px;
-  height: 30px; padding: 0 10px 0 9px;
-  border-radius: 999px;
-  background: rgba(11, 10, 16, .62);
-  border: 1px solid var(--line-2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #fff; font-weight: 700; font-size: 13px;
-  transition: transform .1s, background .2s;
-}
-.hero-district:active { transform: scale(.96); }
-.hero-district .ic { width: 16px; height: 16px; color: var(--pink); }
-.hero-district .ic-sm { width: 14px; height: 14px; color: var(--text-2); }
-
 .gate {
   position: fixed; inset: 0; z-index: 80;
   display: flex; align-items: center; justify-content: center;

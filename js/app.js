@@ -200,7 +200,7 @@ const I18N = {
     comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
     gateTitle: 'Выберите ваш район', gateSub: 'Варшава',
-    changeDistrict: 'Сменить район', districtChanged: 'Район: {d}',
+    districtChanged: 'Район: {d}',
     itemsSum: 'Товары, {n} шт.', discount: 'Скидка', total: 'Итого', checkout: 'Оформить заказ',
     contactAdmin: 'Написать консультанту', unavailable: 'Нет в наличии — не войдёт в заказ',
     orderTitle: 'Ваш заказ', orderNo: 'Заказ', step1: 'Нажмите «Отправить» — откроется чат с консультантом.',
@@ -227,7 +227,7 @@ const I18N = {
     comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
     gateTitle: 'Оберіть ваш район', gateSub: 'Варшава',
-    changeDistrict: 'Змінити район', districtChanged: 'Район: {d}',
+    districtChanged: 'Район: {d}',
     itemsSum: 'Товари, {n} шт.', discount: 'Знижка', total: 'Разом', checkout: 'Оформити замовлення',
     contactAdmin: 'Написати консультанту', unavailable: 'Немає в наявності — не увійде в замовлення',
     orderTitle: 'Ваше замовлення', orderNo: 'Замовлення', step1: 'Натисніть «Надіслати» — відкриється чат з консультантом.',
@@ -254,7 +254,7 @@ const I18N = {
     comment: 'Order comment', commentPh: 'Preferred time, wishes…',
     district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
     gateTitle: 'Choose your district', gateSub: 'Warsaw',
-    changeDistrict: 'Change district', districtChanged: 'District: {d}',
+    districtChanged: 'District: {d}',
     itemsSum: 'Items, {n} pcs', discount: 'Discount', total: 'Total', checkout: 'Checkout',
     contactAdmin: 'Message consultant', unavailable: 'Out of stock — won’t be ordered',
     orderTitle: 'Your order', orderNo: 'Order', step1: 'Tap “Send” — a chat with the consultant will open.',
@@ -401,7 +401,7 @@ const els = {
   cartEmpty: $('cartEmpty'), cartFilled: $('cartFilled'), cartList: $('cartList'),
   comment: $('orderComment'),
   districtPanel: $('districtPanel'), districtOptions: $('districtOptions'), districtError: $('districtError'),
-  gate: $('districtGate'), gateOptions: $('gateOptions'), drawerDistricts: $('drawerDistricts'), heroDistrict: $('heroDistrict'),
+  gate: $('districtGate'), gateOptions: $('gateOptions'), drawerDistricts: $('drawerDistricts'),
   sumCountLabel: $('sumCountLabel'), sumFull: $('sumFull'), sumSaveRow: $('sumSaveRow'),
   sumSaved: $('sumSaved'), sumTotal: $('sumTotal'), checkoutBtn: $('checkoutBtn'),
   drawer: $('drawer'), backdrop: $('backdrop'),
@@ -1127,8 +1127,6 @@ function syncDistricts() {
   document.querySelectorAll('#drawerDistricts button, #gateOptions button').forEach((b) => {
     b.classList.toggle('is-active', b.dataset.value === state.district);
   });
-  els.heroDistrict.hidden = !state.district;
-  els.heroDistrict.querySelector('span').textContent = state.district || '';
   els.gate.classList.toggle('is-dismissible', Boolean(state.district));
 }
 
@@ -1263,7 +1261,6 @@ const actions = {
   contact: () => openTelegramLink(ADMIN_URL),
   'clear-cart': () => clearCart(),
   district: (id, el) => setDistrict(el.dataset.value),
-  'change-district': () => { closeOverlay(); openDistrictGate(); },
 };
 
 document.addEventListener('click', (e) => {
