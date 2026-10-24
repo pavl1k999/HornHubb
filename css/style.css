@@ -548,6 +548,7 @@ img { display: block; max-width: 100%; }
   color: var(--muted);
   font-size: 12px;
 }
+.footer-updated { margin-top: 6px; opacity: .7; font-size: 11px; }
 .footer-logo { font: 800 15px/1 var(--font-display); color: var(--text-2); margin-bottom: 8px; }
 .footer-logo span { margin-left: 4px; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 

@@ -1,0 +1,47 @@
+id,Бренд,Вкус,Категория,Цена,Цена со скидкой,Цена Bemowo,Цена Ożarów,В наличии,Показывать,Фото
+1,Elf Liq,Blackcurrant Aniseed,Жидкости,50,,40,50,TRUE,TRUE,elf/Blackcurrant_Aniseed.png
+2,Elf Liq,Pineapple Colada,Жидкости,50,,40,50,TRUE,TRUE,elf/Pineapple_Colada.png
+3,Elf Liq,Strawberry Snoow,Жидкости,50,,40,50,TRUE,TRUE,elf/Strawberry_Snoow.png
+4,Elf Liq,Blue Razz Lemonade,Жидкости,50,,40,50,TRUE,TRUE,elf/Blue_Razz_Lemonade.png
+5,Elf Liq,Green Grape Rose,Жидкости,50,,40,50,TRUE,TRUE,elf/Green_Grape_Rose.png
+6,Elf Liq,Sour Watermelon Gummy,Жидкости,50,,40,50,TRUE,TRUE,elf/Sour_Watermelon_Gummy.png
+7,Elf Liq,Strawberry Banana,Жидкости,50,,40,50,TRUE,TRUE,elf/Strawberry_Banana.png
+8,Elf Liq,Blueberry Raspberry Pomegranate,Жидкости,50,,40,50,TRUE,TRUE,elf/Blueberry_Raspberry_Pomegranate.png
+9,Elf Liq,P&B Cloud,Жидкости,50,,40,50,TRUE,TRUE,elf/P_B_Cloud.png
+10,Elf Liq,Spearmint,Жидкости,50,,40,50,TRUE,TRUE,elf/Spearmint.png
+200,Vozol,Dragon Fruit Banana Cherry,Жидкости,50,,40,50,FALSE,TRUE,vazool/Dragon_Fruit_Banana_Cherry.png
+201,Vozol,Purple Candy,Жидкости,50,,40,50,TRUE,TRUE,vazool/Purple_Candy.png
+202,Vozol,Pineapple Passion Fruit Lime,Жидкости,50,,40,50,TRUE,TRUE,vazool/Pineapple_Passion_Fruit_Lime.png
+203,Vozol,Strawberry Kiwi,Жидкости,50,,40,50,TRUE,TRUE,vazool/Strawberry_Kiwi.png
+204,Vozol,Love 777,Жидкости,50,,40,50,FALSE,TRUE,vazool/Love_777.png
+205,Vozol,Grape Ice,Жидкости,50,,40,50,TRUE,TRUE,vazool/Grape_Ice.png
+206,Vozol,Watermelon Bubblegum,Жидкости,50,,40,50,TRUE,TRUE,vazool/Watermelon_Bubblegum.png
+207,Vozol,Pomegranate Lemonade,Жидкости,50,,40,50,TRUE,TRUE,vazool/Pomegranate_Lemonade.png
+208,Vozol,Mint Ice,Жидкости,50,,40,50,FALSE,TRUE,vazool/Mint_Ice.png
+100,Chaser LUX,Grape Mint,Жидкости,60,,40,50,FALSE,TRUE,chaser/Grape_Mint.png
+101,Chaser LUX,Berry Lemonade,Жидкости,60,,40,50,FALSE,TRUE,chaser/Berry_Lemonade.png
+102,Chaser LUX,Blackberry Lemonade,Жидкости,60,,40,50,FALSE,TRUE,chaser/Blackberry_Lemonade.png
+103,Chaser LUX,Sour Apple,Жидкости,60,,40,50,FALSE,TRUE,chaser/Sour_Apple.png
+104,Chaser LUX,Vitamin,Жидкости,60,,40,50,FALSE,TRUE,chaser/Vitamin.png
+105,Chaser LUX,Coconut Melon,Жидкости,60,,40,50,FALSE,TRUE,chaser/Coconut_Melon.png
+106,Chaser LUX,Energetic,Жидкости,60,,40,50,FALSE,TRUE,chaser/Energetic.png
+107,Chaser LUX,Strawberry Cream,Жидкости,60,,40,50,FALSE,TRUE,chaser/Strawberry_Cream.png
+108,Chaser LUX,Watermelon Raspberry,Жидкости,60,,40,50,FALSE,TRUE,chaser/Watermelon_Raspberry.png
+109,Chaser LUX,Kiwi Passion Guava,Жидкости,60,,40,50,FALSE,TRUE,chaser/Kiwi_Passion_Guava.png
+400,Elf King 40k,Milki Oolong,Одноразки,110,80,,,FALSE,TRUE,elfking/Milki_Oolong.png
+401,Elf King 40k,Blue Razz Ice,Одноразки,110,80,,,FALSE,TRUE,elfking/Blue_Razz_Ice.png
+402,Elf King 40k,Sour Apple Ice,Одноразки,110,80,,,FALSE,TRUE,elfking/Sour_Apple_Ice.png
+403,Elf King 40k,Sour Pineapple Ice,Одноразки,110,80,,,FALSE,TRUE,elfking/Sour_Pineapple_Ice.png
+404,Elf King 40k,Sour Strawberry Dragonfruit,Одноразки,110,80,,,FALSE,TRUE,elfking/Sour_Strawberry_Dragonfruit.png
+600,BC Pro 40k,Pineapple Rom,Одноразки,110,80,,,FALSE,TRUE,bcpro/Pineapple_Rom.png
+601,BC Pro 40k,Grape Twist,Одноразки,110,80,,,FALSE,TRUE,bcpro/Grape_Twist.png
+602,BC Pro 40k,Strawberry Raspberry Frost,Одноразки,110,80,,,FALSE,TRUE,bcpro/Strawberry_Raspberry_Frost.png
+603,BC Pro 40k,Strawberry Kiwi,Одноразки,110,80,,,FALSE,TRUE,bcpro/Strawberry_Kiwi.png
+604,BC Pro 40k,Aurora Berries,Одноразки,110,80,,,FALSE,TRUE,bcpro/Aurora_Berries.png
+500,Vozol Reve 40k,Watermelon Bubblegum,Одноразки,110,80,,,FALSE,TRUE,vozolreve/Watermelon_Bubblegum.png
+501,Vozol Reve 40k,Strawberry Mango,Одноразки,110,80,,,FALSE,TRUE,vozolreve/Strawberry_Mango.png
+502,Vozol Reve 40k,Kiwi Passion Fruit,Одноразки,110,80,,,FALSE,TRUE,vozolreve/Kiwi_Passion_Fruit.png
+503,Vozol Reve 40k,Mango Ice,Одноразки,110,80,,,FALSE,TRUE,vozolreve/Mango_Ice.png
+504,Vozol Reve 40k,Grape Ice,Одноразки,110,80,,,FALSE,TRUE,vozolreve/Grape_Ice.png
+700,Vaporesso,XROS 6 Mini Black,Pod-системы,180,140,,,TRUE,TRUE,pod/XROS_6_Mini_Black.png
+300,Xros,Cartridge 0.6Ω,Картриджи,35,30,,,TRUE,TRUE,cart/xros.png

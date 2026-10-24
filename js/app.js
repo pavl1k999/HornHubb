@@ -22,6 +22,10 @@
 const ADMIN_NICK = 'gystds';
 const ADMIN_URL = `https://t.me/${ADMIN_NICK}`;
 
+// Google-таблица с товарами, ценами и наличием (как подключить — в README).
+// Вставьте сюда ссылку на таблицу. Пока пусто — товары берутся из CATALOG ниже.
+const SHEET_URL = '';
+
 // Районы Варшавы. Окно выбора района показывается при первом входе, дальше район
 // запоминается. От района зависят цены (см. sale в CATALOG), район попадает в текст заказа.
 // Новый район — просто допишите название в список.
@@ -201,6 +205,7 @@ const I18N = {
     clearCart: 'Очистить', cartCleared: 'Корзина очищена', undo: 'Вернуть',
     addedToCart: 'Добавлено в корзину', removedFromCart: 'Товар удалён',
     comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
+    catalogUpdated: 'Цены обновлены: {time}',
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
     gateTitle: 'Выберите ваш район', gateSub: 'Варшава',
     districtChanged: 'Район: {d}',
@@ -228,6 +233,7 @@ const I18N = {
     clearCart: 'Очистити', cartCleared: 'Кошик очищено', undo: 'Повернути',
     addedToCart: 'Додано до кошика', removedFromCart: 'Товар видалено',
     comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
+    catalogUpdated: 'Ціни оновлено: {time}',
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
     gateTitle: 'Оберіть ваш район', gateSub: 'Варшава',
     districtChanged: 'Район: {d}',
@@ -255,6 +261,7 @@ const I18N = {
     clearCart: 'Clear', cartCleared: 'Cart cleared', undo: 'Undo',
     addedToCart: 'Added to cart', removedFromCart: 'Item removed',
     comment: 'Order comment', commentPh: 'Preferred time, wishes…',
+    catalogUpdated: 'Prices updated: {time}',
     district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
     gateTitle: 'Choose your district', gateSub: 'Warsaw',
     districtChanged: 'District: {d}',
@@ -274,37 +281,73 @@ const I18N = {
 /* ── Товары ───────────────────────────────────────────── */
 const fileName = (name) => name.replace(/[^a-zA-Z0-9]/g, '_') + '.png';
 
-const products = CATALOG.flatMap((b) => b.flavors.map((f, i) => {
-  const flavor = typeof f === 'string' ? f : f.name;
-  const file = typeof f === 'string' ? fileName(f) : f.img;
+// Товары встроенного каталога (CATALOG) — запасной вариант, если таблица не подключена или недоступна
+function builtinRows() {
+  return CATALOG.flatMap((b) => b.flavors.map((f, i) => {
+    const flavor = typeof f === 'string' ? f : f.name;
+    return {
+      id: b.firstId + i,
+      brand: b.brand,
+      brandTitle: b.title,
+      short: b.short || null,
+      flavor,
+      category: b.category,
+      price: b.price,
+      sale: b.sale ?? null,
+      img: `images/${b.folder}/${typeof f === 'string' ? fileName(f) : f.img}`,
+      outOfStock: (b.soldOut || []).includes(flavor),
+    };
+  }));
+}
+
+const products = [];
+const productById = new Map();
+const brandList = []; // бренды в порядке каталога: { brand, title, short, category, count }
+
+function makeProduct(row, order) {
+  const { sale, ...rest } = row;
   return {
-    id: b.firstId + i,
-    brand: b.brand,
-    brandTitle: b.title,
-    flavor,
-    name: `${b.title} – ${flavor}`,
-    category: b.category,
-    price: b.price,
-    salePrices: b.sale,
-    img: `images/${b.folder}/${file}`,
-    outOfStock: (b.soldOut || []).includes(flavor),
+    ...rest,
+    order,
+    name: `${row.brandTitle} – ${row.flavor}`,
+    salePrices: sale,
     // цена и скидка считаются для выбранного района
     get sale() { return districtPrice(this.salePrices, this.price); },
     get discount() {
-      const sale = this.sale;
-      return sale < this.price ? Math.round((1 - sale / this.price) * 100) : 0;
+      const s = this.sale;
+      return s < this.price ? Math.round((1 - s / this.price) * 100) : 0;
     },
   };
-}));
-products.forEach((p, i) => { p.order = i; });
+}
 
-// sale: число — одна цена везде; объект { 'Район': цена } — цена по районам
+function setProducts(rows) {
+  products.length = 0;
+  productById.clear();
+  brandList.length = 0;
+  rows.forEach((row, i) => {
+    const p = makeProduct(row, i);
+    products.push(p);
+    productById.set(p.id, p);
+  });
+  const byKey = new Map();
+  products.forEach((p) => {
+    const key = `${p.category}|${p.brand}`;
+    let b = byKey.get(key);
+    if (!b) {
+      b = { brand: p.brand, title: p.brandTitle, short: p.short, category: p.category, count: 0 };
+      byKey.set(key, b);
+      brandList.push(b);
+    }
+    b.count += 1;
+  });
+}
+
+// sale: число — одна цена везде; объект { 'Район': цена, '*': цена для остальных } — цена по районам
 function districtPrice(sale, price, district = state.district) {
   if (sale == null) return price;
   if (typeof sale !== 'object') return sale;
-  return sale[district] ?? sale[DISTRICTS[0]] ?? price;
+  return sale[district] ?? sale['*'] ?? sale[DISTRICTS[0]] ?? price;
 }
-const productById = new Map(products.map((p) => [p.id, p]));
 
 /* ── Telegram ─────────────────────────────────────────── */
 const tg = window.Telegram?.WebApp ?? null;
@@ -358,6 +401,236 @@ function detectLang() {
   return code.startsWith('uk') ? 'ua' : 'ru';
 }
 
+/* ── Google-таблица ───────────────────────────────────────
+   Колонки (порядок любой, лишние колонки не мешают):
+     id | Бренд | Вкус | Категория | Цена | Цена со скидкой |
+     Цена Bemowo | Цена Ożarów | … | В наличии | Показывать | Фото
+   • «Цена <район>» — цена в этом районе; новый столбец «Цена Wola»
+     добавляет и новый район.
+   • id не меняйте; для нового товара оставьте пустым.
+   ========================================================== */
+const catalogInfo = { at: 0, checkedAt: 0, json: '' };
+
+const CATEGORY_NAMES = {
+  liquid: ['liquid', 'liquids', 'жидкости', 'жидкость', 'жижа', 'жижи', 'рідини', 'рідина'],
+  disposable: ['disposable', 'disposables', 'одноразки', 'одноразка', 'одноразові'],
+  pod: ['pod', 'pods', 'pod-системы', 'pod-система', 'pod системы', 'под-системы', 'поды', 'pod-системи', 'pod systems'],
+  cartridge: ['cartridge', 'cartridges', 'картриджи', 'картридж', 'картриджі'],
+};
+
+// Ссылку можно вставить любую: обычную ссылку на таблицу или «Опубликовать в интернете»
+function sheetCsvUrl(url) {
+  const u = String(url).trim();
+  const gid = (u.match(/[#&?]gid=(\d+)/) || [])[1];
+  if (/\/spreadsheets\/d\/e\//.test(u)) {
+    const base = u.split('?')[0].split('#')[0].replace(/\/pub(html)?$/, '/pub');
+    return `${base}?output=csv${gid ? `&gid=${gid}&single=true` : ''}`;
+  }
+  const id = (u.match(/\/spreadsheets\/d\/([\w-]+)/) || [])[1];
+  if (id) return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv${gid ? `&gid=${gid}` : ''}`;
+  return u;
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let quoted = false;
+  text = text.replace(/^﻿/, '');
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else cell += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ',') { row.push(cell); cell = ''; }
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(cell); rows.push(row); row = []; cell = '';
+    } else cell += c;
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter((r) => r.some((v) => v.trim() !== ''));
+}
+
+const headKey = (s) => String(s ?? '').toLowerCase().replace(/ё/g, 'е').replace(/\s+/g, ' ').trim();
+
+function parseNumber(v) {
+  const s = String(v ?? '').replace(/\s/g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+  const n = parseFloat(s);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+function parseBool(v, empty) {
+  const s = headKey(v);
+  if (!s) return empty;
+  return ['true', 'да', 'так', 'yes', '1', '+', 'v', '✓', '✔', 'x', 'есть', 'є'].includes(s);
+}
+
+function slug(s) {
+  return headKey(s).replace(/[^a-z0-9а-я]+/g, '-').replace(/^-|-$/g, '') || 'brand';
+}
+
+function hashId(text) {
+  let h = 0;
+  for (const ch of text) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+  return 100000 + (h % 900000);
+}
+
+// Фото: путь в папке images, ссылка на картинку или ссылка на файл в Google Диске
+function sheetImage(cell, brandTitle, flavor) {
+  const v = String(cell || '').trim();
+  const drive = v.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?.*id=)([\w-]+)/);
+  if (drive) return `https://drive.google.com/thumbnail?id=${drive[1]}&sz=w1000`;
+  if (/^https?:\/\//i.test(v)) return v;
+  if (v) return v.startsWith('images/') ? v : `images/${v.replace(/^\/+/, '')}`;
+  const known = CATALOG.find((b) => headKey(b.title) === headKey(brandTitle));
+  return known ? `images/${known.folder}/${fileName(flavor)}` : 'images/no-photo.png';
+}
+
+function rowsFromSheet(table) {
+  const problems = [];
+  if (table.length < 2) return { rows: [], districts: [], problems: ['таблица пустая'] };
+  const head = table[0].map(headKey);
+  const col = (...names) => head.findIndex((h) => names.includes(h));
+  const c = {
+    id: col('id', 'номер'),
+    brand: col('бренд', 'brand', 'марка'),
+    flavor: col('вкус', 'название', 'товар', 'flavor', 'name', 'смак'),
+    category: col('категория', 'category', 'категорія'),
+    price: col('цена', 'старая цена', 'price', 'ціна'),
+    sale: col('цена со скидкой', 'скидка', 'цена скидка', 'sale', 'ціна зі знижкою'),
+    stock: col('в наличии', 'наличие', 'stock', 'в наявності'),
+    visible: col('показывать', 'показать', 'visible', 'show', 'показувати'),
+    img: col('фото', 'картинка', 'изображение', 'image', 'img', 'photo'),
+  };
+  if (c.brand < 0 || c.flavor < 0) {
+    return { rows: [], districts: [], problems: ['нет колонок «Бренд» и «Вкус» в первой строке'] };
+  }
+  // колонки «Цена <район>» — цены по районам и сам список районов
+  const districtCols = table[0]
+    .map((h, i) => ({ i, m: String(h).trim().match(/^(?:цена|ціна|price)\s+(.+)$/i) }))
+    .filter(({ m }) => m && !/^(со|зі)\s/i.test(m[1]) && headKey(m[1]) !== 'скидка')
+    .map(({ i, m }) => ({ i, name: m[1].trim() }));
+
+  const knownBrands = Object.fromEntries(CATALOG.map((b) => [headKey(b.title), b]));
+  const usedIds = new Set();
+  const rows = [];
+  table.slice(1).forEach((r, n) => {
+    const line = n + 2;
+    const get = (i) => (i >= 0 ? String(r[i] ?? '').trim() : '');
+    const brandTitle = get(c.brand);
+    const flavor = get(c.flavor);
+    if (!brandTitle && !flavor) return;
+    if (!brandTitle || !flavor) { problems.push(`строка ${line}: нет бренда или вкуса — пропущена`); return; }
+    if (!parseBool(get(c.visible), true)) return;
+
+    const saleDefault = parseNumber(get(c.sale));
+    const byDistrict = {};
+    districtCols.forEach(({ i, name }) => {
+      const v = parseNumber(get(i));
+      if (v != null) byDistrict[name] = v;
+    });
+    let price = parseNumber(get(c.price));
+    if (price == null) price = saleDefault ?? Object.values(byDistrict)[0] ?? null;
+    if (price == null) { problems.push(`строка ${line} (${brandTitle} – ${flavor}): нет цены — пропущена`); return; }
+    const sale = Object.keys(byDistrict).length
+      ? { ...byDistrict, ...(saleDefault != null ? { '*': saleDefault } : {}) }
+      : saleDefault;
+
+    const rawCat = headKey(get(c.category));
+    const category = Object.keys(CATEGORY_NAMES).find((k) => CATEGORY_NAMES[k].includes(rawCat)) || rawCat || 'liquid';
+    if (rawCat && !CATEGORY_NAMES[category]) problems.push(`строка ${line}: неизвестная категория «${get(c.category)}»`);
+
+    let id = parseInt(get(c.id), 10);
+    if (!Number.isFinite(id) || id <= 0 || usedIds.has(id)) {
+      id = hashId(`${headKey(brandTitle)}|${headKey(flavor)}`);
+      while (usedIds.has(id)) id += 1;
+    }
+    usedIds.add(id);
+
+    const known = knownBrands[headKey(brandTitle)];
+    rows.push({
+      id,
+      brand: known ? known.brand : slug(brandTitle),
+      brandTitle,
+      short: known?.short || null,
+      flavor,
+      category,
+      price,
+      sale,
+      img: sheetImage(get(c.img), brandTitle, flavor),
+      outOfStock: !parseBool(get(c.stock), true),
+    });
+  });
+  return { rows, districts: districtCols.map((d) => d.name), problems };
+}
+
+function useDistricts(list) {
+  if (Array.isArray(list) && list.length) DISTRICTS.splice(0, DISTRICTS.length, ...list);
+}
+
+// При запуске: последняя сохранённая версия таблицы (мгновенно) или каталог из кода
+function initCatalog() {
+  const cached = SHEET_URL ? storage.json('catalogSheet', null) : null;
+  if (cached && cached.url === SHEET_URL && Array.isArray(cached.rows) && cached.rows.length) {
+    useDistricts(cached.districts);
+    setProducts(cached.rows);
+    catalogInfo.at = cached.at || 0;
+    catalogInfo.json = JSON.stringify([cached.rows, cached.districts || []]);
+  } else {
+    setProducts(builtinRows());
+  }
+}
+initCatalog();
+
+async function refreshFromSheet() {
+  if (!SHEET_URL) return;
+  catalogInfo.checkedAt = Date.now();
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 10000);
+  try {
+    const res = await fetch(sheetCsvUrl(SHEET_URL), { cache: 'no-store', signal: ctrl.signal });
+    if (!res.ok) throw new Error(`ответ ${res.status}`);
+    const text = await res.text();
+    if (/^\s*</.test(text)) throw new Error('вместо таблицы пришла страница — проверьте доступ к таблице');
+    const { rows, districts, problems } = rowsFromSheet(parseCSV(text));
+    problems.forEach((p) => console.warn('[таблица]', p));
+    if (!rows.length) throw new Error('в таблице нет ни одного товара — оставляю прежний каталог');
+    const json = JSON.stringify([rows, districts]);
+    const changed = json !== catalogInfo.json;
+    catalogInfo.at = Date.now();
+    catalogInfo.json = json;
+    storage.set('catalogSheet', JSON.stringify({ url: SHEET_URL, rows, districts, at: catalogInfo.at }));
+    if (changed) applyCatalog(rows, districts);
+    else safely(renderStatic);
+  } catch (err) {
+    console.warn('[таблица] не удалось обновить цены:', err.message);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Новые данные из таблицы: перестраиваем каталог, чистим корзину и избранное от исчезнувших товаров
+function applyCatalog(rows, districts) {
+  useDistricts(districts);
+  setProducts(rows);
+  const before = cart.length;
+  cart = cart.filter((i) => productById.has(i.id));
+  if (cart.length !== before) saveCart();
+  [...favorites].forEach((id) => { if (!productById.has(id)) favorites.delete(id); });
+  saveFavorites();
+  if (state.brand && !brandList.some((b) => b.brand === state.brand)) state.brand = null;
+  if (ui.overlay === 'sheet' && !productById.has(ui.sheetId)) closeOverlay();
+  safely(renderDistricts);
+  renderAll();
+  if (state.district && !DISTRICTS.includes(state.district)) {
+    state.district = null;
+    safely(openDistrictGate);
+  }
+}
+
 function loadCart() {
   // поддерживает и старый формат (целые объекты товара с qty)
   const raw = storage.json('cart', []);
@@ -400,7 +673,7 @@ const saveFavorites = () => storage.set('favorites', JSON.stringify([...favorite
 const $ = (id) => document.getElementById(id);
 const els = {
   shopView: $('shopView'), cartView: $('cartView'),
-  heroPill: $('heroPill'), listAnchor: $('listAnchor'), filters: $('filters'),
+  heroPill: $('heroPill'), listAnchor: $('listAnchor'), catalogUpdated: $('catalogUpdated'), filters: $('filters'),
   categoryChips: $('categoryChips'), brandChips: $('brandChips'),
   listHead: $('listHead'), grid: $('productGrid'),
   favBadge: $('favBadge'), cartBadge: $('cartBadge'), cartBtn: $('cartBtn'),
@@ -481,7 +754,7 @@ function visibleProducts() {
 }
 
 function brandsOf(category) {
-  return CATALOG.filter((b) => b.category === category);
+  return brandList.filter((b) => b.category === category);
 }
 
 /* ── Рендер: статичные тексты ─────────────────────────── */
@@ -493,6 +766,12 @@ function renderStatic() {
 
   document.querySelectorAll('[data-action="lang"]').forEach((b) => b.classList.toggle('is-active', b.dataset.value === state.lang));
   document.querySelectorAll('#curSeg button').forEach((b) => b.classList.toggle('is-active', b.dataset.value === state.currency));
+
+  els.catalogUpdated.hidden = !catalogInfo.at;
+  if (catalogInfo.at) {
+    const time = new Date(catalogInfo.at).toLocaleString(I18N[state.lang].locale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    els.catalogUpdated.textContent = t('catalogUpdated', { time });
+  }
 
   const maxSale = Math.max(0, ...products.filter((p) => !p.outOfStock).map((p) => p.discount));
   els.heroPill.hidden = !maxSale;
@@ -536,7 +815,7 @@ function renderChips() {
   const brands = state.category === 'all' ? [] : brandsOf(state.category);
   els.brandChips.innerHTML = brands.length > 1 ? brands.map((b) => `
     <button class="chip ${state.brand === b.brand ? 'is-active' : ''}" data-action="brand" data-value="${b.brand}">
-      ${esc(b.short || b.title)}<span class="chip-count">${b.flavors.length}</span>
+      ${esc(b.short || b.title)}<span class="chip-count">${b.count}</span>
     </button>`).join('') : '';
 
   revealActiveChip(els.categoryChips);
@@ -626,7 +905,7 @@ function cardHTML(p, index) {
 function renderListHead(count) {
   let title;
   if (state.favoritesOnly) title = t('favorites');
-  else if (state.brand) title = CATALOG.find((b) => b.brand === state.brand).title;
+  else if (state.brand) title = brandList.find((b) => b.brand === state.brand)?.title || t('all');
   else title = t(state.category);
 
   els.listHead.innerHTML = `
@@ -1339,6 +1618,11 @@ window.addEventListener('storage', (e) => {
 /* ── Старт ────────────────────────────────────────────── */
 safely(initTelegram);
 renderAll();
+refreshFromSheet();
+// Telegram может долго держать магазин открытым — при возвращении в него обновим цены
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && Date.now() - catalogInfo.checkedAt > 2 * 60 * 1000) refreshFromSheet();
+});
 // Окно выбора района — только если район ещё не выбран (обычно при первом входе)
 if (!state.district) {
   loadDistrictFromCloud((saved) => {
