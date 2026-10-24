@@ -28,7 +28,7 @@ const SHEET_URL = '';
 
 // Ссылка на скрипт таблицы, который собирает подписчиков бота (README → «Защита бота»).
 // Нужен, чтобы при спаме от имени бота удалить его у всех и делать свои рассылки.
-const SUBSCRIBERS_URL = '';
+const SUBSCRIBERS_URL = 'https://script.google.com/macros/s/AKfycbyJ76zkKy6f6FXxMT182EfZ-lCA6_LqeRbd3XHvB83hjl9bWU33NW8RzR-aeY8RD-hpRg/exec';
 
 // Районы Варшавы. Окно выбора района показывается при первом входе, дальше район
 // запоминается. От района зависят цены (см. sale в CATALOG), район попадает в текст заказа.
