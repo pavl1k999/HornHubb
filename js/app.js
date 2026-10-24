@@ -31,6 +31,13 @@ const SHEET_URL = '';
 // Новый район — просто допишите название в список.
 const DISTRICTS = ['Bemowo', 'Ożarów'];
 
+// Таймер акции под баннером (время по Варшаве). До старта — «до старта …», во время — «до конца …»,
+// после окончания таймер сам исчезает. Убрать таймер: const SALE = null;
+const SALE = {
+  start: '2026-10-31T00:00:00+01:00', // 31 октября, 00:00
+  end:   '2026-11-02T00:00:00+01:00', // конец 1 ноября
+};
+
 // Оформление задаётся в index.html: <html data-theme="halloween"> (убрать атрибут — обычный вид)
 const THEME = document.documentElement.dataset.theme || 'default';
 
@@ -206,6 +213,8 @@ const I18N = {
     addedToCart: 'Добавлено в корзину', removedFromCart: 'Товар удалён',
     comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
     catalogUpdated: 'Цены обновлены: {time}',
+    saleTitle: 'Распродажа', saleStartsIn: 'До старта', saleLive: 'Распродажа идёт!', saleEndsIn: 'До конца',
+    units: ['д', 'ч', 'мин', 'сек'],
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
     gateTitle: 'Выберите ваш район', gateSub: 'Варшава',
     districtChanged: 'Район: {d}',
@@ -234,6 +243,8 @@ const I18N = {
     addedToCart: 'Додано до кошика', removedFromCart: 'Товар видалено',
     comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
     catalogUpdated: 'Ціни оновлено: {time}',
+    saleTitle: 'Розпродаж', saleStartsIn: 'До старту', saleLive: 'Розпродаж триває!', saleEndsIn: 'До кінця',
+    units: ['д', 'год', 'хв', 'сек'],
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
     gateTitle: 'Оберіть ваш район', gateSub: 'Варшава',
     districtChanged: 'Район: {d}',
@@ -262,6 +273,8 @@ const I18N = {
     addedToCart: 'Added to cart', removedFromCart: 'Item removed',
     comment: 'Order comment', commentPh: 'Preferred time, wishes…',
     catalogUpdated: 'Prices updated: {time}',
+    saleTitle: 'Sale', saleStartsIn: 'Starts in', saleLive: 'The sale is on!', saleEndsIn: 'Ends in',
+    units: ['d', 'h', 'min', 'sec'],
     district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
     gateTitle: 'Choose your district', gateSub: 'Warsaw',
     districtChanged: 'District: {d}',
@@ -673,7 +686,7 @@ const saveFavorites = () => storage.set('favorites', JSON.stringify([...favorite
 const $ = (id) => document.getElementById(id);
 const els = {
   shopView: $('shopView'), cartView: $('cartView'),
-  heroPill: $('heroPill'), listAnchor: $('listAnchor'), catalogUpdated: $('catalogUpdated'), filters: $('filters'),
+  heroPill: $('heroPill'), listAnchor: $('listAnchor'), catalogUpdated: $('catalogUpdated'), saleTimer: $('saleTimer'), filters: $('filters'),
   categoryChips: $('categoryChips'), brandChips: $('brandChips'),
   listHead: $('listHead'), grid: $('productGrid'),
   favBadge: $('favBadge'), cartBadge: $('cartBadge'), cartBtn: $('cartBtn'),
@@ -796,6 +809,46 @@ function renderNavActive() {
     else if (state.favoritesOnly) active = el.dataset.action === 'favorites';
     else active = el.dataset.action === 'nav-category' && el.dataset.value === state.category;
     el.classList.toggle('is-active', active);
+  });
+}
+
+/* ── Таймер акции ─────────────────────────────────────── */
+const saleView = { key: '' };
+
+function saleDates() {
+  const fmt = (ms) => new Date(ms).toLocaleDateString(I18N[state.lang].locale, { timeZone: 'Europe/Warsaw', day: 'numeric', month: '2-digit' });
+  return `${fmt(Date.parse(SALE.start))}–${fmt(Date.parse(SALE.end) - 1)}`;
+}
+
+function renderSaleTimer(force = false) {
+  const el = els.saleTimer;
+  const now = Date.now();
+  const start = SALE ? Date.parse(SALE.start) : NaN;
+  const end = SALE ? Date.parse(SALE.end) : NaN;
+  if (!SALE || !(end > now)) { el.hidden = true; saleView.key = ''; return; }
+
+  const live = now >= start;
+  const key = `${live}|${state.lang}`;
+  if (force || key !== saleView.key) {
+    saleView.key = key;
+    const u = I18N[state.lang].units;
+    el.classList.toggle('is-live', live);
+    el.innerHTML = `
+      <div class="sale-timer-text">
+        <span class="sale-timer-title">${THEME === 'halloween' ? '🎃' : '🔥'} ${esc(live ? t('saleLive') : t('saleTitle'))}${live ? '' : ` <span class="nowrap">${esc(saleDates())}</span>`}</span>
+        <span class="sale-timer-sub">${esc(live ? t('saleEndsIn') : t('saleStartsIn'))}</span>
+      </div>
+      <div class="sale-timer-clock">
+        ${['d', 'h', 'm', 's'].map((k, i) => `<span class="tt" data-k="${k}"><b>00</b><i>${esc(u[i])}</i></span>`).join('')}
+      </div>`;
+    el.hidden = false;
+  }
+  let left = Math.max(0, Math.floor(((live ? end : start) - now) / 1000));
+  const parts = { d: Math.floor(left / 86400), h: Math.floor(left / 3600) % 24, m: Math.floor(left / 60) % 60, s: left % 60 };
+  el.querySelectorAll('.tt').forEach((tile) => {
+    const k = tile.dataset.k;
+    tile.hidden = k === 'd' && parts.d === 0;
+    tile.querySelector('b').textContent = String(parts[k]).padStart(2, '0');
   });
 }
 
@@ -1087,6 +1140,7 @@ function safely(fn) {
 
 function renderAll() {
   safely(renderStatic);
+  safely(() => renderSaleTimer(true));
   safely(renderChips);
   safely(renderGrid);
   safely(renderBadges);
@@ -1619,6 +1673,7 @@ window.addEventListener('storage', (e) => {
 safely(initTelegram);
 renderAll();
 refreshFromSheet();
+if (SALE) setInterval(() => safely(() => renderSaleTimer()), 1000);
 // Telegram может долго держать магазин открытым — при возвращении в него обновим цены
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && Date.now() - catalogInfo.checkedAt > 2 * 60 * 1000) refreshFromSheet();

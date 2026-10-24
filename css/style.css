@@ -267,6 +267,39 @@ img { display: block; max-width: 100%; }
   clip-path: inset(0 round 27px 0 0 0);
 }
 
+/* ── Таймер акции ─────────────────────────────────────── */
+.sale-timer {
+  margin: 10px 12px 0;
+  padding: 10px 10px 10px 14px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  border-radius: 18px;
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    var(--grad) border-box;
+  border: 1px solid transparent;
+  box-shadow: 0 8px 24px rgba(var(--glow-rgb), .18);
+}
+.sale-timer-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sale-timer-title { font-weight: 700; font-size: 13.5px; line-height: 1.25; }
+.nowrap { white-space: nowrap; }
+.sale-timer-sub { color: var(--muted); font-size: 12px; font-weight: 600; }
+.sale-timer.is-live .sale-timer-sub { color: var(--accent-soft); }
+.sale-timer-clock { display: flex; gap: 5px; flex: none; }
+.tt {
+  min-width: 40px; padding: 5px 4px 4px;
+  display: flex; flex-direction: column; align-items: center;
+  border-radius: 11px;
+  background: var(--surface-3);
+  border: 1px solid var(--line);
+}
+.tt b { font: 700 16px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.tt i { margin-top: 3px; font-style: normal; font-size: 9.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; }
+.sale-timer.is-live .tt { background: rgba(var(--accent-rgb), .16); border-color: rgba(var(--accent-rgb), .45); }
+@media (max-width: 359px) {
+  .sale-timer { flex-wrap: wrap; }
+  .sale-timer-clock { width: 100%; justify-content: flex-start; }
+}
+
 /* ── Filters ──────────────────────────────────────────── */
 .filters {
   position: sticky; top: var(--top-offset); z-index: 40;
