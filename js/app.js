@@ -222,7 +222,7 @@ const I18N = {
     addedToCart: 'Добавлено в корзину', removedFromCart: 'Товар удалён',
     comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
     catalogUpdated: 'Цены обновлены: {time}',
-    saleLabel: 'Распродажа', saleLabelHalloween: 'Хэллоуин', saleLiveLabel: 'Распродажа идёт',
+    saleLabel: 'Распродажа', saleLabelHalloween: 'Хэллоуин', saleLiveLabel: 'Распродажа идёт', saleLiveShort: 'Идёт',
     saleOffer: 'Все {what} по {price}', saleOfferAny: 'Большая распродажа', saleStartsIn: 'до старта', saleEndsIn: 'до конца',
     units: ['д', 'ч', 'мин', 'сек'],
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
@@ -254,7 +254,7 @@ const I18N = {
     addedToCart: 'Додано до кошика', removedFromCart: 'Товар видалено',
     comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
     catalogUpdated: 'Ціни оновлено: {time}',
-    saleLabel: 'Розпродаж', saleLabelHalloween: 'Хелловін', saleLiveLabel: 'Розпродаж триває',
+    saleLabel: 'Розпродаж', saleLabelHalloween: 'Хелловін', saleLiveLabel: 'Розпродаж триває', saleLiveShort: 'Триває',
     saleOffer: 'Усі {what} по {price}', saleOfferAny: 'Великий розпродаж', saleStartsIn: 'до старту', saleEndsIn: 'до кінця',
     units: ['д', 'год', 'хв', 'сек'],
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
@@ -286,7 +286,7 @@ const I18N = {
     addedToCart: 'Added to cart', removedFromCart: 'Item removed',
     comment: 'Order comment', commentPh: 'Preferred time, wishes…',
     catalogUpdated: 'Prices updated: {time}',
-    saleLabel: 'Sale', saleLabelHalloween: 'Halloween', saleLiveLabel: 'Sale is on',
+    saleLabel: 'Sale', saleLabelHalloween: 'Halloween', saleLiveLabel: 'Sale is on', saleLiveShort: 'Live',
     saleOffer: 'All {what} for {price}', saleOfferAny: 'Big sale', saleStartsIn: 'starts in', saleEndsIn: 'ends in',
     units: ['d', 'h', 'min', 'sec'],
     district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
@@ -866,27 +866,27 @@ function renderSaleTimer(force = false) {
     const days = Math.round((end - start) / 86400000);
     const range = `<span class="nowrap">${esc(saleDay(start))}–${esc(saleDay(end - 1))}</span>`;
     const label = live
-      ? `${esc(t('saleLiveLabel'))} · ${range}`
-      : `${esc(THEME === 'halloween' ? t('saleLabelHalloween') : t('saleLabel'))} · <span class="nowrap">${days} ${esc(plural(days, 'days'))}</span> · ${range}`;
+      ? `${esc(t('saleLiveShort'))} · ${range}`
+      : `${range} · <span class="nowrap">${days} ${esc(plural(days, 'days'))}</span>`;
     el.classList.toggle('is-live', live);
     el.innerHTML = `
-      <div class="sale-timer-label"><span class="sale-timer-emoji">${emoji}</span>${label}</div>
-      <div class="sale-timer-offer">${esc(saleOfferText())}</div>
-      <div class="sale-timer-row">
+      <span class="sale-timer-emoji" aria-hidden="true">${emoji}</span>
+      <div class="sale-timer-text">
+        <div class="sale-timer-offer">${esc(saleOfferText())}</div>
+        <div class="sale-timer-label">${label}</div>
+      </div>
+      <div class="sale-timer-clock">
         <span class="sale-timer-sub">${esc(live ? t('saleEndsIn') : t('saleStartsIn'))}</span>
-        <div class="sale-timer-clock">
-          ${['d', 'h', 'm', 's'].map((k, i) => `<span class="tt" data-k="${k}"><b>00</b><i>${esc(u[i])}</i></span>`).join('')}
-        </div>
+        <b class="sale-timer-time"></b>
       </div>`;
     el.hidden = false;
   }
-  let left = Math.max(0, Math.floor(((live ? end : start) - now) / 1000));
-  const parts = { d: Math.floor(left / 86400), h: Math.floor(left / 3600) % 24, m: Math.floor(left / 60) % 60, s: left % 60 };
-  el.querySelectorAll('.tt').forEach((tile) => {
-    const k = tile.dataset.k;
-    tile.hidden = k === 'd' && parts.d === 0;
-    tile.querySelector('b').textContent = String(parts[k]).padStart(2, '0');
-  });
+  // компактный отсчёт: «6д 21:58:15», в последний день — «21:58:15»
+  const left = Math.max(0, Math.floor(((live ? end : start) - now) / 1000));
+  const d = Math.floor(left / 86400);
+  const pad = (n) => String(n).padStart(2, '0');
+  const hms = `${pad(Math.floor(left / 3600) % 24)}:${pad(Math.floor(left / 60) % 60)}:${pad(left % 60)}`;
+  el.querySelector('.sale-timer-time').textContent = d ? `${d}${I18N[state.lang].units[0]} ${hms}` : hms;
 }
 
 /* ── Рендер: фильтры ──────────────────────────────────── */
