@@ -872,16 +872,14 @@ function renderSaleTimer(force = false) {
       : `${range} · <span class="nowrap">${days} ${esc(plural(days, 'days'))}</span>`;
     el.classList.toggle('is-live', live);
     el.innerHTML = `
-      <div class="sale-timer-top">
-        <span class="sale-timer-emoji" aria-hidden="true">${emoji}</span>
-        <span class="sale-timer-offer">${esc(saleTitleText())}</span>
+      <span class="sale-timer-emoji" aria-hidden="true">${emoji}</span>
+      <div class="sale-timer-main">
+        <div class="sale-timer-offer">${esc(saleTitleText())}</div>
+        <div class="sale-timer-label">${label}</div>
       </div>
-      <div class="sale-timer-bottom">
-        <span class="sale-timer-label">${label}</span>
-        <span class="sale-timer-clock">
-          <span class="sale-timer-sub">${esc(live ? t('saleEndsIn') : t('saleStartsIn'))}</span>
-          <b class="sale-timer-time"></b>
-        </span>
+      <div class="sale-timer-clock">
+        <span class="sale-timer-sub">${esc(live ? t('saleEndsIn') : t('saleStartsIn'))}</span>
+        <b class="sale-timer-time"></b>
       </div>`;
     el.hidden = false;
   }

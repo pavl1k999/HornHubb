@@ -318,24 +318,31 @@ img { display: block; max-width: 100%; }
   clip-path: inset(0 round 27px 0 0 0);
 }
 
-/* ── Таймер акции (компактная полоска) ────────────────── */
+/* ── Таймер акции: [тыква] [название + даты] | [отсчёт] ── */
 .sale-timer {
   margin: 10px 12px 0;
-  padding: 9px 10px 9px 12px;
-  border-radius: 16px;
+  padding: 10px 14px 10px 10px;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; column-gap: 12px;
+  border-radius: 18px;
   background:
-    radial-gradient(120% 160% at 100% 0%, rgba(var(--accent-rgb), .16), transparent 55%) padding-box,
+    radial-gradient(120% 160% at 100% 0%, rgba(var(--accent-rgb), .14), transparent 55%) padding-box,
     linear-gradient(var(--surface), var(--surface)) padding-box,
     var(--grad) border-box;
   border: 1px solid transparent;
   box-shadow: 0 6px 18px rgba(var(--glow-rgb), .16);
 }
-.sale-timer-top { display: flex; align-items: center; gap: 7px; }
-.sale-timer-emoji { flex: none; font-size: 17px; line-height: 1; }
-.sale-timer-offer { min-width: 0; font-weight: 700; font-size: 15px; line-height: 1.25; }
-.sale-timer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }
+.sale-timer-emoji {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: rgba(var(--accent-rgb), .14);
+  border: 1px solid rgba(var(--accent-rgb), .3);
+  font-size: 21px; line-height: 1;
+}
+.sale-timer-main { min-width: 0; }
+.sale-timer-offer { font-weight: 700; font-size: 15px; line-height: 1.2; text-wrap: balance; }
 .sale-timer-label {
-  min-width: 0;
+  margin-top: 4px;
   display: flex; align-items: center; gap: 5px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   color: var(--accent-soft);
@@ -349,17 +356,20 @@ img { display: block; max-width: 100%; }
 @keyframes live-dot { 50% { opacity: .35; } }
 .nowrap { white-space: nowrap; }
 .sale-timer-clock {
-  flex: none;
-  display: flex; align-items: baseline; gap: 6px;
-  padding: 4px 8px;
-  border-radius: 10px;
-  background: var(--surface-3);
-  border: 1px solid var(--line);
+  display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line-2);
 }
-.sale-timer.is-live .sale-timer-clock { background: rgba(var(--accent-rgb), .16); border-color: rgba(var(--accent-rgb), .45); }
-.sale-timer-sub { color: var(--muted); font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
-.sale-timer-time { font: 700 13px/1.2 var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; }
-@media (max-width: 359px) { .sale-timer-sub { display: none; } }
+.sale-timer-sub { color: var(--muted); font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+.sale-timer-time { font: 700 16px/1 var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sale-timer.is-live .sale-timer-time { color: var(--accent-soft); }
+@media (max-width: 374px) {
+  .sale-timer { column-gap: 10px; padding-right: 12px; }
+  .sale-timer-emoji { width: 34px; height: 34px; font-size: 18px; border-radius: 10px; }
+  .sale-timer-offer { font-size: 14px; }
+  .sale-timer-clock { padding-left: 10px; }
+  .sale-timer-time { font-size: 14px; }
+}
 
 /* ── Filters ──────────────────────────────────────────── */
 .filters {
