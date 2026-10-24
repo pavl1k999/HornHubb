@@ -222,7 +222,8 @@ const I18N = {
     addedToCart: 'Добавлено в корзину', removedFromCart: 'Товар удалён',
     comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
     catalogUpdated: 'Цены обновлены: {time}',
-    saleTitle: 'Распродажа', saleStartsIn: 'До старта', saleLive: 'Распродажа идёт!', saleEndsIn: 'До конца',
+    saleLabel: 'Распродажа', saleLabelHalloween: 'Хэллоуин', saleLiveLabel: 'Распродажа идёт', saleUntil: 'до {date}',
+    saleOffer: 'Все {what} по {price}', saleOfferAny: 'Большая распродажа', saleStartsIn: 'до старта', saleEndsIn: 'до конца',
     units: ['д', 'ч', 'мин', 'сек'],
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
     gateTitle: 'Выберите ваш район', gateSub: 'Варшава',
@@ -252,7 +253,8 @@ const I18N = {
     addedToCart: 'Додано до кошика', removedFromCart: 'Товар видалено',
     comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
     catalogUpdated: 'Ціни оновлено: {time}',
-    saleTitle: 'Розпродаж', saleStartsIn: 'До старту', saleLive: 'Розпродаж триває!', saleEndsIn: 'До кінця',
+    saleLabel: 'Розпродаж', saleLabelHalloween: 'Хелловін', saleLiveLabel: 'Розпродаж триває', saleUntil: 'до {date}',
+    saleOffer: 'Усі {what} по {price}', saleOfferAny: 'Великий розпродаж', saleStartsIn: 'до старту', saleEndsIn: 'до кінця',
     units: ['д', 'год', 'хв', 'сек'],
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
     gateTitle: 'Оберіть ваш район', gateSub: 'Варшава',
@@ -282,7 +284,8 @@ const I18N = {
     addedToCart: 'Added to cart', removedFromCart: 'Item removed',
     comment: 'Order comment', commentPh: 'Preferred time, wishes…',
     catalogUpdated: 'Prices updated: {time}',
-    saleTitle: 'Sale', saleStartsIn: 'Starts in', saleLive: 'The sale is on!', saleEndsIn: 'Ends in',
+    saleLabel: 'Sale', saleLabelHalloween: 'Halloween', saleLiveLabel: 'Sale is on', saleUntil: 'until {date}',
+    saleOffer: 'All {what} for {price}', saleOfferAny: 'Big sale', saleStartsIn: 'starts in', saleEndsIn: 'ends in',
     units: ['d', 'h', 'min', 'sec'],
     district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
     gateTitle: 'Choose your district', gateSub: 'Warsaw',
@@ -827,9 +830,13 @@ function renderNavActive() {
 /* ── Таймер акции ─────────────────────────────────────── */
 const saleView = { key: '' };
 
-function saleDates() {
-  const fmt = (ms) => new Date(ms).toLocaleDateString(I18N[state.lang].locale, { timeZone: 'Europe/Warsaw', day: 'numeric', month: '2-digit' });
-  return `${fmt(Date.parse(SALE.start))}–${fmt(Date.parse(SALE.end) - 1)}`;
+const saleDay = (ms) => new Date(ms).toLocaleDateString(I18N[state.lang].locale, { timeZone: 'Europe/Warsaw', day: 'numeric', month: '2-digit' });
+
+// «Все жидкости по 30 zł» — из SALE.prices (первая категория), с учётом района и валюты
+function saleOfferText() {
+  const [cat, value] = Object.entries(SALE.prices || {})[0] || [];
+  if (cat == null) return t('saleOfferAny');
+  return t('saleOffer', { what: t(cat).toLowerCase(), price: money(districtPrice(value, 0)) });
 }
 
 function renderSaleTimer(force = false) {
@@ -848,18 +855,23 @@ function renderSaleTimer(force = false) {
   if (!SALE || !(end > now)) { el.hidden = true; saleView.key = ''; return; }
 
   const live = now >= start;
-  const key = `${live}|${state.lang}`;
+  const key = `${live}|${state.lang}|${state.currency}|${state.district}`;
   if (force || key !== saleView.key) {
     saleView.key = key;
     const u = I18N[state.lang].units;
+    const emoji = THEME === 'halloween' ? '🎃' : '🔥';
+    const label = live
+      ? `${esc(t('saleLiveLabel'))} · <span class="nowrap">${esc(t('saleUntil', { date: saleDay(end - 1) }))}</span>`
+      : `${esc(THEME === 'halloween' ? t('saleLabelHalloween') : t('saleLabel'))} · <span class="nowrap">${esc(saleDay(start))}–${esc(saleDay(end - 1))}</span>`;
     el.classList.toggle('is-live', live);
     el.innerHTML = `
-      <div class="sale-timer-text">
-        <span class="sale-timer-title">${THEME === 'halloween' ? '🎃' : '🔥'} ${esc(live ? t('saleLive') : t('saleTitle'))}${live ? '' : ` <span class="nowrap">${esc(saleDates())}</span>`}</span>
+      <div class="sale-timer-label"><span class="sale-timer-emoji">${emoji}</span>${label}</div>
+      <div class="sale-timer-offer">${esc(saleOfferText())}</div>
+      <div class="sale-timer-row">
         <span class="sale-timer-sub">${esc(live ? t('saleEndsIn') : t('saleStartsIn'))}</span>
-      </div>
-      <div class="sale-timer-clock">
-        ${['d', 'h', 'm', 's'].map((k, i) => `<span class="tt" data-k="${k}"><b>00</b><i>${esc(u[i])}</i></span>`).join('')}
+        <div class="sale-timer-clock">
+          ${['d', 'h', 'm', 's'].map((k, i) => `<span class="tt" data-k="${k}"><b>00</b><i>${esc(u[i])}</i></span>`).join('')}
+        </div>
       </div>`;
     el.hidden = false;
   }
