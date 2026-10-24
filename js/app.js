@@ -36,7 +36,16 @@ const DISTRICTS = ['Bemowo', 'Ożarów'];
 const SALE = {
   start: '2026-10-31T00:00:00+01:00', // 31 октября, 00:00
   end:   '2026-11-02T00:00:00+01:00', // конец 1 ноября
+  // Цены на время акции по категориям — во всех районах. Включаются и выключаются сами.
+  // Можно и по районам: liquid: { 'Bemowo': 30, 'Ożarów': 35 }
+  prices: {
+    liquid: 30, // все жидкости по 30 zł
+  },
 };
+
+function saleActive(now = Date.now()) {
+  return Boolean(SALE) && now >= Date.parse(SALE.start) && now < Date.parse(SALE.end);
+}
 
 // Оформление задаётся в index.html: <html data-theme="halloween"> (убрать атрибут — обычный вид)
 const THEME = document.documentElement.dataset.theme || 'default';
@@ -325,7 +334,10 @@ function makeProduct(row, order) {
     name: `${row.brandTitle} – ${row.flavor}`,
     salePrices: sale,
     // цена и скидка считаются для выбранного района
-    get sale() { return districtPrice(this.salePrices, this.price); },
+    get sale() {
+      const promo = saleActive() ? SALE.prices?.[this.category] : null;
+      return promo != null ? districtPrice(promo, this.price) : districtPrice(this.salePrices, this.price);
+    },
     get discount() {
       const s = this.sale;
       return s < this.price ? Math.round((1 - s / this.price) * 100) : 0;
@@ -825,6 +837,14 @@ function renderSaleTimer(force = false) {
   const now = Date.now();
   const start = SALE ? Date.parse(SALE.start) : NaN;
   const end = SALE ? Date.parse(SALE.end) : NaN;
+  // акция началась или закончилась, пока магазин открыт, — пересчитываем цены везде
+  const active = saleActive(now);
+  if (saleView.active !== undefined && saleView.active !== active && !force) {
+    saleView.active = active;
+    renderAll();
+    return;
+  }
+  saleView.active = active;
   if (!SALE || !(end > now)) { el.hidden = true; saleView.key = ''; return; }
 
   const live = now >= start;
