@@ -222,7 +222,7 @@ const I18N = {
     addedToCart: 'Добавлено в корзину', removedFromCart: 'Товар удалён',
     comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
     catalogUpdated: 'Цены обновлены: {time}',
-    saleLabel: 'Распродажа', saleLabelHalloween: 'Хэллоуин', saleLiveLabel: 'Распродажа идёт', saleUntil: 'до {date}',
+    saleLabel: 'Распродажа', saleLabelHalloween: 'Хэллоуин', saleLiveLabel: 'Распродажа идёт',
     saleOffer: 'Все {what} по {price}', saleOfferAny: 'Большая распродажа', saleStartsIn: 'до старта', saleEndsIn: 'до конца',
     units: ['д', 'ч', 'мин', 'сек'],
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
@@ -238,6 +238,7 @@ const I18N = {
     soldOutGroup: 'Нет в наличии', maxQty: 'Максимум {n} шт.',
     ageNote: '18+ · Продукция содержит никотин и предназначена только для совершеннолетних.',
     items: ['товар', 'товара', 'товаров'],
+    days: ['день', 'дня', 'дней'],
   },
   ua: {
     locale: 'uk-UA',
@@ -253,7 +254,7 @@ const I18N = {
     addedToCart: 'Додано до кошика', removedFromCart: 'Товар видалено',
     comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
     catalogUpdated: 'Ціни оновлено: {time}',
-    saleLabel: 'Розпродаж', saleLabelHalloween: 'Хелловін', saleLiveLabel: 'Розпродаж триває', saleUntil: 'до {date}',
+    saleLabel: 'Розпродаж', saleLabelHalloween: 'Хелловін', saleLiveLabel: 'Розпродаж триває',
     saleOffer: 'Усі {what} по {price}', saleOfferAny: 'Великий розпродаж', saleStartsIn: 'до старту', saleEndsIn: 'до кінця',
     units: ['д', 'год', 'хв', 'сек'],
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
@@ -269,6 +270,7 @@ const I18N = {
     soldOutGroup: 'Немає в наявності', maxQty: 'Максимум {n} шт.',
     ageNote: '18+ · Продукція містить нікотин і призначена лише для повнолітніх.',
     items: ['товар', 'товари', 'товарів'],
+    days: ['день', 'дні', 'днів'],
   },
   en: {
     locale: 'en-GB',
@@ -284,7 +286,7 @@ const I18N = {
     addedToCart: 'Added to cart', removedFromCart: 'Item removed',
     comment: 'Order comment', commentPh: 'Preferred time, wishes…',
     catalogUpdated: 'Prices updated: {time}',
-    saleLabel: 'Sale', saleLabelHalloween: 'Halloween', saleLiveLabel: 'Sale is on', saleUntil: 'until {date}',
+    saleLabel: 'Sale', saleLabelHalloween: 'Halloween', saleLiveLabel: 'Sale is on',
     saleOffer: 'All {what} for {price}', saleOfferAny: 'Big sale', saleStartsIn: 'starts in', saleEndsIn: 'ends in',
     units: ['d', 'h', 'min', 'sec'],
     district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
@@ -300,6 +302,7 @@ const I18N = {
     soldOutGroup: 'Out of stock', maxQty: 'Max {n} pcs',
     ageNote: '18+ · Products contain nicotine and are intended for adults only.',
     items: ['item', 'items'],
+    days: ['day', 'days'],
   },
 };
 
@@ -727,8 +730,8 @@ function t(key, vars) {
   return s;
 }
 
-function plural(n) {
-  const forms = I18N[state.lang].items;
+function plural(n, key = 'items') {
+  const forms = I18N[state.lang][key];
   if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
   const m10 = n % 10, m100 = n % 100;
   if (m10 === 1 && m100 !== 11) return forms[0];
@@ -860,9 +863,11 @@ function renderSaleTimer(force = false) {
     saleView.key = key;
     const u = I18N[state.lang].units;
     const emoji = THEME === 'halloween' ? '🎃' : '🔥';
+    const days = Math.round((end - start) / 86400000);
+    const range = `<span class="nowrap">${esc(saleDay(start))}–${esc(saleDay(end - 1))}</span>`;
     const label = live
-      ? `${esc(t('saleLiveLabel'))} · <span class="nowrap">${esc(t('saleUntil', { date: saleDay(end - 1) }))}</span>`
-      : `${esc(THEME === 'halloween' ? t('saleLabelHalloween') : t('saleLabel'))} · <span class="nowrap">${esc(saleDay(start))}–${esc(saleDay(end - 1))}</span>`;
+      ? `${esc(t('saleLiveLabel'))} · ${range}`
+      : `${esc(THEME === 'halloween' ? t('saleLabelHalloween') : t('saleLabel'))} · <span class="nowrap">${days} ${esc(plural(days, 'days'))}</span> · ${range}`;
     el.classList.toggle('is-live', live);
     el.innerHTML = `
       <div class="sale-timer-label"><span class="sale-timer-emoji">${emoji}</span>${label}</div>
