@@ -36,6 +36,12 @@ const DISTRICTS = ['Bemowo', 'Ożarów'];
 const SALE = {
   start: '2026-10-31T00:00:00+01:00', // 31 октября, 00:00
   end:   '2026-11-02T00:00:00+01:00', // конец 1 ноября
+  // Название акции в таймере (на трёх языках)
+  title: {
+    ru: 'Хэллоуинская распродажа',
+    ua: 'Хелловінський розпродаж',
+    en: 'Halloween sale',
+  },
   // Цены на время акции по категориям — во всех районах. Включаются и выключаются сами.
   // Можно и по районам: liquid: { 'Bemowo': 30, 'Ożarów': 35 }
   prices: {
@@ -223,7 +229,7 @@ const I18N = {
     comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
     catalogUpdated: 'Цены обновлены: {time}',
     saleLabel: 'Распродажа', saleLabelHalloween: 'Хэллоуин', saleLiveLabel: 'Распродажа идёт', saleLiveShort: 'Идёт',
-    saleOffer: 'Все {what} по {price}', saleOfferAny: 'Большая распродажа', saleStartsIn: 'до старта', saleEndsIn: 'до конца',
+    saleOfferAny: 'Большая распродажа', saleStartsIn: 'до старта', saleEndsIn: 'до конца',
     units: ['д', 'ч', 'мин', 'сек'],
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
     gateTitle: 'Выберите ваш район', gateSub: 'Варшава',
@@ -255,7 +261,7 @@ const I18N = {
     comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
     catalogUpdated: 'Ціни оновлено: {time}',
     saleLabel: 'Розпродаж', saleLabelHalloween: 'Хелловін', saleLiveLabel: 'Розпродаж триває', saleLiveShort: 'Триває',
-    saleOffer: 'Усі {what} по {price}', saleOfferAny: 'Великий розпродаж', saleStartsIn: 'до старту', saleEndsIn: 'до кінця',
+    saleOfferAny: 'Великий розпродаж', saleStartsIn: 'до старту', saleEndsIn: 'до кінця',
     units: ['д', 'год', 'хв', 'сек'],
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
     gateTitle: 'Оберіть ваш район', gateSub: 'Варшава',
@@ -287,7 +293,7 @@ const I18N = {
     comment: 'Order comment', commentPh: 'Preferred time, wishes…',
     catalogUpdated: 'Prices updated: {time}',
     saleLabel: 'Sale', saleLabelHalloween: 'Halloween', saleLiveLabel: 'Sale is on', saleLiveShort: 'Live',
-    saleOffer: 'All {what} for {price}', saleOfferAny: 'Big sale', saleStartsIn: 'starts in', saleEndsIn: 'ends in',
+    saleOfferAny: 'Big sale', saleStartsIn: 'starts in', saleEndsIn: 'ends in',
     units: ['d', 'h', 'min', 'sec'],
     district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
     gateTitle: 'Choose your district', gateSub: 'Warsaw',
@@ -835,11 +841,11 @@ const saleView = { key: '' };
 
 const saleDay = (ms) => new Date(ms).toLocaleDateString(I18N[state.lang].locale, { timeZone: 'Europe/Warsaw', day: 'numeric', month: '2-digit' });
 
-// «Все жидкости по 30 zł» — из SALE.prices (первая категория), с учётом района и валюты
-function saleOfferText() {
-  const [cat, value] = Object.entries(SALE.prices || {})[0] || [];
-  if (cat == null) return t('saleOfferAny');
-  return t('saleOffer', { what: t(cat).toLowerCase(), price: money(districtPrice(value, 0)) });
+// Название акции из SALE.title на языке покупателя
+function saleTitleText() {
+  const title = SALE.title;
+  if (typeof title === 'string') return title;
+  return title?.[state.lang] || title?.ru || t('saleOfferAny');
 }
 
 function renderSaleTimer(force = false) {
@@ -870,14 +876,16 @@ function renderSaleTimer(force = false) {
       : `${range} · <span class="nowrap">${days} ${esc(plural(days, 'days'))}</span>`;
     el.classList.toggle('is-live', live);
     el.innerHTML = `
-      <span class="sale-timer-emoji" aria-hidden="true">${emoji}</span>
-      <div class="sale-timer-text">
-        <div class="sale-timer-offer">${esc(saleOfferText())}</div>
-        <div class="sale-timer-label">${label}</div>
+      <div class="sale-timer-top">
+        <span class="sale-timer-emoji" aria-hidden="true">${emoji}</span>
+        <span class="sale-timer-offer">${esc(saleTitleText())}</span>
       </div>
-      <div class="sale-timer-clock">
-        <span class="sale-timer-sub">${esc(live ? t('saleEndsIn') : t('saleStartsIn'))}</span>
-        <b class="sale-timer-time"></b>
+      <div class="sale-timer-bottom">
+        <span class="sale-timer-label">${label}</span>
+        <span class="sale-timer-clock">
+          <span class="sale-timer-sub">${esc(live ? t('saleEndsIn') : t('saleStartsIn'))}</span>
+          <b class="sale-timer-time"></b>
+        </span>
       </div>`;
     el.hidden = false;
   }
