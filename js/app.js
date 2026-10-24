@@ -240,7 +240,7 @@ const I18N = {
     step2: 'Текст заказа уже скопирован. Если он не подставился сам — просто вставьте его в сообщение.',
     sendTelegram: 'Отправить в Telegram', copy: 'Скопировать текст', copied: 'Заказ скопирован ✅',
     copyFailed: 'Не удалось скопировать — выделите текст вручную',
-    client: 'Клиент', pcs: 'шт.', saleUpTo: 'Скидки до −{n}%', moreFlavors: 'Другие вкусы {brand}',
+    client: 'Клиент', pcs: 'шт.', moreFlavors: 'Другие вкусы {brand}',
     soldOutGroup: 'Нет в наличии', maxQty: 'Максимум {n} шт.',
     ageNote: '18+ · Продукция содержит никотин и предназначена только для совершеннолетних.',
     items: ['товар', 'товара', 'товаров'],
@@ -272,7 +272,7 @@ const I18N = {
     step2: 'Текст замовлення вже скопійовано. Якщо він не підставився сам — просто вставте його в повідомлення.',
     sendTelegram: 'Надіслати в Telegram', copy: 'Скопіювати текст', copied: 'Замовлення скопійовано ✅',
     copyFailed: 'Не вдалося скопіювати — виділіть текст вручну',
-    client: 'Клієнт', pcs: 'шт.', saleUpTo: 'Знижки до −{n}%', moreFlavors: 'Інші смаки {brand}',
+    client: 'Клієнт', pcs: 'шт.', moreFlavors: 'Інші смаки {brand}',
     soldOutGroup: 'Немає в наявності', maxQty: 'Максимум {n} шт.',
     ageNote: '18+ · Продукція містить нікотин і призначена лише для повнолітніх.',
     items: ['товар', 'товари', 'товарів'],
@@ -304,7 +304,7 @@ const I18N = {
     step2: 'The order text is already copied. If it isn’t filled in automatically, just paste it into the message.',
     sendTelegram: 'Send via Telegram', copy: 'Copy text', copied: 'Order copied ✅',
     copyFailed: 'Couldn’t copy — please select the text manually',
-    client: 'Customer', pcs: 'pcs', saleUpTo: 'Up to −{n}% off', moreFlavors: 'More {brand} flavors',
+    client: 'Customer', pcs: 'pcs', moreFlavors: 'More {brand} flavors',
     soldOutGroup: 'Out of stock', maxQty: 'Max {n} pcs',
     ageNote: '18+ · Products contain nicotine and are intended for adults only.',
     items: ['item', 'items'],
@@ -710,7 +710,7 @@ const saveFavorites = () => storage.set('favorites', JSON.stringify([...favorite
 const $ = (id) => document.getElementById(id);
 const els = {
   shopView: $('shopView'), cartView: $('cartView'),
-  heroPill: $('heroPill'), listAnchor: $('listAnchor'), catalogUpdated: $('catalogUpdated'), saleTimer: $('saleTimer'), filters: $('filters'),
+  listAnchor: $('listAnchor'), catalogUpdated: $('catalogUpdated'), saleTimer: $('saleTimer'), filters: $('filters'),
   categoryChips: $('categoryChips'), brandChips: $('brandChips'),
   listHead: $('listHead'), grid: $('productGrid'),
   favBadge: $('favBadge'), cartBadge: $('cartBadge'), cartBtn: $('cartBtn'),
@@ -809,10 +809,6 @@ function renderStatic() {
     const time = new Date(catalogInfo.at).toLocaleString(I18N[state.lang].locale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
     els.catalogUpdated.textContent = t('catalogUpdated', { time });
   }
-
-  const maxSale = Math.max(0, ...products.filter((p) => !p.outOfStock).map((p) => p.discount));
-  els.heroPill.hidden = !maxSale;
-  els.heroPill.textContent = `${THEME === 'halloween' ? '🎃' : '🔥'} ${t('saleUpTo', { n: maxSale })}`;
 
   document.querySelectorAll('[data-count]').forEach((el) => {
     const key = el.dataset.count;

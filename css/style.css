@@ -192,16 +192,6 @@ img { display: block; max-width: 100%; }
   background: linear-gradient(180deg, transparent 55%, rgba(var(--bg-rgb), .55));
   pointer-events: none;
 }
-.hero-pill {
-  position: absolute; left: 12px; bottom: 12px; z-index: 1;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: var(--grad);
-  box-shadow: var(--glow);
-  font: 700 12px/1 var(--font);
-  letter-spacing: .2px;
-}
-
 /* Хэллоуин: фото товаров в тёплых тонах темы, но без потери яркости.
    Мягкий оранжевый свет (soft-light) + чуть больше сочности и контраста.
    Сами файлы картинок не меняются. */
@@ -212,6 +202,67 @@ img { display: block; max-width: 100%; }
   background: linear-gradient(180deg, rgba(255, 150, 60, .2) 0%, rgba(255, 100, 20, .42) 100%);
   mix-blend-mode: soft-light;
   pointer-events: none;
+}
+
+/* Украшения на баннере слева от носорога (только в теме «Хэллоуин») */
+.hero-deco { display: none; }
+[data-theme="halloween"] .hero-deco { display: block; position: absolute; inset: 0 45% 0 0; z-index: 1; pointer-events: none; }
+
+/* мерцание тыквы, будто внутри свеча */
+.pumpkin-glow {
+  position: absolute; left: -6%; bottom: -14%;
+  width: 46%; aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 150, 40, .55), rgba(255, 90, 10, .18) 45%, transparent 70%);
+  mix-blend-mode: screen;
+  animation: candle 2.6s ease-in-out infinite;
+}
+@keyframes candle {
+  0%, 100% { opacity: .55; transform: scale(1); }
+  20% { opacity: .9; }
+  35% { opacity: .6; transform: scale(1.04); }
+  55% { opacity: 1; }
+  75% { opacity: .7; transform: scale(.97); }
+}
+
+/* искры от фонарей: тёплые огоньки поднимаются вверх */
+.ember {
+  position: absolute; bottom: 8%;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: #ffb347;
+  box-shadow: 0 0 6px 2px rgba(255, 140, 30, .75);
+  opacity: 0;
+  animation: ember 6s ease-out infinite;
+}
+.ember:nth-child(2) { left: 8%;  animation-delay: 0s;   animation-duration: 6.5s; }
+.ember:nth-child(3) { left: 18%; animation-delay: 1.2s; animation-duration: 5.5s; width: 3px; height: 3px; }
+.ember:nth-child(4) { left: 27%; animation-delay: 2.6s; animation-duration: 7s; }
+.ember:nth-child(5) { left: 36%; animation-delay: .6s;  animation-duration: 6s; width: 3px; height: 3px; }
+.ember:nth-child(6) { left: 45%; animation-delay: 3.4s; animation-duration: 6.8s; }
+.ember:nth-child(7) { left: 13%; animation-delay: 4.1s; animation-duration: 5.8s; width: 3px; height: 3px; }
+.ember:nth-child(8) { left: 31%; animation-delay: 5s;   animation-duration: 6.2s; }
+.ember:nth-child(9) { left: 52%; animation-delay: 1.9s; animation-duration: 7.4s; width: 3px; height: 3px; }
+@keyframes ember {
+  0%   { opacity: 0; transform: translate(0, 0) scale(1); }
+  15%  { opacity: 1; }
+  50%  { transform: translate(8px, -45%) scale(.9); }
+  80%  { opacity: .7; }
+  100% { opacity: 0; transform: translate(-6px, -90%) scale(.5); }
+}
+
+/* паук на паутинке */
+.spider {
+  position: absolute; top: 0; left: 30%;
+  display: flex; flex-direction: column; align-items: center;
+  animation: spider-drop 5s ease-in-out infinite alternate;
+  transform-origin: 50% 0;
+}
+.spider-thread { width: 1px; height: 46px; background: linear-gradient(rgba(255, 235, 215, .15), rgba(255, 235, 215, .7)); }
+.spider-body { width: 22px; height: 24px; margin-top: -2px; color: #140d0b; filter: drop-shadow(0 0 3px rgba(255, 140, 40, .45)); }
+@keyframes spider-drop {
+  0%   { transform: translateY(-26px) rotate(-3deg); }
+  60%  { transform: translateY(0) rotate(2deg); }
+  100% { transform: translateY(6px) rotate(-1deg); }
 }
 
 /* Летучие мыши над баннером (только в теме «Хэллоуин») */
