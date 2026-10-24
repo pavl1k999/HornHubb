@@ -53,6 +53,19 @@ function saleActive(now = Date.now()) {
   return Boolean(SALE) && now >= Date.parse(SALE.start) && now < Date.parse(SALE.end);
 }
 
+// Важное объявление вверху магазина. Покупатель закрывает его кнопкой «Понятно»
+// (больше не показывается), после даты until исчезает само. Убрать: const NOTICE = null;
+// Для нового объявления поменяйте id — тогда его увидят и те, кто закрыл прошлое.
+const NOTICE = {
+  id: 'scam-2026-10-24',
+  until: '2026-11-10T00:00:00+01:00',
+  text: {
+    ru: '<b>Внимание!</b> 24 октября от имени нашего бота пришло сообщение «Оживи фотку за 5 секунд». Это не мы — это мошенники. Не переходите по ссылке и удалите это сообщение из чата.',
+    ua: '<b>Увага!</b> 24 жовтня від імені нашого бота надійшло повідомлення «Оживи фотку за 5 секунд». Це не ми — це шахраї. Не переходьте за посиланням і видаліть це повідомлення з чату.',
+    en: '<b>Warning!</b> On 24 October a message “Оживи фотку за 5 секунд” was sent on behalf of our bot. It wasn’t us — it’s a scam. Don’t follow the link and delete that message from the chat.',
+  },
+};
+
 // Оформление задаётся в index.html: <html data-theme="halloween"> (убрать атрибут — обычный вид)
 const THEME = document.documentElement.dataset.theme || 'default';
 
@@ -227,7 +240,7 @@ const I18N = {
     clearCart: 'Очистить', cartCleared: 'Корзина очищена', undo: 'Вернуть',
     addedToCart: 'Добавлено в корзину', removedFromCart: 'Товар удалён',
     comment: 'Комментарий к заказу', commentPh: 'Удобное время, пожелания…',
-    catalogUpdated: 'Цены обновлены: {time}',
+    catalogUpdated: 'Цены обновлены: {time}', noticeOk: 'Понятно',
     saleLabel: 'Распродажа', saleLabelHalloween: 'Хэллоуин', saleLiveLabel: 'Распродажа идёт', saleLiveShort: 'Идёт',
     saleOfferAny: 'Большая распродажа', saleStartsIn: 'до старта', saleEndsIn: 'до конца',
     units: ['д', 'ч', 'мин', 'сек'],
@@ -259,7 +272,7 @@ const I18N = {
     clearCart: 'Очистити', cartCleared: 'Кошик очищено', undo: 'Повернути',
     addedToCart: 'Додано до кошика', removedFromCart: 'Товар видалено',
     comment: 'Коментар до замовлення', commentPh: 'Зручний час, побажання…',
-    catalogUpdated: 'Ціни оновлено: {time}',
+    catalogUpdated: 'Ціни оновлено: {time}', noticeOk: 'Зрозуміло',
     saleLabel: 'Розпродаж', saleLabelHalloween: 'Хелловін', saleLiveLabel: 'Розпродаж триває', saleLiveShort: 'Триває',
     saleOfferAny: 'Великий розпродаж', saleStartsIn: 'до старту', saleEndsIn: 'до кінця',
     units: ['д', 'год', 'хв', 'сек'],
@@ -291,7 +304,7 @@ const I18N = {
     clearCart: 'Clear', cartCleared: 'Cart cleared', undo: 'Undo',
     addedToCart: 'Added to cart', removedFromCart: 'Item removed',
     comment: 'Order comment', commentPh: 'Preferred time, wishes…',
-    catalogUpdated: 'Prices updated: {time}',
+    catalogUpdated: 'Prices updated: {time}', noticeOk: 'Got it',
     saleLabel: 'Sale', saleLabelHalloween: 'Halloween', saleLiveLabel: 'Sale is on', saleLiveShort: 'Live',
     saleOfferAny: 'Big sale', saleStartsIn: 'starts in', saleEndsIn: 'ends in',
     units: ['d', 'h', 'min', 'sec'],
@@ -710,7 +723,7 @@ const saveFavorites = () => storage.set('favorites', JSON.stringify([...favorite
 const $ = (id) => document.getElementById(id);
 const els = {
   shopView: $('shopView'), cartView: $('cartView'),
-  listAnchor: $('listAnchor'), catalogUpdated: $('catalogUpdated'), saleTimer: $('saleTimer'), filters: $('filters'),
+  listAnchor: $('listAnchor'), notice: $('notice'), catalogUpdated: $('catalogUpdated'), saleTimer: $('saleTimer'), filters: $('filters'),
   categoryChips: $('categoryChips'), brandChips: $('brandChips'),
   listHead: $('listHead'), grid: $('productGrid'),
   favBadge: $('favBadge'), cartBadge: $('cartBadge'), cartBtn: $('cartBtn'),
@@ -1177,8 +1190,23 @@ function safely(fn) {
   try { fn(); } catch (err) { console.error(err); }
 }
 
+// Объявление вверху магазина (текст из NOTICE — наш, поэтому вставляем как HTML)
+function renderNotice() {
+  const seen = storage.get('noticeSeen') === NOTICE?.id;
+  const expired = NOTICE && Date.now() >= Date.parse(NOTICE.until);
+  if (!NOTICE || seen || expired) { els.notice.hidden = true; return; }
+  els.notice.innerHTML = `
+    <span class="notice-icon" aria-hidden="true">⚠️</span>
+    <div class="notice-body">
+      <p class="notice-text">${NOTICE.text[state.lang] || NOTICE.text.ru}</p>
+      <button class="notice-btn" data-action="notice-ok">${esc(t('noticeOk'))}</button>
+    </div>`;
+  els.notice.hidden = false;
+}
+
 function renderAll() {
   safely(renderStatic);
+  safely(renderNotice);
   safely(() => renderSaleTimer(true));
   safely(renderChips);
   safely(renderGrid);
@@ -1661,6 +1689,7 @@ const actions = {
   contact: () => openTelegramLink(ADMIN_URL),
   'clear-cart': () => clearCart(),
   district: (id, el) => setDistrict(el.dataset.value),
+  'notice-ok': () => { storage.set('noticeSeen', NOTICE.id); els.notice.hidden = true; haptic.tap(); },
 };
 
 document.addEventListener('click', (e) => {
