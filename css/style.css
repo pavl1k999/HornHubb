@@ -318,30 +318,6 @@ img { display: block; max-width: 100%; }
   clip-path: inset(0 round 27px 0 0 0);
 }
 
-/* ── Важное объявление (например, предупреждение о мошенниках) ── */
-.notice {
-  margin: 12px 12px 0;
-  padding: 12px 12px 12px 12px;
-  display: flex; gap: 10px; align-items: flex-start;
-  border-radius: 16px;
-  background: rgba(255, 92, 74, .12);
-  border: 1px solid rgba(255, 92, 74, .55);
-  animation: viewIn .35s var(--ease);
-}
-.notice-icon { flex: none; font-size: 20px; line-height: 1.2; }
-.notice-body { min-width: 0; }
-.notice-text { font-size: 13.5px; line-height: 1.45; color: var(--text); }
-.notice-text b { color: #ff8a7a; }
-.notice-btn {
-  margin-top: 10px;
-  height: 34px; padding: 0 16px;
-  border-radius: 10px;
-  background: rgba(255, 92, 74, .2);
-  border: 1px solid rgba(255, 92, 74, .55);
-  color: #fff; font-weight: 700; font-size: 13.5px;
-}
-.notice-btn:active { transform: scale(.97); }
-
 /* ── Таймер акции: [тыква] [название + даты] | [отсчёт] ── */
 .sale-timer {
   margin: 10px 12px 0;
