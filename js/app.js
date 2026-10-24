@@ -26,6 +26,10 @@ const ADMIN_URL = `https://t.me/${ADMIN_NICK}`;
 // Вставьте сюда ссылку на таблицу. Пока пусто — товары берутся из CATALOG ниже.
 const SHEET_URL = '';
 
+// Ссылка на скрипт таблицы, который собирает подписчиков бота (README → «Защита бота»).
+// Нужен, чтобы при спаме от имени бота удалить его у всех и делать свои рассылки.
+const SUBSCRIBERS_URL = '';
+
 // Районы Варшавы. Окно выбора района показывается при первом входе, дальше район
 // запоминается. От района зависят цены (см. sale в CATALOG), район попадает в текст заказа.
 // Новый район — просто допишите название в список.
@@ -621,6 +625,21 @@ function initCatalog() {
   }
 }
 initCatalog();
+
+// Покупатель открыл магазин в Telegram — отмечаем его в списке подписчиков (не чаще раза в сутки).
+// Отправляются только подписанные Telegram данные, скрипт таблицы проверяет подпись.
+function registerSubscriber() {
+  if (!SUBSCRIBERS_URL || !isTg || !tg.initData) return;
+  const last = Number(storage.get('subscriberSentAt')) || 0;
+  if (Date.now() - last < 24 * 60 * 60 * 1000) return;
+  storage.set('subscriberSentAt', String(Date.now()));
+  fetch(SUBSCRIBERS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ initData: tg.initData }),
+  }).catch(() => storage.set('subscriberSentAt', '0'));
+}
 
 async function refreshFromSheet() {
   if (!SHEET_URL) return;
@@ -1712,6 +1731,7 @@ window.addEventListener('storage', (e) => {
 safely(initTelegram);
 renderAll();
 refreshFromSheet();
+safely(registerSubscriber);
 if (SALE) setInterval(() => safely(() => renderSaleTimer()), 1000);
 // Telegram может долго держать магазин открытым — при возвращении в него обновим цены
 document.addEventListener('visibilitychange', () => {
