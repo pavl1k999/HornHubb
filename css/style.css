@@ -1113,6 +1113,71 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
   .sheet-body { padding-bottom: 20px; }
 }
 
+/* ── Техобслуживание: <html data-maintenance> ───────────
+   Виден только экран-заглушка, остальной магазин скрыт. */
+.maintenance { display: none; }
+[data-maintenance] body > :not(.maintenance):not(.bg-webs):not(svg):not(script) { display: none !important; }
+/* без шапки магазина верхняя паутина поднимается к краю экрана */
+[data-maintenance] .bg-web-tl, [data-maintenance] .bg-web-tr { top: -8px; }
+[data-maintenance] .maintenance {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; min-height: 100dvh;
+  padding: calc(var(--safe-top) + var(--content-top) + 16px) 16px calc(var(--safe-bottom) + 16px);
+}
+.maint-card {
+  position: relative;
+  width: 100%; max-width: 400px;
+  text-align: center;
+  background: var(--bg-elev);
+  border: 1px solid var(--line-2);
+  border-radius: 28px;
+  box-shadow: var(--shadow), 0 0 60px rgba(var(--glow-rgb), .12);
+  overflow: hidden;
+  animation: maint-in .6s var(--ease) both;
+}
+.maint-banner {
+  position: relative;
+  aspect-ratio: var(--banner-ratio);
+  background: var(--banner) var(--banner-pos) / cover no-repeat;
+}
+.maint-banner::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 55%, var(--bg-elev));
+}
+.maint-icon {
+  position: relative;
+  width: 62px; height: 62px;
+  margin: -31px auto 0;
+  display: grid; place-items: center;
+  border-radius: 20px;
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 0 0 5px var(--bg-elev), var(--glow);
+}
+.maint-icon .ic { width: 28px; height: 28px; animation: maint-wrench 2.8s ease-in-out infinite; }
+.maint-body { padding: 14px 22px 24px; }
+.maint-logo { font-size: 14px; letter-spacing: 1px; color: var(--muted); }
+.maint-title { margin-top: 12px; font: 600 21px/1.25 var(--font-display); text-wrap: balance; }
+.maint-text { margin-top: 10px; color: var(--text-2); font-size: 14.5px; line-height: 1.5; text-wrap: pretty; }
+.maint-status {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 18px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--accent-rgb), .3);
+  background: rgba(var(--accent-rgb), .12);
+  color: var(--accent-soft);
+  font: 600 13px/1 var(--font);
+}
+.maint-status::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%; flex: none;
+  background: var(--violet);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), .8);
+  animation: live-dot 1.4s ease-in-out infinite;
+}
+@keyframes maint-in { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+@keyframes maint-wrench { 0%, 60%, 100% { transform: rotate(0); } 25% { transform: rotate(-22deg); } 40% { transform: rotate(10deg); } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;

@@ -57,6 +57,10 @@ function saleActive(now = Date.now()) {
   return Boolean(SALE) && now >= Date.parse(SALE.start) && now < Date.parse(SALE.end);
 }
 
+// Техобслуживание: магазин закрыт, покупатель видит только экран «Магазин на техническом обслуживании».
+// Включается в index.html: <html … data-maintenance>. Открыть магазин — убрать data-maintenance.
+const MAINTENANCE = document.documentElement.hasAttribute('data-maintenance');
+
 // Оформление задаётся в index.html: <html data-theme="halloween"> (убрать атрибут — обычный вид)
 const THEME = document.documentElement.dataset.theme || 'default';
 
@@ -220,6 +224,9 @@ const MAX_QTY = 99;
 const I18N = {
   ru: {
     locale: 'ru-RU',
+    maintTitle: 'Магазин на техническом обслуживании',
+    maintText: 'Мы обновляем магазин и скоро вернёмся. Пожалуйста, загляните чуть позже.',
+    maintStatus: 'Скоро откроемся',
     all: 'Все товары', liquid: 'Жидкости', disposable: 'Одноразки', pod: 'Pod-системы', cartridge: 'Картриджи',
     menu: 'Меню', back: 'Назад', close: 'Закрыть', language: 'Язык', currency: 'Валюта',
     addToCart: 'В корзину', outOfStock: 'Нет в наличии', inStock: 'В наличии',
@@ -252,6 +259,9 @@ const I18N = {
   },
   ua: {
     locale: 'uk-UA',
+    maintTitle: 'Магазин на технічному обслуговуванні',
+    maintText: 'Ми оновлюємо магазин і скоро повернемося. Будь ласка, зазирніть трохи пізніше.',
+    maintStatus: 'Скоро відкриємося',
     all: 'Всі товари', liquid: 'Рідини', disposable: 'Одноразки', pod: 'Pod-системи', cartridge: 'Картриджі',
     menu: 'Меню', back: 'Назад', close: 'Закрити', language: 'Мова', currency: 'Валюта',
     addToCart: 'До кошика', outOfStock: 'Немає в наявності', inStock: 'В наявності',
@@ -284,6 +294,9 @@ const I18N = {
   },
   en: {
     locale: 'en-GB',
+    maintTitle: 'The shop is under maintenance',
+    maintText: "We're updating the shop and will be back soon. Please check back a little later.",
+    maintStatus: 'Opening soon',
     all: 'All products', liquid: 'Liquids', disposable: 'Disposables', pod: 'Pod systems', cartridge: 'Cartridges',
     menu: 'Menu', back: 'Back', close: 'Close', language: 'Language', currency: 'Currency',
     addToCart: 'Add to cart', outOfStock: 'Out of stock', inStock: 'In stock',
@@ -1196,6 +1209,12 @@ function safely(fn) {
   try { fn(); } catch (err) { console.error(err); }
 }
 
+// Экран техобслуживания уже в index.html — только переводим его на язык покупателя
+function renderMaintenance() {
+  document.documentElement.lang = state.lang === 'ua' ? 'uk' : state.lang;
+  document.querySelectorAll('#maintenance [data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
+}
+
 function renderAll() {
   safely(renderStatic);
   safely(() => renderSaleTimer(true));
@@ -1711,6 +1730,7 @@ document.addEventListener('keydown', (e) => {
 
 // Синхронизация между вкладками браузера
 window.addEventListener('storage', (e) => {
+  if (MAINTENANCE) return;
   if (e.key === 'district') {
     if (DISTRICTS.includes(e.newValue) && e.newValue !== state.district) {
       state.district = e.newValue;
@@ -1728,25 +1748,37 @@ window.addEventListener('storage', (e) => {
 });
 
 /* ── Старт ────────────────────────────────────────────── */
-safely(initTelegram);
-renderAll();
-refreshFromSheet();
-safely(registerSubscriber);
-if (SALE) setInterval(() => safely(() => renderSaleTimer()), 1000);
-// Telegram может долго держать магазин открытым — при возвращении в него обновим цены
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && Date.now() - catalogInfo.checkedAt > 2 * 60 * 1000) refreshFromSheet();
-});
-// Окно выбора района — только если район ещё не выбран (обычно при первом входе)
-if (!state.district) {
-  loadDistrictFromCloud((saved) => {
-    if (state.district) return; // уже выбрали, пока ждали облако
-    if (DISTRICTS.includes(saved)) {
-      state.district = saved;
-      storage.set('district', saved);
-      renderAll();
-    } else {
-      safely(openDistrictGate);
-    }
+function startShop() {
+  safely(initTelegram);
+  renderAll();
+  refreshFromSheet();
+  safely(registerSubscriber);
+  if (SALE) setInterval(() => safely(() => renderSaleTimer()), 1000);
+  // Telegram может долго держать магазин открытым — при возвращении в него обновим цены
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && Date.now() - catalogInfo.checkedAt > 2 * 60 * 1000) refreshFromSheet();
   });
+  // Окно выбора района — только если район ещё не выбран (обычно при первом входе)
+  if (!state.district) {
+    loadDistrictFromCloud((saved) => {
+      if (state.district) return; // уже выбрали, пока ждали облако
+      if (DISTRICTS.includes(saved)) {
+        state.district = saved;
+        storage.set('district', saved);
+        renderAll();
+      } else {
+        safely(openDistrictGate);
+      }
+    });
+  }
+}
+
+if (MAINTENANCE) {
+  // Магазин закрыт: работает только экран техобслуживания, сам магазин не запускаем.
+  // Подписчиков продолжаем собирать — это нужно для защиты бота.
+  safely(initTelegram);
+  safely(renderMaintenance);
+  safely(registerSubscriber);
+} else {
+  startShop();
 }
