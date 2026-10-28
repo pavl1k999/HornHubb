@@ -61,6 +61,12 @@ function saleActive(now = Date.now()) {
 // Включается в index.html: <html … data-maintenance>. Открыть магазин — убрать data-maintenance.
 const MAINTENANCE = document.documentElement.hasAttribute('data-maintenance');
 
+// Кому магазин закрыт. Магазин открывается только внутри Telegram.
+// BLOCKED_LANGS — язык приложения Telegram, для которого магазин закрыт ('pl' — польский).
+// Пустой список [] — пускать всех. Тот же список — в скрипте таблицы (bot/hornhub-bot.gs).
+// Отдельного человека закрывают в таблице: лист «Подписчики», «Статус» → «заблокирован».
+const BLOCKED_LANGS = ['pl'];
+
 // Оформление задаётся в index.html: <html data-theme="halloween"> (убрать атрибут — обычный вид)
 const THEME = document.documentElement.dataset.theme || 'default';
 
@@ -227,6 +233,10 @@ const I18N = {
     maintTitle: 'Магазин на техническом обслуживании',
     maintText: 'Мы обновляем магазин и скоро вернёмся. Пожалуйста, загляните чуть позже.',
     maintStatus: 'Скоро откроемся',
+    deniedTitle: 'Доступ закрыт',
+    deniedText: 'Магазин недоступен для вашего аккаунта.',
+    tgOnlyTitle: 'Откройте магазин в Telegram',
+    tgOnlyText: 'Магазин работает только внутри Telegram\u00a0— откройте его через нашего бота.',
     all: 'Все товары', liquid: 'Жидкости', disposable: 'Одноразки', pod: 'Pod-системы', cartridge: 'Картриджи',
     menu: 'Меню', back: 'Назад', close: 'Закрыть', language: 'Язык', currency: 'Валюта',
     addToCart: 'В корзину', outOfStock: 'Нет в наличии', inStock: 'В наличии',
@@ -262,6 +272,10 @@ const I18N = {
     maintTitle: 'Магазин на технічному обслуговуванні',
     maintText: 'Ми оновлюємо магазин і скоро повернемося. Будь ласка, зазирніть трохи пізніше.',
     maintStatus: 'Скоро відкриємося',
+    deniedTitle: 'Доступ закрито',
+    deniedText: 'Магазин недоступний для вашого акаунта.',
+    tgOnlyTitle: 'Відкрийте магазин у Telegram',
+    tgOnlyText: 'Магазин працює лише всередині Telegram\u00a0— відкрийте його через нашого бота.',
     all: 'Всі товари', liquid: 'Рідини', disposable: 'Одноразки', pod: 'Pod-системи', cartridge: 'Картриджі',
     menu: 'Меню', back: 'Назад', close: 'Закрити', language: 'Мова', currency: 'Валюта',
     addToCart: 'До кошика', outOfStock: 'Немає в наявності', inStock: 'В наявності',
@@ -297,6 +311,10 @@ const I18N = {
     maintTitle: 'The shop is under maintenance',
     maintText: "We're updating the shop and will be back soon. Please check back a little later.",
     maintStatus: 'Opening soon',
+    deniedTitle: 'Access denied',
+    deniedText: 'The shop is not available for your account.',
+    tgOnlyTitle: 'Open the shop in Telegram',
+    tgOnlyText: 'The shop works only inside Telegram\u00a0— open it via our bot.',
     all: 'All products', liquid: 'Liquids', disposable: 'Disposables', pod: 'Pod systems', cartridge: 'Cartridges',
     menu: 'Menu', back: 'Back', close: 'Close', language: 'Language', currency: 'Currency',
     addToCart: 'Add to cart', outOfStock: 'Out of stock', inStock: 'In stock',
@@ -639,19 +657,35 @@ function initCatalog() {
 }
 initCatalog();
 
-// Покупатель открыл магазин в Telegram — отмечаем его в списке подписчиков (не чаще раза в сутки).
-// Отправляются только подписанные Telegram данные, скрипт таблицы проверяет подпись.
-function registerSubscriber() {
+// Почему магазин закрыт для этого покупателя (null — открыт)
+function lockReason() {
+  if (!isTg) return 'tgOnly';
+  const lang = String(tg.initDataUnsafe?.user?.language_code || '').toLowerCase();
+  if (BLOCKED_LANGS.some((l) => lang === l || lang.startsWith(`${l}-`))) return 'denied';
+  if (storage.get('accessDenied') === '1') return 'denied'; // заблокирован в таблице (запомнили с прошлого раза)
+  return null;
+}
+
+// Покупатель открыл магазин в Telegram — отмечаем его в списке подписчиков и узнаём,
+// не заблокирован ли он в таблице. Отправляются только подписанные Telegram данные,
+// скрипт таблицы проверяет подпись. Нет ответа от таблицы — магазин работает как обычно.
+async function checkAccess() {
   if (!SUBSCRIBERS_URL || !isTg || !tg.initData) return;
-  const last = Number(storage.get('subscriberSentAt')) || 0;
-  if (Date.now() - last < 24 * 60 * 60 * 1000) return;
-  storage.set('subscriberSentAt', String(Date.now()));
-  fetch(SUBSCRIBERS_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ initData: tg.initData }),
-  }).catch(() => storage.set('subscriberSentAt', '0'));
+  try {
+    const res = await fetch(SUBSCRIBERS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ initData: tg.initData }),
+    });
+    const { access } = await res.json();
+    if (access === 'blocked') {
+      storage.set('accessDenied', '1');
+      safely(() => showLock('denied'));
+    } else if (access === 'ok' && storage.get('accessDenied') === '1') {
+      storage.set('accessDenied', '0'); // блокировку сняли в таблице
+      location.reload();
+    }
+  } catch {}
 }
 
 async function refreshFromSheet() {
@@ -743,6 +777,7 @@ const $ = (id) => document.getElementById(id);
 const els = {
   shopView: $('shopView'), cartView: $('cartView'),
   listAnchor: $('listAnchor'), catalogUpdated: $('catalogUpdated'), saleTimer: $('saleTimer'), filters: $('filters'),
+  maintenance: $('maintenance'),
   categoryChips: $('categoryChips'), brandChips: $('brandChips'),
   listHead: $('listHead'), grid: $('productGrid'),
   favBadge: $('favBadge'), cartBadge: $('cartBadge'), cartBtn: $('cartBtn'),
@@ -1213,6 +1248,19 @@ function safely(fn) {
 function renderMaintenance() {
   document.documentElement.lang = state.lang === 'ua' ? 'uk' : state.lang;
   document.querySelectorAll('#maintenance [data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
+}
+
+// Магазин закрыт для покупателя: тот же экран-заглушка, но с другим текстом и значком
+function showLock(reason) {
+  const root = document.documentElement;
+  root.setAttribute('data-locked', reason);
+  els.maintenance.querySelector('.maint-title').dataset.i18n = `${reason}Title`;
+  els.maintenance.querySelector('.maint-text').dataset.i18n = `${reason}Text`;
+  els.maintenance.querySelector('.maint-icon use').setAttribute('href', reason === 'tgOnly' ? '#i-send' : '#i-lock');
+  renderMaintenance();
+  document.body.classList.remove('lock', 'has-bar');
+  if (isTg) try { tg.BackButton.hide(); } catch {}
+  window.scrollTo(0, 0);
 }
 
 function renderAll() {
@@ -1752,7 +1800,7 @@ function startShop() {
   safely(initTelegram);
   renderAll();
   refreshFromSheet();
-  safely(registerSubscriber);
+  checkAccess();
   if (SALE) setInterval(() => safely(() => renderSaleTimer()), 1000);
   // Telegram может долго держать магазин открытым — при возвращении в него обновим цены
   document.addEventListener('visibilitychange', () => {
@@ -1773,12 +1821,18 @@ function startShop() {
   }
 }
 
-if (MAINTENANCE) {
+const lock = lockReason();
+if (lock) {
+  // Магазин закрыт для этого покупателя — сам магазин не запускаем
+  safely(initTelegram);
+  safely(() => showLock(lock));
+  checkAccess(); // отметить в списке и снять блокировку, если её убрали в таблице
+} else if (MAINTENANCE) {
   // Магазин закрыт: работает только экран техобслуживания, сам магазин не запускаем.
   // Подписчиков продолжаем собирать — это нужно для защиты бота.
   safely(initTelegram);
   safely(renderMaintenance);
-  safely(registerSubscriber);
+  checkAccess();
 } else {
   startShop();
 }

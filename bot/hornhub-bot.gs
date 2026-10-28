@@ -9,7 +9,12 @@
  */
 
 const SHEET_SUBS = 'Подписчики';
-const SUBS_HEADER = ['chat_id', 'username', 'Имя', 'Язык', 'Первый вход', 'Последний вход', 'Статус'];
+const SUBS_HEADER = ['chat_id', 'username', 'Имя', 'Язык', 'Первый вход', 'Последний вход', 'Статус', 'Последнее сообщение'];
+// Впишите в колонку «Статус» — магазин для этого человека закроется, рассылки ему не уходят.
+// Снять блокировку — написать «активен».
+const BAN_STATUS = 'заблокирован';
+// Язык приложения Telegram, для которого магазин закрыт и рассылки не уходят (как BLOCKED_LANGS в js/app.js)
+const BLOCKED_LANGS = ['pl'];
 const TIME_BUDGET_MS = 5 * 60 * 1000; // Apps Script даёт 6 минут на запуск — останавливаемся заранее
 const DELETE_DEPTH = 100;             // сколько последних сообщений в каждом чате пытаться удалить
 
@@ -48,16 +53,19 @@ function tg_(method, payload) {
   return data;
 }
 
-/* ── Магазин присылает сюда покупателя, который открыл магазин ── */
+/* ── Магазин присылает сюда покупателя, который открыл магазин ──
+   В ответ магазин узнаёт, не заблокирован ли покупатель: {"access": "ok" | "blocked"}. */
 function doPost(e) {
+  let access = 'unknown';
   try {
     const body = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     const user = verifyInitData_(body.initData || '', token_());
-    if (user && user.id) saveSubscriber_(user);
+    if (user && user.id) access = saveSubscriber_(user) ? 'blocked' : 'ok';
   } catch (err) {
     console.warn('doPost: ' + err);
   }
-  return ContentService.createTextOutput('ok');
+  return ContentService.createTextOutput(JSON.stringify({ access: access }))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doGet() {
@@ -94,25 +102,58 @@ function subsSheet_() {
     sh.setFrozenRows(1);
     sh.getRange('A:A').setNumberFormat('@');
   }
+  // новая колонка в уже созданном листе
+  if (sh.getRange(1, SUBS_HEADER.length).getValue() === '') {
+    sh.getRange(1, 1, 1, SUBS_HEADER.length).setValues([SUBS_HEADER]).setFontWeight('bold');
+  }
   return sh;
 }
 
-function saveSubscriber_(u) {
+function isBanned_(status) {
+  return String(status || '').trim().toLowerCase() === BAN_STATUS;
+}
+
+function langBlocked_(lang) {
+  lang = String(lang || '').toLowerCase();
+  return BLOCKED_LANGS.some(function (l) { return lang === l || lang.indexOf(l + '-') === 0; });
+}
+
+// Текст из Telegram кладём в таблицу как текст: «=…» не должно стать формулой
+function plain_(s) {
+  s = String(s || '');
+  return /^[=+\-@]/.test(s) ? "'" + s : s;
+}
+
+// Что человек написал боту — для колонки «Последнее сообщение»
+function messageText_(m) {
+  const kinds = ['photo', 'video', 'sticker', 'voice', 'video_note', 'document', 'audio', 'animation', 'contact', 'location'];
+  const kind = kinds.filter(function (k) { return m[k]; })[0];
+  const text = m.text || m.caption || '[' + (kind || 'сообщение') + ']';
+  const time = Utilities.formatDate(new Date(m.date * 1000), Session.getScriptTimeZone(), 'dd.MM HH:mm');
+  return time + ' — ' + text.slice(0, 300);
+}
+
+// Записывает или обновляет человека в списке. Возвращает true, если он заблокирован в таблице.
+function saveSubscriber_(u, lastMessage) {
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
     const sh = subsSheet_();
     const now = new Date();
     const username = u.username ? '@' + u.username : '';
-    const name = [u.first_name, u.last_name].filter(function (x) { return x; }).join(' ');
+    const name = plain_([u.first_name, u.last_name].filter(function (x) { return x; }).join(' '));
     const found = sh.getRange('A:A').createTextFinder(String(u.id)).matchEntireCell(true).findNext();
     if (found) {
       const row = found.getRow();
+      const status = sh.getRange(row, 7).getValue();
+      const banned = isBanned_(status);
       sh.getRange(row, 2, 1, 3).setValues([[username, name, u.language_code || '']]);
-      sh.getRange(row, 6, 1, 2).setValues([[now, 'активен']]);
-    } else {
-      sh.appendRow([String(u.id), username, name, u.language_code || '', now, now, 'активен']);
+      sh.getRange(row, 6, 1, 2).setValues([[now, banned ? status : 'активен']]); // блокировку не снимаем
+      if (lastMessage) sh.getRange(row, 8).setValue(plain_(lastMessage));
+      return banned;
     }
+    sh.appendRow([String(u.id), username, name, u.language_code || '', now, now, 'активен', plain_(lastMessage)]);
+    return false;
   } finally {
     lock.releaseLock();
   }
@@ -123,14 +164,23 @@ function subscribers_() {
   const last = sh.getLastRow();
   if (last < 2) return [];
   return sh.getRange(2, 1, last - 1, 7).getValues()
-    .map(function (r, i) { return { row: i + 2, id: String(r[0]).trim(), status: String(r[6]) }; })
+    .map(function (r, i) { return { row: i + 2, id: String(r[0]).trim(), lang: String(r[3]), status: String(r[6]) }; })
     .filter(function (s) { return /^\d+$/.test(s.id) && s.status !== 'заблокировал бота'; });
 }
 
+// Кому идёт задача: рассылка — без заблокированных и без закрытых языков, удаление спама — всем
+function audience_(type) {
+  const all = subscribers_();
+  if (type !== 'broadcast') return all;
+  return all.filter(function (s) { return !isBanned_(s.status) && !langBlocked_(s.lang); });
+}
+
 function markStatus_(row, description) {
+  const cell = subsSheet_().getRange(row, 7);
+  if (isBanned_(cell.getValue())) return; // блокировку, которую поставили вручную, не трогаем
   const d = String(description || '').toLowerCase();
   const status = /blocked|deactivated|chat not found|user not found/.test(d) ? 'заблокировал бота' : 'ошибка: ' + description;
-  subsSheet_().getRange(row, 7).setValue(status);
+  cell.setValue(plain_(status));
 }
 
 /* ── Удаление спама в одном чате ────────────────────────────
@@ -156,7 +206,7 @@ function cleanChat_(chatId, notice) {
 function runForAll_(job, perChat) {
   const ui = SpreadsheetApp.getUi();
   const props = PropertiesService.getScriptProperties();
-  const subs = subscribers_();
+  const subs = audience_(job.type);
   if (!subs.length) { ui.alert('В списке пока нет подписчиков.'); return; }
 
   const saved = JSON.parse(props.getProperty('job') || 'null');
@@ -204,11 +254,12 @@ function cleanupSpam() {
 /* ── 📣 Разослать сообщение всем ────────────────────────── */
 function broadcast() {
   const ui = SpreadsheetApp.getUi();
-  const p = ui.prompt('Текст рассылки', 'Сообщение получат все подписчики из листа «Подписчики».', ui.ButtonSet.OK_CANCEL);
+  const p = ui.prompt('Текст рассылки', 'Сообщение получат подписчики из листа «Подписчики», ' +
+    'кроме заблокированных и тех, у кого Telegram на польском.', ui.ButtonSet.OK_CANCEL);
   if (p.getSelectedButton() !== ui.Button.OK) return;
   const text = p.getResponseText().trim();
   if (!text) return;
-  const n = subscribers_().length;
+  const n = audience_('broadcast').length;
   if (ui.alert('Отправить сообщение ' + n + ' подписчикам?', text, ui.ButtonSet.OK_CANCEL) !== ui.Button.OK) return;
   runForAll_({ type: 'broadcast', text: text }, function (s, job) {
     return tg_('sendMessage', { chat_id: s.id, text: job.text });
@@ -222,7 +273,8 @@ function checkBot() {
   if (!me.ok) { ui.alert('Токен не работает: ' + me.description + '\nПроверьте BOT_TOKEN в свойствах скрипта.'); return; }
   collectFromUpdates_();
   const report = guardReport_();
-  ui.alert('Бот @' + me.result.username + ' подключён.\nПодписчиков в списке: ' + subscribers_().length + '\n\n' +
+  ui.alert('Бот @' + me.result.username + ' подключён.\nПодписчиков в списке: ' + subscribers_().length +
+    ', получают рассылку: ' + audience_('broadcast').length + '\n\n' +
     (report.length ? '⚠️ ТРЕВОГА:\n' + report.join('\n') : '🛡 Признаков чужого доступа к боту не найдено.'));
 }
 
@@ -285,7 +337,7 @@ function collectFromUpdates_() {
         if (found) markStatus_(found.getRow(), 'blocked');
         return;
       }
-      saveSubscriber_(m.from || m.chat);
+      saveSubscriber_(m.from || m.chat, u.message ? messageText_(u.message) : '');
       added++;
     });
   }

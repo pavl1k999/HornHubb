@@ -1114,12 +1114,16 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
 }
 
 /* ── Техобслуживание: <html data-maintenance> ───────────
-   Виден только экран-заглушка, остальной магазин скрыт. */
+   Виден только экран-заглушка, остальной магазин скрыт.
+   Тот же экран — когда магазин закрыт для покупателя (<html data-locked>, ставит js/app.js). */
 .maintenance { display: none; }
-[data-maintenance] body > :not(.maintenance):not(.bg-webs):not(svg):not(script) { display: none !important; }
+[data-maintenance] body > :not(.maintenance):not(.bg-webs):not(svg):not(script),
+[data-locked] body > :not(.maintenance):not(.bg-webs):not(svg):not(script) { display: none !important; }
+[data-maintenance] body, [data-locked] body { padding-bottom: 0 !important; }
 /* без шапки магазина верхняя паутина поднимается к краю экрана */
-[data-maintenance] .bg-web-tl, [data-maintenance] .bg-web-tr { top: -8px; }
-[data-maintenance] .maintenance {
+[data-maintenance] .bg-web-tl, [data-maintenance] .bg-web-tr,
+[data-locked] .bg-web-tl, [data-locked] .bg-web-tr { top: -8px; }
+[data-maintenance] .maintenance, [data-locked] .maintenance {
   display: flex; align-items: center; justify-content: center;
   min-height: 100vh; min-height: 100dvh;
   padding: calc(var(--safe-top) + var(--content-top) + 16px) 16px calc(var(--safe-bottom) + 16px);
@@ -1155,6 +1159,8 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
   box-shadow: 0 0 0 5px var(--bg-elev), var(--glow);
 }
 .maint-icon .ic { width: 28px; height: 28px; animation: maint-wrench 2.8s ease-in-out infinite; }
+[data-locked] .maint-icon .ic { animation: none; }
+[data-locked] .maint-status { display: none; }
 .maint-body { padding: 14px 22px 24px; }
 .maint-logo { font-size: 14px; letter-spacing: 1px; color: var(--muted); }
 .maint-title { margin-top: 12px; font: 600 21px/1.25 var(--font-display); text-wrap: balance; }
