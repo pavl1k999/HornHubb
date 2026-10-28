@@ -13,8 +13,9 @@ const SUBS_HEADER = ['chat_id', 'username', 'Имя', 'Язык', 'Первый 
 // Впишите в колонку «Статус» — магазин для этого человека закроется, рассылки ему не уходят.
 // Снять блокировку — написать «активен».
 const BAN_STATUS = 'заблокирован';
-// Язык приложения Telegram, для которого магазин закрыт и рассылки не уходят (как BLOCKED_LANGS в js/app.js)
-const BLOCKED_LANGS = ['pl'];
+// Языки приложения Telegram, для которых магазин открыт (как ALLOWED_LANGS в js/app.js).
+// Остальным рассылки не уходят. Пустой список [] — всем.
+const ALLOWED_LANGS = ['uk', 'ru', 'en'];
 const TIME_BUDGET_MS = 5 * 60 * 1000; // Apps Script даёт 6 минут на запуск — останавливаемся заранее
 const DELETE_DEPTH = 100;             // сколько последних сообщений в каждом чате пытаться удалить
 
@@ -115,7 +116,8 @@ function isBanned_(status) {
 
 function langBlocked_(lang) {
   lang = String(lang || '').toLowerCase();
-  return BLOCKED_LANGS.some(function (l) { return lang === l || lang.indexOf(l + '-') === 0; });
+  if (!lang || !ALLOWED_LANGS.length) return false; // язык неизвестен — не закрываем
+  return !ALLOWED_LANGS.some(function (l) { return lang === l || lang.indexOf(l + '-') === 0; });
 }
 
 // Текст из Telegram кладём в таблицу как текст: «=…» не должно стать формулой
@@ -255,7 +257,7 @@ function cleanupSpam() {
 function broadcast() {
   const ui = SpreadsheetApp.getUi();
   const p = ui.prompt('Текст рассылки', 'Сообщение получат подписчики из листа «Подписчики», ' +
-    'кроме заблокированных и тех, у кого Telegram на польском.', ui.ButtonSet.OK_CANCEL);
+    'кроме заблокированных и тех, у кого Telegram не на украинском, русском или английском.', ui.ButtonSet.OK_CANCEL);
   if (p.getSelectedButton() !== ui.Button.OK) return;
   const text = p.getResponseText().trim();
   if (!text) return;

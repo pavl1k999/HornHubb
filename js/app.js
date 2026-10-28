@@ -62,10 +62,12 @@ function saleActive(now = Date.now()) {
 const MAINTENANCE = document.documentElement.hasAttribute('data-maintenance');
 
 // Кому магазин закрыт. Магазин открывается только внутри Telegram.
-// BLOCKED_LANGS — язык приложения Telegram, для которого магазин закрыт ('pl' — польский).
-// Пустой список [] — пускать всех. Тот же список — в скрипте таблицы (bot/hornhub-bot.gs).
+// ALLOWED_LANGS — языки приложения Telegram, для которых магазин открыт ('uk' — украинский,
+// 'ru' — русский, 'en' — английский), для всех остальных — «Доступ закрыт».
+// Если Telegram язык не сообщил — пускаем. Пустой список [] — пускать всех.
+// Тот же список — в скрипте таблицы (bot/hornhub-bot.gs).
 // Отдельного человека закрывают в таблице: лист «Подписчики», «Статус» → «заблокирован».
-const BLOCKED_LANGS = ['pl'];
+const ALLOWED_LANGS = ['uk', 'ru', 'en'];
 
 // Оформление задаётся в index.html: <html data-theme="halloween"> (убрать атрибут — обычный вид)
 const THEME = document.documentElement.dataset.theme || 'default';
@@ -661,7 +663,8 @@ initCatalog();
 function lockReason() {
   if (!isTg) return 'tgOnly';
   const lang = String(tg.initDataUnsafe?.user?.language_code || '').toLowerCase();
-  if (BLOCKED_LANGS.some((l) => lang === l || lang.startsWith(`${l}-`))) return 'denied';
+  const langOk = !lang || !ALLOWED_LANGS.length || ALLOWED_LANGS.some((l) => lang === l || lang.startsWith(`${l}-`));
+  if (!langOk) return 'denied';
   if (storage.get('accessDenied') === '1') return 'denied'; // заблокирован в таблице (запомнили с прошлого раза)
   return null;
 }
