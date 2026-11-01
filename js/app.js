@@ -69,6 +69,11 @@ const MAINTENANCE = document.documentElement.hasAttribute('data-maintenance');
 // Отдельного человека закрывают в таблице: лист «Подписчики», «Статус» → «заблокирован».
 const ALLOWED_LANGS = ['uk', 'ru', 'en'];
 
+// Владелец: видит магазин всегда — и во время техобслуживания, и при любых блокировках.
+// Номер аккаунта Telegram, а не ник: ник можно сменить или занять, номер — нет.
+// 1271298179 — @pvlenemy. Ещё человек — допишите его номер через запятую (номер есть в таблице подписчиков).
+const OWNER_IDS = [1271298179];
+
 // Оформление задаётся в index.html: <html data-theme="halloween"> (убрать атрибут — обычный вид)
 const THEME = document.documentElement.dataset.theme || 'default';
 
@@ -427,6 +432,7 @@ function districtPrice(sale, price, district = state.district) {
 const tg = window.Telegram?.WebApp ?? null;
 const isTg = Boolean(tg?.initData);
 const tgVersion = (v) => { try { return isTg && tg.isVersionAtLeast(v); } catch { return false; } };
+const IS_OWNER = isTg && OWNER_IDS.includes(Number(tg.initDataUnsafe?.user?.id));
 
 const haptic = {
   tap()     { if (tgVersion('6.1')) try { tg.HapticFeedback.impactOccurred('light'); } catch {} },
@@ -681,7 +687,7 @@ async function checkAccess() {
       body: JSON.stringify({ initData: tg.initData }),
     });
     const { access } = await res.json();
-    if (access === 'blocked') {
+    if (access === 'blocked' && !IS_OWNER) {
       storage.set('accessDenied', '1');
       safely(() => showLock('denied'));
     } else if (access === 'ok' && storage.get('accessDenied') === '1') {
@@ -1824,18 +1830,23 @@ function startShop() {
   }
 }
 
-const lock = lockReason();
+const lock = IS_OWNER ? null : lockReason();
 if (lock) {
   // Магазин закрыт для этого покупателя — сам магазин не запускаем
   safely(initTelegram);
   safely(() => showLock(lock));
   checkAccess(); // отметить в списке и снять блокировку, если её убрали в таблице
-} else if (MAINTENANCE) {
+} else if (MAINTENANCE && !IS_OWNER) {
   // Магазин закрыт: работает только экран техобслуживания, сам магазин не запускаем.
   // Подписчиков продолжаем собирать — это нужно для защиты бота.
   safely(initTelegram);
   safely(renderMaintenance);
   checkAccess();
 } else {
+  if (MAINTENANCE) {
+    // Владелец во время техобслуживания видит обычный магазин и пометку, что он закрыт для остальных
+    document.documentElement.removeAttribute('data-maintenance');
+    $('ownerNote').hidden = false;
+  }
   startShop();
 }

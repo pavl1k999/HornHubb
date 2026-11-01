@@ -1113,6 +1113,18 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
   .sheet-body { padding-bottom: 20px; }
 }
 
+/* Пометка для владельца: магазин на техобслуживании, остальные его не видят */
+.owner-note {
+  margin: 12px 12px 0;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(var(--accent-rgb), .3);
+  background: rgba(var(--accent-rgb), .12);
+  color: var(--accent-soft);
+  font: 600 13px/1.3 var(--font);
+  text-align: center;
+}
+
 /* ── Техобслуживание: <html data-maintenance> ───────────
    Виден только экран-заглушка, остальной магазин скрыт.
    Тот же экран — когда магазин закрыт для покупателя (<html data-locked>, ставит js/app.js). */
