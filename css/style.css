@@ -1196,6 +1196,46 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
 @keyframes maint-in { from { opacity: 0; transform: translateY(14px) scale(.97); } }
 @keyframes maint-wrench { 0%, 60%, 100% { transform: rotate(0); } 25% { transform: rotate(-22deg); } 40% { transform: rotate(10deg); } }
 
+/* ── 3D-заставка с носорогом (js/intro.js, исходник — tools/intro) ── */
+.intro {
+  position: fixed; inset: 0; z-index: 300;
+  background: var(--bg);
+  transition: opacity .7s var(--ease);
+  touch-action: none;
+}
+.intro.is-out { opacity: 0; pointer-events: none; }
+.intro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: var(--fade, 0); }
+.intro::after { /* виньетка */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(var(--bg-rgb), .75) 100%);
+}
+.intro-logo {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--safe-bottom) + 15%);
+  text-align: center;
+  font: 800 34px/1 var(--font-display);
+  letter-spacing: 1px;
+  color: #fff;
+  text-shadow: 0 0 28px rgba(var(--glow-rgb), .55);
+  opacity: var(--logo, 0);
+  transform: translateY(calc((1 - var(--logo, 0)) * 14px));
+}
+.intro-logo span {
+  margin-left: 8px;
+  background: var(--grad);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+}
+.intro:not(.is-ready) .intro-logo { --logo: .6; animation: live-dot 1.4s ease-in-out infinite; }
+.intro-hint {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--safe-bottom) + 18px);
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  opacity: var(--fade, 0);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;

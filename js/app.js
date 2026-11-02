@@ -74,6 +74,12 @@ const ALLOWED_LANGS = ['uk', 'ru', 'en'];
 // 1271298179 — @pvlenemy. Ещё человек — допишите его номер через запятую (номер есть в таблице подписчиков).
 const OWNER_IDS = [1271298179];
 
+// 3D-заставка с носорогом при открытии магазина (js/intro.js, модель models/rhino.glb).
+// Покупатели видят её раз в день, владелец — при каждом открытии. Выключить: const INTRO = false;
+const INTRO = true;
+// Версия файлов из index.html (app.js?v=…) — с ней же грузим заставку и модель, чтобы не брать старые из кэша
+const ASSET_V = (() => { try { return new URL(document.currentScript.src).search; } catch { return ''; } })();
+
 // Оформление задаётся в index.html: <html data-theme="halloween"> (убрать атрибут — обычный вид)
 const THEME = document.documentElement.dataset.theme || 'default';
 
@@ -240,6 +246,7 @@ const I18N = {
     maintTitle: 'Магазин на техническом обслуживании',
     maintText: 'Мы обновляем магазин и скоро вернёмся. Пожалуйста, загляните чуть позже.',
     maintStatus: 'Скоро откроемся',
+    introSkip: 'Нажмите, чтобы пропустить',
     deniedTitle: 'Доступ закрыт',
     deniedText: 'Магазин недоступен для вашего аккаунта.',
     tgOnlyTitle: 'Откройте магазин в Telegram',
@@ -279,6 +286,7 @@ const I18N = {
     maintTitle: 'Магазин на технічному обслуговуванні',
     maintText: 'Ми оновлюємо магазин і скоро повернемося. Будь ласка, зазирніть трохи пізніше.',
     maintStatus: 'Скоро відкриємося',
+    introSkip: 'Натисніть, щоб пропустити',
     deniedTitle: 'Доступ закрито',
     deniedText: 'Магазин недоступний для вашого акаунта.',
     tgOnlyTitle: 'Відкрийте магазин у Telegram',
@@ -318,6 +326,7 @@ const I18N = {
     maintTitle: 'The shop is under maintenance',
     maintText: "We're updating the shop and will be back soon. Please check back a little later.",
     maintStatus: 'Opening soon',
+    introSkip: 'Tap to skip',
     deniedTitle: 'Access denied',
     deniedText: 'The shop is not available for your account.',
     tgOnlyTitle: 'Open the shop in Telegram',
@@ -1259,6 +1268,42 @@ function renderMaintenance() {
   document.querySelectorAll('#maintenance [data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
 }
 
+// 3D-заставка. Экран ставим сразу (чтобы магазин не мелькнул), а сцену и модель грузим параллельно.
+// Не успели за 6 секунд или что-то сломалось — заставка просто исчезает, магазин уже готов под ней.
+function playIntro() {
+  const today = new Date().toDateString();
+  if (!INTRO || (!IS_OWNER && storage.get('introDay') === today)) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !window.WebGLRenderingContext) return;
+  storage.set('introDay', today);
+
+  const root = document.createElement('div');
+  root.className = 'intro';
+  root.innerHTML = `<canvas class="intro-canvas"></canvas>
+    <div class="intro-logo">HORN<span>HUB</span></div>
+    <div class="intro-hint">${t('introSkip')}</div>`;
+  document.body.appendChild(root);
+  let started = false;
+  const dismiss = () => {
+    if (started || root.classList.contains('is-out')) return;
+    root.classList.add('is-out');
+    setTimeout(() => root.remove(), 700);
+  };
+  root.addEventListener('pointerdown', dismiss);
+  const giveUp = setTimeout(dismiss, 6000);
+
+  const glb = fetch(`models/rhino.glb${ASSET_V}`).then((r) => {
+    if (!r.ok) throw new Error(`model ${r.status}`);
+    return r.arrayBuffer();
+  });
+  glb.catch(() => {});
+  import(`./intro.js${ASSET_V}`).then((m) => {
+    clearTimeout(giveUp);
+    if (!root.isConnected || root.classList.contains('is-out')) return; // уже пропустили
+    started = true;
+    m.playIntro({ root, glb, hint: t('introSkip') });
+  }).catch(() => { clearTimeout(giveUp); dismiss(); });
+}
+
 // Магазин закрыт для покупателя: тот же экран-заглушка, но с другим текстом и значком
 function showLock(reason) {
   const root = document.documentElement;
@@ -1807,6 +1852,7 @@ window.addEventListener('storage', (e) => {
 /* ── Старт ────────────────────────────────────────────── */
 function startShop() {
   safely(initTelegram);
+  safely(playIntro);
   renderAll();
   refreshFromSheet();
   checkAccess();
