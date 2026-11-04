@@ -36,21 +36,21 @@ const SUBSCRIBERS_URL = 'https://script.google.com/macros/s/AKfycbyJ76zkKy6f6FXx
 const DISTRICTS = ['Bemowo', 'Ożarów'];
 
 // Таймер акции под баннером (время по Варшаве). До старта — «до старта …», во время — «до конца …»,
-// после окончания таймер сам исчезает. Убрать таймер: const SALE = null;
-const SALE = {
-  start: '2026-10-31T00:00:00+01:00', // 31 октября, 00:00
-  end:   '2026-11-02T00:00:00+01:00', // конец 1 ноября
-  // Название акции в таймере (на трёх языках)
-  title: {
-    ru: 'Хэллоуинская распродажа',
-    ua: 'Хелловінський розпродаж',
-    en: 'Halloween sale',
-  },
-  // Цены на время акции по категориям — во всех районах. Включаются и выключаются сами.
-  // Можно и по районам: liquid: { 'Bemowo': 30, 'Ożarów': 35 }
-  prices: {
-    liquid: 30, // все жидкости по 30 zł
-  },
+// после окончания таймер сам исчезает. Сейчас акции нет: const SALE = null;
+// Пример (так была устроена хэллоуинская распродажа):
+// const SALE = {
+//   start: '2026-12-30T00:00:00+01:00',
+//   end:   '2027-01-01T00:00:00+01:00',
+//   title: { ru: 'Новогодняя распродажа', ua: 'Новорічний розпродаж', en: 'New Year sale' },
+//   prices: { liquid: 30 },  // цены на время акции по категориям, во всех районах; можно по районам: { 'Bemowo': 30, 'Ożarów': 35 }
+// };
+const SALE = null;
+
+// Отсчёт до Нового года на месте таймера, когда акции нет (время по Варшаве).
+// После полуночи до дня until показывается «С Новым годом!», потом блок исчезает сам. Убрать: const NEW_YEAR = null;
+const NEW_YEAR = {
+  at: '2027-01-01T00:00:00+01:00',
+  until: '2027-01-08T00:00:00+01:00',
 };
 
 function saleActive(now = Date.now()) {
@@ -74,13 +74,11 @@ const ALLOWED_LANGS = ['uk', 'ru', 'en'];
 // 1271298179 — @pvlenemy. Ещё человек — допишите его номер через запятую (номер есть в таблице подписчиков).
 const OWNER_IDS = [1271298179];
 
-// 3D-заставка с носорогом при открытии магазина (js/intro.js, модель models/rhino.glb).
-// Покупатели видят её раз в день, владелец — при каждом открытии. Выключить: const INTRO = false;
-const INTRO = true;
-// Версия файлов из index.html (app.js?v=…) — с ней же грузим заставку и модель, чтобы не брать старые из кэша
+// Версия файлов из index.html (app.js?v=…) — с ней же грузим снежный шар и модель, чтобы не брать старые из кэша
 const ASSET_V = (() => { try { return new URL(document.currentScript.src).search; } catch { return ''; } })();
 
-// Оформление задаётся в index.html: <html data-theme="halloween"> (убрать атрибут — обычный вид)
+// Оформление задаётся в index.html: <html data-theme="newyear"> (Новый год), "halloween" (Хэллоуин),
+// без атрибута — обычный вид. В теме «Новый год» вместо баннера — 3D-снежный шар с носорогом (js/globe.js).
 const THEME = document.documentElement.dataset.theme || 'default';
 
 // Курсы относительно злотого
@@ -246,7 +244,8 @@ const I18N = {
     maintTitle: 'Магазин на техническом обслуживании',
     maintText: 'Мы обновляем магазин и скоро вернёмся. Пожалуйста, загляните чуть позже.',
     maintStatus: 'Скоро откроемся',
-    introSkip: 'Нажмите, чтобы пропустить',
+    nyHero: 'С наступающим 2027!', nyHeroAfter: 'С Новым 2027 годом!', globeHint: 'Нажми на шар ❄',
+    nyTitle: 'До Нового года', nyLeft: 'осталось', nyWhen: '31.12 · полночь', nyHappy: 'С Новым 2027 годом!', nyWish: 'Спасибо, что вы с нами',
     deniedTitle: 'Доступ закрыт',
     deniedText: 'Магазин недоступен для вашего аккаунта.',
     tgOnlyTitle: 'Откройте магазин в Telegram',
@@ -286,7 +285,8 @@ const I18N = {
     maintTitle: 'Магазин на технічному обслуговуванні',
     maintText: 'Ми оновлюємо магазин і скоро повернемося. Будь ласка, зазирніть трохи пізніше.',
     maintStatus: 'Скоро відкриємося',
-    introSkip: 'Натисніть, щоб пропустити',
+    nyHero: 'З наступаючим 2027!', nyHeroAfter: 'З Новим 2027 роком!', globeHint: 'Натисни на кулю ❄',
+    nyTitle: 'До Нового року', nyLeft: 'залишилось', nyWhen: '31.12 · опівночі', nyHappy: 'З Новим 2027 роком!', nyWish: 'Дякуємо, що ви з нами',
     deniedTitle: 'Доступ закрито',
     deniedText: 'Магазин недоступний для вашого акаунта.',
     tgOnlyTitle: 'Відкрийте магазин у Telegram',
@@ -326,7 +326,8 @@ const I18N = {
     maintTitle: 'The shop is under maintenance',
     maintText: "We're updating the shop and will be back soon. Please check back a little later.",
     maintStatus: 'Opening soon',
-    introSkip: 'Tap to skip',
+    nyHero: 'Happy New Year 2027!', nyHeroAfter: 'Happy New Year 2027!', globeHint: 'Tap the globe ❄',
+    nyTitle: 'Until New Year', nyLeft: 'left', nyWhen: 'Dec 31 · midnight', nyHappy: 'Happy New Year 2027!', nyWish: 'Thank you for being with us',
     deniedTitle: 'Access denied',
     deniedText: 'The shop is not available for your account.',
     tgOnlyTitle: 'Open the shop in Telegram',
@@ -942,14 +943,14 @@ function renderSaleTimer(force = false) {
     return;
   }
   saleView.active = active;
-  if (!SALE || !(end > now)) { el.hidden = true; saleView.key = ''; return; }
+  if (!SALE || !(end > now)) { renderNewYear(el, now); return; }
 
   const live = now >= start;
   const key = `${live}|${state.lang}|${state.currency}|${state.district}`;
   if (force || key !== saleView.key) {
     saleView.key = key;
     const u = I18N[state.lang].units;
-    const emoji = THEME === 'halloween' ? '🎃' : '🔥';
+    const emoji = THEME === 'halloween' ? '🎃' : THEME === 'newyear' ? '🎁' : '🔥';
     const days = Math.round((end - start) / 86400000);
     const range = `<span class="nowrap">${esc(saleDay(start))}–${esc(saleDay(end - 1))}</span>`;
     const label = live
@@ -970,6 +971,44 @@ function renderSaleTimer(force = false) {
   }
   // компактный отсчёт: «6д 21:58:15», в последний день — «21:58:15»
   const left = Math.max(0, Math.floor(((live ? end : start) - now) / 1000));
+  const d = Math.floor(left / 86400);
+  const pad = (n) => String(n).padStart(2, '0');
+  const hms = `${pad(Math.floor(left / 3600) % 24)}:${pad(Math.floor(left / 60) % 60)}:${pad(left % 60)}`;
+  el.querySelector('.sale-timer-time').textContent = d ? `${d}${I18N[state.lang].units[0]} ${hms}` : hms;
+}
+
+// Отсчёт до Нового года (тот же блок, что у акции): «До Нового года · осталось 57д 23:10:05»,
+// после полуночи — «С Новым годом!» до NEW_YEAR.until
+function renderNewYear(el, now) {
+  const at = NEW_YEAR ? Date.parse(NEW_YEAR.at) : NaN;
+  if (!NEW_YEAR || !(Date.parse(NEW_YEAR.until) > now)) { el.hidden = true; saleView.key = ''; return; }
+  const after = now >= at;
+  const key = `ny|${after}|${state.lang}`;
+  if (key !== saleView.key) {
+    saleView.key = key;
+    el.classList.toggle('is-live', after);
+    el.innerHTML = after ? `
+      <span class="sale-timer-emoji" aria-hidden="true">🥂</span>
+      <div class="sale-timer-main">
+        <div class="sale-timer-offer">${esc(t('nyHappy'))}</div>
+        <div class="sale-timer-label">${esc(t('nyWish'))}</div>
+      </div>` : `
+      <span class="sale-timer-emoji" aria-hidden="true">🎄</span>
+      <div class="sale-timer-main">
+        <div class="sale-timer-offer">${esc(t('nyTitle'))}</div>
+        <div class="sale-timer-label">${esc(t('nyWhen'))}</div>
+      </div>
+      <div class="sale-timer-clock">
+        <span class="sale-timer-sub">${esc(t('nyLeft'))}</span>
+        <b class="sale-timer-time"></b>
+      </div>`;
+    el.hidden = false;
+    const sub = $('nySub');
+    if (sub) sub.dataset.i18n = after ? 'nyHeroAfter' : 'nyHero';
+    if (sub) sub.textContent = t(sub.dataset.i18n);
+  }
+  if (after) return;
+  const left = Math.max(0, Math.floor((at - now) / 1000));
   const d = Math.floor(left / 86400);
   const pad = (n) => String(n).padStart(2, '0');
   const hms = `${pad(Math.floor(left / 3600) % 24)}:${pad(Math.floor(left / 60) % 60)}:${pad(left % 60)}`;
@@ -1268,40 +1307,68 @@ function renderMaintenance() {
   document.querySelectorAll('#maintenance [data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
 }
 
-// 3D-заставка. Экран ставим сразу (чтобы магазин не мелькнул), а сцену и модель грузим параллельно.
-// Не успели за 6 секунд или что-то сломалось — заставка просто исчезает, магазин уже готов под ней.
-function playIntro() {
-  const today = new Date().toDateString();
-  if (!INTRO || (!IS_OWNER && storage.get('introDay') === today)) return;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !window.WebGLRenderingContext) return;
-  storage.set('introDay', today);
+/* ── Новый год: снежный шар, снег, гирлянда ─────────────── */
 
-  const root = document.createElement('div');
-  root.className = 'intro';
-  root.innerHTML = `<canvas class="intro-canvas"></canvas>
-    <div class="intro-logo">HORN<span>HUB</span></div>
-    <div class="intro-hint">${t('introSkip')}</div>`;
-  document.body.appendChild(root);
-  let started = false;
-  const dismiss = () => {
-    if (started || root.classList.contains('is-out')) return;
-    root.classList.add('is-out');
-    setTimeout(() => root.remove(), 700);
+// 3D-шар грузим после показа магазина; пока грузится (и если 3D недоступно) — картинка шара
+function mountGlobe() {
+  const box = $('globe');
+  if (THEME !== 'newyear' || !box || reducedMotion() || !window.WebGLRenderingContext) return;
+  const hint = $('globeHint');
+  const start = () => {
+    const glb = fetch(`models/rhino.glb${ASSET_V}`).then((r) => {
+      if (!r.ok) throw new Error(`model ${r.status}`);
+      return r.arrayBuffer();
+    });
+    glb.catch(() => {});
+    import(`./globe.js${ASSET_V}`).then((m) => m.mountGlobe({
+      container: box,
+      glb,
+      onReady: () => {
+        box.classList.add('is-live');
+        box.closest('.ny-hero')?.classList.add('is-live');
+        if (hint && storage.get('globeShaken') !== '1') hint.hidden = false;
+      },
+      onShake: () => {
+        haptic.tap();
+        if (hint) hint.hidden = true;
+        storage.set('globeShaken', '1');
+      },
+    })).catch(() => {});
   };
-  root.addEventListener('pointerdown', dismiss);
-  const giveUp = setTimeout(dismiss, 6000);
+  // не мешаем первой отрисовке витрины
+  if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1500 }); else setTimeout(start, 400);
+}
 
-  const glb = fetch(`models/rhino.glb${ASSET_V}`).then((r) => {
-    if (!r.ok) throw new Error(`model ${r.status}`);
-    return r.arrayBuffer();
-  });
-  glb.catch(() => {});
-  import(`./intro.js${ASSET_V}`).then((m) => {
-    clearTimeout(giveUp);
-    if (!root.isConnected || root.classList.contains('is-out')) return; // уже пропустили
-    started = true;
-    m.playIntro({ root, glb, hint: t('introSkip') });
-  }).catch(() => { clearTimeout(giveUp); dismiss(); });
+// Падающий снег поверх витрины — лёгкий, на CSS
+function makeSnowfall() {
+  const box = $('snowfall');
+  if (THEME !== 'newyear' || !box || reducedMotion()) return;
+  const r = (a, b) => a + Math.random() * (b - a);
+  box.innerHTML = Array.from({ length: innerWidth < 720 ? 20 : 36 }, () => {
+    const t = r(10, 20);
+    return `<i style="--x:${r(0, 100).toFixed(1)}%;--s:${r(2, 4.5).toFixed(1)}px;--o:${r(0.25, 0.7).toFixed(2)};` +
+      `--t:${t.toFixed(1)}s;--d:${(-r(0, t)).toFixed(1)}s;--dx:${r(-40, 40).toFixed(0)}px"></i>`;
+  }).join('');
+}
+
+// Гирлянда по нижнему краю шапки: провод провисает между крючками, лампочки мигают
+function makeGarland() {
+  const box = $('garland');
+  if (THEME !== 'newyear' || !box) return;
+  const w = box.clientWidth || innerWidth, span = 64, sag = 7;
+  const n = Math.max(2, Math.round(w / span)), step = w / n;
+  const colors = ['#ffd76a', '#ff4d5e', '#6ee7a0', '#7ab8ff'];
+  let path = '', bulbs = '';
+  for (let i = 0; i < n; i++) {
+    const x0 = i * step;
+    path += `M${x0.toFixed(1)} 2Q${(x0 + step / 2).toFixed(1)} ${2 + sag * 2} ${(x0 + step).toFixed(1)} 2`;
+    for (const u of [0.25, 0.5, 0.75]) {
+      const x = x0 + u * step, y = 2 + sag * 4 * u * (1 - u);
+      const k = i * 3 + Math.round(u * 4);
+      bulbs += `<i style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;--c:${colors[k % 4]};--d:${(-(k * 0.37) % 2.6).toFixed(2)}s"></i>`;
+    }
+  }
+  box.innerHTML = `<svg viewBox="0 0 ${w} 18" preserveAspectRatio="none"><path d="${path}"/></svg>${bulbs}`;
 }
 
 // Магазин закрыт для покупателя: тот же экран-заглушка, но с другим текстом и значком
@@ -1852,11 +1919,11 @@ window.addEventListener('storage', (e) => {
 /* ── Старт ────────────────────────────────────────────── */
 function startShop() {
   safely(initTelegram);
-  safely(playIntro);
   renderAll();
+  safely(mountGlobe);
   refreshFromSheet();
   checkAccess();
-  if (SALE) setInterval(() => safely(() => renderSaleTimer()), 1000);
+  if (SALE || NEW_YEAR) setInterval(() => safely(() => renderSaleTimer()), 1000);
   // Telegram может долго держать магазин открытым — при возвращении в него обновим цены
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && Date.now() - catalogInfo.checkedAt > 2 * 60 * 1000) refreshFromSheet();
@@ -1875,6 +1942,12 @@ function startShop() {
     });
   }
 }
+
+// снег и гирлянда — и в магазине, и на экранах-заглушках
+safely(makeSnowfall);
+safely(makeGarland);
+let garlandTimer = 0;
+addEventListener('resize', () => { clearTimeout(garlandTimer); garlandTimer = setTimeout(() => safely(makeGarland), 200); });
 
 const lock = IS_OWNER ? null : lockReason();
 if (lock) {

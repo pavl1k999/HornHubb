@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <!-- data-maintenance — магазин закрыт на техобслуживание (виден только экран-заглушка).
-     Открыть магазин: удалите data-maintenance, останется <html lang="ru" data-theme="halloween"> -->
-<html lang="ru" data-theme="halloween" data-maintenance>
+     Открыть магазин: удалите data-maintenance, останется <html lang="ru" data-theme="newyear">.
+     data-theme — сезонное оформление: newyear (Новый год), halloween (Хэллоуин), без атрибута — обычное. -->
+<html lang="ru" data-theme="newyear" data-maintenance>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0d0908">
+  <meta name="theme-color" content="#070b14">
   <meta name="format-detection" content="telephone=no">
   <title>HORN HUB — Vape Shop</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
   <!-- ?v= — версия файлов: меняйте её, когда меняете вместе index.html и js/css,
        иначе Telegram может взять старый файл из кэша -->
-  <link rel="stylesheet" href="css/style.css?v=2026-11-02-1">
+  <link rel="stylesheet" href="css/style.css?v=2026-11-04-1">
 </head>
 <body>
 
@@ -42,6 +43,7 @@
   <symbol id="i-pod" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M7 8h10M10 13h4"/></symbol>
   <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="11" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-flake" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><g transform="rotate(0 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g><g transform="rotate(60 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g><g transform="rotate(120 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g><g transform="rotate(180 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g><g transform="rotate(240 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g><g transform="rotate(300 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g></g></symbol>
   <symbol id="i-sad" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01"/></symbol>
 </svg>
 
@@ -67,6 +69,14 @@
   </div>
 </section>
 
+<!-- Снежинки на фоне и падающий снег (только в теме «Новый год») -->
+<div class="bg-flakes" aria-hidden="true">
+  <svg class="bg-flake bg-flake-tl" viewBox="0 0 100 100"><use href="#i-flake"/></svg>
+  <svg class="bg-flake bg-flake-tr" viewBox="0 0 100 100"><use href="#i-flake"/></svg>
+  <svg class="bg-flake bg-flake-bl" viewBox="0 0 100 100"><use href="#i-flake"/></svg>
+</div>
+<div class="snowfall" id="snowfall" aria-hidden="true"></div>
+
 <header class="topbar" id="topbar">
   <div class="topbar-inner">
     <button class="icon-btn" data-action="menu" data-i18n-aria="menu">
@@ -86,6 +96,7 @@
       </button>
     </div>
   </div>
+  <div class="garland" id="garland" aria-hidden="true"></div>
 </header>
 
 <main class="app">
@@ -95,6 +106,18 @@
     <!-- видит только владелец, когда магазин на техобслуживании -->
     <p class="owner-note" id="ownerNote" hidden>🔧 Техобслуживание включено — магазин видите только вы</p>
     <div class="hero" role="img" aria-label="HORN HUB">
+      <!-- Новый год: снежный шар с носорогом (3D — js/globe.js, пока грузится — картинка) -->
+      <div class="ny-hero" aria-hidden="true">
+        <div class="ny-lights"></div>
+        <div class="ny-text">
+          <div class="ny-logo">HORN<span>HUB</span></div>
+          <div class="ny-sub" id="nySub" data-i18n="nyHero">С наступающим 2027!</div>
+          <span class="ny-hint" id="globeHint" data-i18n="globeHint" hidden>Нажми на шар ❄</span>
+        </div>
+        <div class="ny-globe" id="globe">
+          <img class="ny-globe-img" src="images/newyear/globe.webp" alt="" width="840" height="840" decoding="async">
+        </div>
+      </div>
       <div class="bats" aria-hidden="true">
         <span class="bat"><svg viewBox="0 0 64 28"><use href="#i-bat"/></svg></span>
         <span class="bat"><svg viewBox="0 0 64 28"><use href="#i-bat"/></svg></span>
@@ -304,6 +327,7 @@
 <!-- Выбор района при входе -->
 <div class="gate" id="districtGate" role="dialog" aria-modal="true" aria-labelledby="gateTitle" inert aria-hidden="true">
   <div class="gate-card">
+    <svg class="gate-flake" viewBox="0 0 100 100" aria-hidden="true"><use href="#i-flake"/></svg>
     <svg class="cobweb" viewBox="0 0 100 100" aria-hidden="true"><path d="M0 0L100.0 0.0M0 0L95.1 30.9M0 0L80.9 58.8M0 0L58.8 80.9M0 0L30.9 95.1M0 0L0.0 100.0M20.0 0.0Q17.0 2.7 19.0 6.2Q15.3 7.8 16.2 11.8Q12.2 12.2 11.8 16.2Q7.8 15.3 6.2 19.0Q2.7 17.0 0.0 20.0M40.0 0.0Q34.0 5.4 38.0 12.4Q30.7 15.6 32.4 23.5Q24.3 24.3 23.5 32.4Q15.6 30.7 12.4 38.0Q5.4 34.0 0.0 40.0M60.0 0.0Q51.0 8.1 57.1 18.5Q46.0 23.4 48.5 35.3Q36.5 36.5 35.3 48.5Q23.4 46.0 18.5 57.1Q8.1 51.0 0.0 60.0M80.0 0.0Q68.0 10.8 76.1 24.7Q61.3 31.2 64.7 47.0Q48.6 48.6 47.0 64.7Q31.2 61.3 24.7 76.1Q10.8 68.0 0.0 80.0"/></svg>
     <button class="icon-btn gate-close" data-action="close" data-i18n-aria="close">
       <svg class="ic"><use href="#i-x"/></svg>
@@ -323,6 +347,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="js/app.js?v=2026-11-02-1"></script>
+<script src="js/app.js?v=2026-11-04-1"></script>
 </body>
 </html>
