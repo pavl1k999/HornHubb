@@ -244,7 +244,7 @@ const I18N = {
     maintTitle: 'Магазин на техническом обслуживании',
     maintText: 'Мы обновляем магазин и скоро вернёмся. Пожалуйста, загляните чуть позже.',
     maintStatus: 'Скоро откроемся',
-    nyHero: 'С наступающим', nyHeroAfter: 'С Новым годом', globeHint: 'Нажми на шар ❄', globeHintMotion: 'или потряси телефон',
+    nyHero: 'С наступающим', nyHeroAfter: 'С Новым годом', globeHint: 'Нажми на шарик ❄', globeHintMotion: 'или потряси телефон',
     nyTitle: 'До Нового года', nyLeft: 'осталось', nyWhen: '31.12 · полночь', nyHappy: 'С Новым 2027 годом!', nyWish: 'Спасибо, что вы с нами',
     deniedTitle: 'Доступ закрыт',
     deniedText: 'Магазин недоступен для вашего аккаунта.',
@@ -285,7 +285,7 @@ const I18N = {
     maintTitle: 'Магазин на технічному обслуговуванні',
     maintText: 'Ми оновлюємо магазин і скоро повернемося. Будь ласка, зазирніть трохи пізніше.',
     maintStatus: 'Скоро відкриємося',
-    nyHero: 'З наступаючим', nyHeroAfter: 'З Новим роком', globeHint: 'Натисни на кулю ❄', globeHintMotion: 'або потруси телефон',
+    nyHero: 'З наступаючим', nyHeroAfter: 'З Новим роком', globeHint: 'Натисни на кульку ❄', globeHintMotion: 'або потруси телефон',
     nyTitle: 'До Нового року', nyLeft: 'залишилось', nyWhen: '31.12 · опівночі', nyHappy: 'З Новим 2027 роком!', nyWish: 'Дякуємо, що ви з нами',
     deniedTitle: 'Доступ закрито',
     deniedText: 'Магазин недоступний для вашого акаунта.',
@@ -1348,16 +1348,13 @@ function mountGlobe() {
       motion,
       onReady: () => {
         hero?.classList.add('is-live');
-        if (hint && storage.get('globeShaken') !== '1') {
+        if (hint) {
           hint.hidden = false;
           $('globeHintMotion').hidden = !motion;
         }
       },
       onShake: (power, byUser) => {
-        if (!byUser) return; // шар сам встряхнулся, когда его долго не трогали
-        if (power > 0.6) haptic.tap();
-        if (hint) hint.hidden = true;
-        storage.set('globeShaken', '1');
+        if (byUser && power > 0.6) haptic.tap(); // шар может и сам встряхнуться, если его долго не трогали
       },
     })).catch(() => {});
   };
