@@ -25,7 +25,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
-const FLAKES = 650;                       // снежинок в шаре
+const FLAKES = 1300;                      // снежинок в шаре
 // дальше крутить нельзя — может стать видно лицо (проверено рендером; влево открывается раньше)
 const TURN_MIN = MathUtils.degToRad(-28), TURN_MAX = MathUtils.degToRad(40);
 const VIEW_EL = MathUtils.degToRad(15);   // обычный ракурс: чуть сверху, со спины носорога
