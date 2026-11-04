@@ -251,7 +251,11 @@ img { display: block; max-width: 100%; }
     linear-gradient(180deg, #0d1c40 0%, #13275a 55%, #0a142c 100%);
 }
 [data-theme="newyear"] .hero::after { display: none; }
-[data-theme="newyear"] .ny-hero { display: block; position: absolute; inset: 0; z-index: 1; }
+[data-theme="newyear"] .ny-hero {
+  display: block; position: absolute; inset: 0; z-index: 1;
+  container-type: size;
+  --gx: 70%; --gy: 45.9%; --gr: 36.4cqh;  /* шар на картинке-заглушке (конечный кадр сцены) */
+}
 .ny-poster, .ny-poster img, .ny-stage, .globe-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .ny-poster img { object-fit: cover; object-position: 72% 50%; transition: opacity .7s var(--ease); }
 .ny-stage { touch-action: pan-y; -webkit-user-select: none; user-select: none; } /* прокрутка страницы не ломается */
@@ -260,10 +264,16 @@ img { display: block; max-width: 100%; }
 .ny-hero.is-live .ny-poster img { opacity: 0; }
 /* надпись: маленькое «С наступающим» и крупный золотой год */
 .ny-text {
-  position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
-  max-width: 40%;
+  position: absolute; inset: 0; padding-left: 18px;
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
   pointer-events: none;
+  /* «2027» уходит за шар: всё, что внутри круга стекла, скрыто — край повторяет форму шара.
+     Где шар — сообщает js/globe.js; до этого — его место на картинке-заглушке. */
+  -webkit-mask: radial-gradient(circle at var(--gx) var(--gy), transparent var(--gr), #000 calc(var(--gr) + 1px));
+          mask: radial-gradient(circle at var(--gx) var(--gy), transparent var(--gr), #000 calc(var(--gr) + 1px));
 }
+.ny-text > * { max-width: 44%; }
+.ny-text > .ny-year { max-width: none; width: max-content; padding-right: .04em; } /* заливка — по всей ширине цифр */
 .ny-eyebrow {
   color: var(--accent-soft);
   font: 700 clamp(10px, 2.8vw, 14px)/1.2 var(--font);
@@ -1233,7 +1243,8 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
   .hero { margin: 16px 12px 0; border-radius: 26px; aspect-ratio: auto; height: clamp(240px, 30vw, 340px); }
   [data-theme="halloween"] .hero { height: clamp(280px, 38vw, 440px); }
   [data-theme="newyear"] .hero { aspect-ratio: auto; height: clamp(260px, 32vw, 400px); }
-  [data-theme="newyear"] .ny-text { left: 7%; }
+  [data-theme="newyear"] .ny-text { padding-left: 7%; }
+  [data-theme="newyear"] .ny-hero { --gx: 72%; }
   .sheet { bottom: 20px; border-radius: 26px; border-bottom: 1px solid var(--line); }
   .sheet-body { padding-bottom: 20px; }
 }

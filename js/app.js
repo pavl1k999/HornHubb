@@ -1382,6 +1382,12 @@ function mountGlobe() {
       onShake: (power, byUser) => {
         if (byUser && power > 0.6) haptic.tap(); // шар может и сам встряхнуться, если его долго не трогали
       },
+      // где стекло на экране — по этому кругу «2027» уходит за шар
+      onView: ({ x, y, r }) => {
+        hero?.style.setProperty('--gx', `${x.toFixed(1)}px`);
+        hero?.style.setProperty('--gy', `${y.toFixed(1)}px`);
+        hero?.style.setProperty('--gr', `${r.toFixed(1)}px`);
+      },
     })).catch(() => {});
   };
   // не мешаем первой отрисовке витрины

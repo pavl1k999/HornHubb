@@ -464,10 +464,12 @@ function makeFlakes(atlas, colliders) {
  *   (единицы определяются сами); permit() вызывается по нажатию — на iPhone так спрашивают доступ.
  * gx — где по ширине стоит шар (0..1), функция от соотношения сторон.
  * onReady — сцена нарисована, onShake(сила, этоЧеловек) — шар встряхнули (для вибрации и подсказки).
+ * onView({ x, y, r }) — где на экране стеклянный шар (центр и радиус в пикселях контейнера):
+ *   по нему надпись «2027» уходит за шар по круглому контуру.
  * debug: true — время не идёт само, управление через window.__globe (для проверок и картинок-заглушек).
  */
 export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (aspect > 1.9 ? 0.72 : 0.7),
-  onReady = () => {}, onShake = () => {}, onFail = () => {}, debug = false }) {
+  onReady = () => {}, onShake = () => {}, onFail = () => {}, onView = () => {}, debug = false }) {
   let renderer;
   try {
     renderer = new WebGLRenderer({ antialias: true, preserveDrawingBuffer: debug, powerPreference: 'high-performance' });
@@ -737,6 +739,19 @@ export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (as
       head.rotation.y = MathUtils.degToRad(Math.sin(clock * 0.6) * 5);
     }
     renderer.render(scene, camera);
+    reportView();
+  };
+
+  // контур стекла на экране: центр шара и его видимый радиус (сообщаем, только когда меняется)
+  const vc = new Vector3(), view = { x: 0, y: 0, r: 0 };
+  const reportView = () => {
+    vc.set(0, 0, 0).project(camera);
+    const d = camera.position.length();
+    const r = (h / 2) * Math.tan(Math.asin(Math.min(1, 1.012 / d))) / Math.tan(MathUtils.degToRad(camera.fov / 2));
+    const x = (vc.x + 1) / 2 * w, y = (1 - vc.y) / 2 * h;
+    if (Math.abs(x - view.x) + Math.abs(y - view.y) + Math.abs(r - view.r) < 0.3) return;
+    view.x = x; view.y = y; view.r = r;
+    onView({ ...view });
   };
 
   // рисуем только когда шапка видна, не чаще 30 кадров в секунду
@@ -792,7 +807,7 @@ export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (as
     flakes.shake(1.1); // при появлении шар как будто только что встряхнули
     started = true;
     if (debug) {
-      window.__globe = { scene, camera, renderer, rhino, globe, flakes, shake, step: animate, setTurn: (v) => { turn = v; idleSince = clock; } };
+      window.__globe = { scene, camera, renderer, rhino, globe, flakes, shake, step: animate, view: () => ({ ...view }), setTurn: (v) => { turn = v; idleSince = clock; } };
       animate(0);
     } else {
       wake();
