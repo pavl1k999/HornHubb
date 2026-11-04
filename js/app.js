@@ -244,7 +244,7 @@ const I18N = {
     maintTitle: 'Магазин на техническом обслуживании',
     maintText: 'Мы обновляем магазин и скоро вернёмся. Пожалуйста, загляните чуть позже.',
     maintStatus: 'Скоро откроемся',
-    nyHero: 'С наступающим 2027!', nyHeroAfter: 'С Новым 2027 годом!', globeHint: 'Нажми на шар ❄',
+    nyHero: 'С наступающим', nyHeroAfter: 'С Новым годом', globeHint: 'Нажми на шар ❄', globeHintMotion: 'или потряси телефон',
     nyTitle: 'До Нового года', nyLeft: 'осталось', nyWhen: '31.12 · полночь', nyHappy: 'С Новым 2027 годом!', nyWish: 'Спасибо, что вы с нами',
     deniedTitle: 'Доступ закрыт',
     deniedText: 'Магазин недоступен для вашего аккаунта.',
@@ -285,7 +285,7 @@ const I18N = {
     maintTitle: 'Магазин на технічному обслуговуванні',
     maintText: 'Ми оновлюємо магазин і скоро повернемося. Будь ласка, зазирніть трохи пізніше.',
     maintStatus: 'Скоро відкриємося',
-    nyHero: 'З наступаючим 2027!', nyHeroAfter: 'З Новим 2027 роком!', globeHint: 'Натисни на кулю ❄',
+    nyHero: 'З наступаючим', nyHeroAfter: 'З Новим роком', globeHint: 'Натисни на кулю ❄', globeHintMotion: 'або потруси телефон',
     nyTitle: 'До Нового року', nyLeft: 'залишилось', nyWhen: '31.12 · опівночі', nyHappy: 'З Новим 2027 роком!', nyWish: 'Дякуємо, що ви з нами',
     deniedTitle: 'Доступ закрито',
     deniedText: 'Магазин недоступний для вашого акаунта.',
@@ -326,7 +326,7 @@ const I18N = {
     maintTitle: 'The shop is under maintenance',
     maintText: "We're updating the shop and will be back soon. Please check back a little later.",
     maintStatus: 'Opening soon',
-    nyHero: 'Happy New Year 2027!', nyHeroAfter: 'Happy New Year 2027!', globeHint: 'Tap the globe ❄',
+    nyHero: 'Happy New Year', nyHeroAfter: 'Happy New Year', globeHint: 'Tap the globe ❄', globeHintMotion: 'or shake your phone',
     nyTitle: 'Until New Year', nyLeft: 'left', nyWhen: 'Dec 31 · midnight', nyHappy: 'Happy New Year 2027!', nyWish: 'Thank you for being with us',
     deniedTitle: 'Access denied',
     deniedText: 'The shop is not available for your account.',
@@ -1003,7 +1003,7 @@ function renderNewYear(el, now) {
         <b class="sale-timer-time"></b>
       </div>`;
     el.hidden = false;
-    const sub = $('nySub');
+    const sub = $('nyEyebrow');
     if (sub) sub.dataset.i18n = after ? 'nyHeroAfter' : 'nyHero';
     if (sub) sub.textContent = t(sub.dataset.i18n);
   }
@@ -1309,11 +1309,33 @@ function renderMaintenance() {
 
 /* ── Новый год: снежный шар, снег, гирлянда ─────────────── */
 
-// 3D-шар грузим после показа магазина; пока грузится (и если 3D недоступно) — картинка шара
+// Акселерометр для снежного шара (потрясти телефон): Telegram с версии 8.0, иначе — браузер (Android)
+function motionSource() {
+  if (isTg && tgVersion('8.0') && tg.Accelerometer) {
+    let cb = null;
+    const onChange = () => { const a = tg.Accelerometer; if (cb && a.isStarted) cb(a.x, a.y, a.z); };
+    return {
+      start(fn) { cb = fn; try { tg.onEvent('accelerometerChanged', onChange); tg.Accelerometer.start({ refresh_rate: 60 }); } catch {} },
+      stop() { cb = null; try { tg.offEvent('accelerometerChanged', onChange); tg.Accelerometer.stop(); } catch {} },
+    };
+  }
+  if ('DeviceMotionEvent' in window && typeof DeviceMotionEvent.requestPermission !== 'function' && matchMedia('(pointer: coarse)').matches) {
+    let cb = null;
+    const onMotion = (e) => { const a = e.accelerationIncludingGravity; if (cb && a && a.x != null) cb(a.x, a.y, a.z); };
+    return {
+      start(fn) { cb = fn; addEventListener('devicemotion', onMotion); },
+      stop() { cb = null; removeEventListener('devicemotion', onMotion); },
+    };
+  }
+  return null;
+}
+
+// 3D-сцену грузим после показа магазина; пока грузится (и если 3D недоступно) — картинка той же сцены
 function mountGlobe() {
   const box = $('globe');
   if (THEME !== 'newyear' || !box || reducedMotion() || !window.WebGLRenderingContext) return;
-  const hint = $('globeHint');
+  const hero = box.closest('.ny-hero'), hint = $('globeHint');
+  const motion = motionSource();
   const start = () => {
     const glb = fetch(`models/rhino.glb${ASSET_V}`).then((r) => {
       if (!r.ok) throw new Error(`model ${r.status}`);
@@ -1323,13 +1345,17 @@ function mountGlobe() {
     import(`./globe.js${ASSET_V}`).then((m) => m.mountGlobe({
       container: box,
       glb,
+      motion,
       onReady: () => {
-        box.classList.add('is-live');
-        box.closest('.ny-hero')?.classList.add('is-live');
-        if (hint && storage.get('globeShaken') !== '1') hint.hidden = false;
+        hero?.classList.add('is-live');
+        if (hint && storage.get('globeShaken') !== '1') {
+          hint.hidden = false;
+          $('globeHintMotion').hidden = !motion;
+        }
       },
-      onShake: () => {
-        haptic.tap();
+      onShake: (power, byUser) => {
+        if (!byUser) return; // шар сам встряхнулся, когда его долго не трогали
+        if (power > 0.6) haptic.tap();
         if (hint) hint.hidden = true;
         storage.set('globeShaken', '1');
       },
@@ -1351,24 +1377,43 @@ function makeSnowfall() {
   }).join('');
 }
 
-// Гирлянда по нижнему краю шапки: провод провисает между крючками, лампочки мигают
+// Гирлянда по краю шапки: витой провод провисает между крючками, на нём лампочки —
+// цоколь и стеклянная колба (блик, светящаяся нить, ореол), лампочки покачиваются и мерцают
 function makeGarland() {
   const box = $('garland');
   if (THEME !== 'newyear' || !box) return;
-  const w = box.clientWidth || innerWidth, span = 64, sag = 7;
+  const w = box.clientWidth || innerWidth, span = 74, sag = 9;
   const n = Math.max(2, Math.round(w / span)), step = w / n;
-  const colors = ['#ffd76a', '#ff4d5e', '#6ee7a0', '#7ab8ff'];
-  let path = '', bulbs = '';
+  const colors = [['#ffe08a', '#c98a12'], ['#ff6b78', '#a3102a'], ['#7ff0b0', '#11803f'], ['#8cc6ff', '#1d58b8']];
+  let defs = '<linearGradient id="gCap" x1="0" x2="1"><stop offset="0" stop-color="#132a1c"/><stop offset=".45" stop-color="#4b7a5a"/><stop offset="1" stop-color="#0e2016"/></linearGradient>';
+  colors.forEach(([c1, c2], i) => {
+    defs += `<radialGradient id="gB${i}" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset=".3" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></radialGradient>` +
+      `<radialGradient id="gG${i}"><stop offset="0" stop-color="${c1}" stop-opacity=".6"/><stop offset=".45" stop-color="${c1}" stop-opacity=".18"/><stop offset="1" stop-color="${c1}" stop-opacity="0"/></radialGradient>`;
+  });
+  let wire = '', bulbs = '';
+  const at = (x0, u) => { // точка и наклон провода
+    const x = x0 + u * step, y = 3 + sag * 4 * u * (1 - u);
+    return [x, y, Math.atan2(sag * 4 * (1 - 2 * u), step) * 180 / Math.PI];
+  };
   for (let i = 0; i < n; i++) {
     const x0 = i * step;
-    path += `M${x0.toFixed(1)} 2Q${(x0 + step / 2).toFixed(1)} ${2 + sag * 2} ${(x0 + step).toFixed(1)} 2`;
-    for (const u of [0.25, 0.5, 0.75]) {
-      const x = x0 + u * step, y = 2 + sag * 4 * u * (1 - u);
-      const k = i * 3 + Math.round(u * 4);
-      bulbs += `<i style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;--c:${colors[k % 4]};--d:${(-(k * 0.37) % 2.6).toFixed(2)}s"></i>`;
-    }
+    wire += `M${x0.toFixed(1)} 3Q${(x0 + step / 2).toFixed(1)} ${3 + sag * 2} ${(x0 + step).toFixed(1)} 3`;
+    [0.22, 0.5, 0.78].forEach((u, j) => {
+      const [x, y, ang] = at(x0, u), k = i * 3 + j, c = k % 4;
+      bulbs += `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(ang + (k % 2 ? 6 : -6)).toFixed(1)})">` +
+        `<g class="bulb" style="--s:${(-(k * 0.61) % 3.4).toFixed(2)}s;--d:${(-(k * 0.47) % 2.8).toFixed(2)}s">` +
+        `<circle class="glow" cx="0" cy="12" r="15" fill="url(#gG${c})"/>` +
+        `<rect x="-2.4" y="0" width="4.8" height="4.6" rx="1.1" fill="url(#gCap)"/>` +
+        `<path d="M-2.4 4.6h4.8" stroke="#0b1a10" stroke-width=".7"/>` +
+        `<path d="M-3.1 4.6C-4.9 8.2-4.4 12.6 0 15.4 4.4 12.6 4.9 8.2 3.1 4.6Z" fill="url(#gB${c})"/>` +
+        `<ellipse class="lit" cx="0" cy="10.5" rx="1.6" ry="2.6" fill="#fff"/>` +
+        `<ellipse cx="-1.5" cy="8.2" rx=".75" ry="2.1" fill="#fff" opacity=".6"/>` +
+        `</g></g>`;
+    });
   }
-  box.innerHTML = `<svg viewBox="0 0 ${w} 18" preserveAspectRatio="none"><path d="${path}"/></svg>${bulbs}`;
+  box.innerHTML = `<svg viewBox="0 0 ${w.toFixed(0)} 30" preserveAspectRatio="none"><defs>${defs}</defs>` +
+    `<path d="${wire}" fill="none" stroke="#10241a" stroke-width="2"/>` +
+    `<path d="${wire}" fill="none" stroke="#3a6a4c" stroke-width="1" stroke-dasharray="2.4 2.2"/>${bulbs}</svg>`;
 }
 
 // Магазин закрыт для покупателя: тот же экран-заглушка, но с другим текстом и значком

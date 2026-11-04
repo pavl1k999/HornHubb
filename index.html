@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
   <!-- ?v= — версия файлов: меняйте её, когда меняете вместе index.html и js/css,
        иначе Telegram может взять старый файл из кэша -->
-  <link rel="stylesheet" href="css/style.css?v=2026-11-04-1">
+  <link rel="stylesheet" href="css/style.css?v=2026-11-04-2">
 </head>
 <body>
 
@@ -106,16 +106,17 @@
     <!-- видит только владелец, когда магазин на техобслуживании -->
     <p class="owner-note" id="ownerNote" hidden>🔧 Техобслуживание включено — магазин видите только вы</p>
     <div class="hero" role="img" aria-label="HORN HUB">
-      <!-- Новый год: снежный шар с носорогом (3D — js/globe.js, пока грузится — картинка) -->
+      <!-- Новый год: 3D-снежный шар во всю шапку (js/globe.js), пока грузится — картинка той же сцены -->
       <div class="ny-hero" aria-hidden="true">
-        <div class="ny-lights"></div>
+        <picture class="ny-poster">
+          <source media="(min-width: 720px)" srcset="images/newyear/hero-wide.webp">
+          <img src="images/newyear/hero.webp" alt="" decoding="async">
+        </picture>
+        <div class="ny-stage" id="globe"></div>
         <div class="ny-text">
-          <div class="ny-logo">HORN<span>HUB</span></div>
-          <div class="ny-sub" id="nySub" data-i18n="nyHero">С наступающим 2027!</div>
-          <span class="ny-hint" id="globeHint" data-i18n="globeHint" hidden>Нажми на шар ❄</span>
-        </div>
-        <div class="ny-globe" id="globe">
-          <img class="ny-globe-img" src="images/newyear/globe.webp" alt="" width="840" height="840" decoding="async">
+          <div class="ny-eyebrow" id="nyEyebrow" data-i18n="nyHero">С наступающим</div>
+          <div class="ny-year">2027</div>
+          <div class="ny-hint" id="globeHint" hidden><span data-i18n="globeHint">Нажми на шар ❄</span><small id="globeHintMotion" data-i18n="globeHintMotion" hidden>или потряси телефон</small></div>
         </div>
       </div>
       <div class="bats" aria-hidden="true">
@@ -347,6 +348,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="js/app.js?v=2026-11-04-1"></script>
+<script src="js/app.js?v=2026-11-04-2"></script>
 </body>
 </html>
