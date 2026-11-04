@@ -1292,10 +1292,23 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
   aspect-ratio: var(--banner-ratio);
   background: var(--banner) var(--banner-pos) / cover no-repeat;
 }
+/* Новый год: крупный живой шар во всю ширину карточки, его можно нажать и покрутить */
 [data-theme="newyear"] .maint-banner {
-  aspect-ratio: 3 / 2;
-  background: url('../images/newyear/hero-card.webp') center / cover no-repeat, #0d1c40;
+  aspect-ratio: 1 / 1;
+  background: url('../images/newyear/maint.webp') center / cover no-repeat, #0d1c40;
 }
+[data-theme="newyear"] .maint-banner::after { display: none; } /* иначе перекрывает шар для пальца */
+[data-theme="newyear"] .maint-icon { display: none; }
+[data-theme="newyear"] .maint-body { padding-top: 6px; }
+.maint-stage { position: absolute; inset: 0; touch-action: pan-y; -webkit-user-select: none; user-select: none; }
+.maint-banner.is-live .globe-canvas { opacity: 1; }
+.maint-hint {
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, .78); font: 600 12.5px/1.3 var(--font);
+  opacity: 0; transition: opacity .5s;
+}
+.maint-banner.is-live ~ .maint-body .maint-hint:not([hidden]) { opacity: 1; animation: hint-bob 2.4s ease-in-out infinite; }
+@keyframes hint-bob { 50% { transform: translateY(-2px); } }
 .maint-banner::after {
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(to bottom, transparent 55%, var(--bg-elev));

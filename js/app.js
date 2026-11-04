@@ -1356,11 +1356,10 @@ function motionSource() {
   };
 }
 
-// 3D-сцену грузим после показа магазина; пока грузится (и если 3D недоступно) — картинка той же сцены
-function mountGlobe() {
-  const box = $('globe');
+// 3D-сцену грузим после показа страницы; пока грузится (и если 3D недоступно) — картинка той же сцены.
+// live — кому поставить is-live, когда сцена готова; hint — подсказка «Нажми на шарик»; gx — где шар по ширине.
+function mountGlobe(box, { live, hint, hintMotion, gx, onView } = {}) {
   if (THEME !== 'newyear' || !box || reducedMotion() || !window.WebGLRenderingContext) return;
-  const hero = box.closest('.ny-hero'), hint = $('globeHint');
   const motion = motionSource();
   const start = () => {
     const glb = fetch(`models/rhino.glb${ASSET_V}`).then((r) => {
@@ -1372,26 +1371,39 @@ function mountGlobe() {
       container: box,
       glb,
       motion,
+      gx,
+      onView,
       onReady: () => {
-        hero?.classList.add('is-live');
-        if (hint) {
-          hint.hidden = false;
-          $('globeHintMotion').hidden = !motion;
-        }
+        live?.classList.add('is-live');
+        if (hint) hint.hidden = false;
+        if (hintMotion) hintMotion.hidden = !motion;
       },
       onShake: (power, byUser) => {
         if (byUser && power > 0.6) haptic.tap(); // шар может и сам встряхнуться, если его долго не трогали
       },
-      // где стекло на экране — по этому кругу «2027» уходит за шар
-      onView: ({ x, y, r }) => {
-        hero?.style.setProperty('--gx', `${x.toFixed(1)}px`);
-        hero?.style.setProperty('--gy', `${y.toFixed(1)}px`);
-        hero?.style.setProperty('--gr', `${r.toFixed(1)}px`);
-      },
     })).catch(() => {});
   };
-  // не мешаем первой отрисовке витрины
+  // не мешаем первой отрисовке страницы
   if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1500 }); else setTimeout(start, 400);
+}
+
+// шар в шапке магазина: справа, «2027» уходит за него по круглому контуру
+function mountHeroGlobe() {
+  const box = $('globe'), hero = box?.closest('.ny-hero');
+  mountGlobe(box, {
+    live: hero, hint: $('globeHint'), hintMotion: $('globeHintMotion'),
+    onView: ({ x, y, r }) => {
+      hero?.style.setProperty('--gx', `${x.toFixed(1)}px`);
+      hero?.style.setProperty('--gy', `${y.toFixed(1)}px`);
+      hero?.style.setProperty('--gr', `${r.toFixed(1)}px`);
+    },
+  });
+}
+
+// шар на экране техобслуживания: по центру карточки, крупный
+function mountMaintGlobe() {
+  const box = $('maintGlobe');
+  mountGlobe(box, { live: box?.parentElement, hint: $('maintHint'), hintMotion: $('maintHintMotion'), gx: () => 0.5 });
 }
 
 // Падающий снег поверх витрины — лёгкий, на CSS
@@ -1994,7 +2006,7 @@ window.addEventListener('storage', (e) => {
 function startShop() {
   safely(initTelegram);
   renderAll();
-  safely(mountGlobe);
+  safely(mountHeroGlobe);
   refreshFromSheet();
   checkAccess();
   if (SALE || NEW_YEAR) setInterval(() => safely(() => renderSaleTimer()), 1000);
@@ -2034,6 +2046,7 @@ if (lock) {
   // Подписчиков продолжаем собирать — это нужно для защиты бота.
   safely(initTelegram);
   safely(renderMaintenance);
+  safely(mountMaintGlobe);
   checkAccess();
 } else {
   if (MAINTENANCE) {
