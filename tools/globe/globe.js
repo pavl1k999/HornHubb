@@ -13,7 +13,7 @@
    проверено рендером.
    ========================================================== */
 import {
-  WebGLRenderer, Scene, PerspectiveCamera, HemisphereLight, DirectionalLight, PointLight, Group, Mesh, Object3D,
+  WebGLRenderer, Scene, PerspectiveCamera, HemisphereLight, DirectionalLight, PointLight, SpotLight, Group, Mesh, Object3D,
   SphereGeometry, CylinderGeometry, ConeGeometry, TorusGeometry, PlaneGeometry, CircleGeometry, LatheGeometry,
   ExtrudeGeometry, TubeGeometry, BoxGeometry, InstancedBufferGeometry, InstancedBufferAttribute, BufferGeometry,
   Float32BufferAttribute, Shape, Vector2, Vector3, CatmullRomCurve3, Color, MathUtils,
@@ -573,12 +573,16 @@ export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (as
   inner.add(new Points(glitGeo, glitMat));
 
   const tree = makeTree(dummy);
-  tree.position.set(0.3, groundAt(0.3, -0.28) - 0.015, -0.28);
+  const TREE_S = 1.15;
+  tree.scale.setScalar(TREE_S);
+  tree.position.set(0.37, groundAt(0.37, -0.3) - 0.015, -0.3);
   inner.add(tree);
   const treeLight = new PointLight(0xffc46b, 1.1, 1.2, 2);
   treeLight.position.set(0.22, -0.3, -0.12);
   inner.add(treeLight);
   const lamp = makeLamp();
+  const LAMP_S = 1.3;
+  lamp.scale.setScalar(LAMP_S);
   lamp.position.set(-0.43, groundAt(-0.43, -0.3) - 0.01, -0.3);
   inner.add(lamp);
   const snowman = makeSnowman(snow);
@@ -605,15 +609,15 @@ export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (as
     return null;
   } });
   colliders.push({ hit: (x, y, z) => { // ёлка — конус
-    const lx = x - tree.position.x, lz = z - tree.position.z, ly = y - tree.position.y;
+    const lx = x - tree.position.x, lz = z - tree.position.z, ly = (y - tree.position.y) / TREE_S;
     if (ly < 0.08 || ly > tree.H + 0.02) return null;
-    const rr = tree.radiusAt(ly), d = Math.hypot(lx, lz);
+    const rr = tree.radiusAt(ly) * TREE_S, d = Math.hypot(lx, lz);
     if (d < rr) { const k = (rr + 0.004) / Math.max(d, 1e-4); return [tree.position.x + lx * k, y, tree.position.z + lz * k, Math.random() < 0.35]; }
     return null;
   } });
   for (const [g] of gifts) colliders.push(disc(g.position.x, g.position.z, Math.min(...g.half) * 1.1, g.position.y + g.top));
   colliders.push(disc(snowman.position.x, snowman.position.z, 0.035, snowman.position.y + 0.32 * 0.9));
-  colliders.push(disc(lamp.position.x, lamp.position.z, 0.04, lamp.position.y + 0.535));
+  colliders.push(disc(lamp.position.x, lamp.position.z, 0.04 * LAMP_S, lamp.position.y + 0.535 * LAMP_S));
 
   const flakes = makeFlakes(flakeAtlas(), colliders);
   inner.add(flakes);
@@ -753,16 +757,22 @@ export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (as
     });
     upper = rhino.getObjectByName('UPPER');
     head = rhino.getObjectByName('HEAD');
-    const S = 0.74 / 1.97, rx = -0.06, rz = 0.1;
+    const S = 1.0 / 1.97, rx = -0.07, rz = 0.17; // носорог — около половины высоты шара
     rhino.scale.setScalar(S);
     rhino.position.set(rx, groundAt(rx, rz) - 0.005, rz);
     rhino.rotation.y = Math.PI - 0.38; // спиной к нам, смотрит на ёлку
     inner.add(rhino);
+    // мягкий свет со стороны зрителя: видно шляпу, складки куртки, сумку (иначе — чёрный силуэт)
+    const fill = new SpotLight(0xc9dcff, 4.5, 3, 0.55, 0.85, 1.5);
+    fill.position.set(rx + 0.35, rhino.position.y + 1.1, rz + 0.9);
+    fill.target.position.set(rx, rhino.position.y + 0.55, rz);
+    inner.add(fill, fill.target);
+    rhino.traverse((o) => { if (o.isMesh) o.material.envMapIntensity = 2.2; });
     // снег ложится на шляпу и плечи
     const feet = rhino.position.y;
-    colliders.push(disc(rx - 0.004, rz + 0.01, 0.068, feet + 1.865 * S));   // поля шляпы
-    colliders.push(disc(rx - 0.004, rz + 0.01, 0.045, feet + 1.955 * S));   // макушка шляпы
-    colliders.push(disc(rx - 0.004, rz + 0.01, 0.14, feet + 1.5 * S));      // плечи
+    colliders.push(disc(rx, rz, 0.18 * S, feet + 1.865 * S));   // поля шляпы
+    colliders.push(disc(rx, rz, 0.12 * S, feet + 1.955 * S));   // макушка шляпы
+    colliders.push(disc(rx, rz, 0.37 * S, feet + 1.5 * S));     // плечи
     flakes.shake(1.1); // при появлении шар как будто только что встряхнули
     started = true;
     if (debug) {
