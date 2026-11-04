@@ -1309,25 +1309,51 @@ function renderMaintenance() {
 
 /* ── Новый год: снежный шар, снег, гирлянда ─────────────── */
 
-// Акселерометр для снежного шара (потрясти телефон): Telegram с версии 8.0, иначе — браузер (Android)
+// Акселерометр для снежного шара (потрясти телефон). Сначала — датчик Telegram (с версии 8.0);
+// если он не запустился или молчит — датчик движения самого телефона. На iPhone к нему дают доступ
+// только по нажатию: permit() шар вызывает, когда на него нажали.
 function motionSource() {
-  if (isTg && tgVersion('8.0') && tg.Accelerometer) {
-    let cb = null;
-    const onChange = () => { const a = tg.Accelerometer; if (cb && a.isStarted) cb(a.x, a.y, a.z); };
-    return {
-      start(fn) { cb = fn; try { tg.onEvent('accelerometerChanged', onChange); tg.Accelerometer.start({ refresh_rate: 60 }); } catch {} },
-      stop() { cb = null; try { tg.offEvent('accelerometerChanged', onChange); tg.Accelerometer.stop(); } catch {} },
-    };
+  const hasTg = isTg && tgVersion('8.0') && Boolean(tg.Accelerometer);
+  const hasDm = 'DeviceMotionEvent' in window && matchMedia('(pointer: coarse)').matches;
+  if (!hasTg && !hasDm) return null;
+  const needPermit = hasDm && typeof DeviceMotionEvent.requestPermission === 'function';
+  let cb = null, mode = hasTg ? 'tg' : 'dm', permitted = !needPermit, lastEvent = 0, watchdog = 0;
+  const emit = (x, y, z) => { lastEvent = Date.now(); if (cb) cb(x, y, z); };
+  const onTg = () => { const a = tg.Accelerometer; if (a && a.x != null) emit(a.x, a.y, a.z); };
+  const onDm = (e) => { const a = e.accelerationIncludingGravity; if (a && a.x != null) emit(a.x, a.y, a.z); };
+  const stopTg = () => { try { tg.offEvent('accelerometerChanged', onTg); tg.offEvent('accelerometerFailed', toDm); tg.Accelerometer.stop(); } catch {} };
+  const startDm = () => { if (permitted) addEventListener('devicemotion', onDm); };
+  function toDm() { // датчик Telegram не работает — переходим на датчик телефона
+    if (mode !== 'tg' || !hasDm) return;
+    stopTg(); mode = 'dm';
+    if (cb) startDm();
   }
-  if ('DeviceMotionEvent' in window && typeof DeviceMotionEvent.requestPermission !== 'function' && matchMedia('(pointer: coarse)').matches) {
-    let cb = null;
-    const onMotion = (e) => { const a = e.accelerationIncludingGravity; if (cb && a && a.x != null) cb(a.x, a.y, a.z); };
-    return {
-      start(fn) { cb = fn; addEventListener('devicemotion', onMotion); },
-      stop() { cb = null; removeEventListener('devicemotion', onMotion); },
-    };
-  }
-  return null;
+  return {
+    start(fn) {
+      cb = fn;
+      if (mode === 'tg') {
+        try {
+          tg.onEvent('accelerometerChanged', onTg);
+          tg.onEvent('accelerometerFailed', toDm);
+          tg.Accelerometer.start({ refresh_rate: 50 });
+        } catch { toDm(); }
+        clearTimeout(watchdog);
+        watchdog = setTimeout(() => { if (Date.now() - lastEvent > 2000) toDm(); }, 2500);
+      } else startDm();
+    },
+    stop() {
+      cb = null; clearTimeout(watchdog);
+      if (mode === 'tg') stopTg(); else removeEventListener('devicemotion', onDm);
+    },
+    permit() {
+      if (permitted || !needPermit) return;
+      DeviceMotionEvent.requestPermission().then((r) => {
+        if (r !== 'granted') return;
+        permitted = true;
+        if (cb && mode === 'dm') startDm();
+      }).catch(() => {});
+    },
+  };
 }
 
 // 3D-сцену грузим после показа магазина; пока грузится (и если 3D недоступно) — картинка той же сцены

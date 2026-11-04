@@ -460,7 +460,8 @@ function makeFlakes(atlas, colliders) {
 /**
  * Ставит сцену в container (элемент во всю шапку).
  * glb — Promise<ArrayBuffer> с моделью носорога.
- * motion — { start(cb), stop() }: акселерометр телефона, cb(x, y, z) в м/с² (необязательно).
+ * motion — { start(cb), stop(), permit() }: акселерометр телефона, cb(x, y, z) — в м/с² или в g
+ *   (единицы определяются сами); permit() вызывается по нажатию — на iPhone так спрашивают доступ.
  * gx — где по ширине стоит шар (0..1), функция от соотношения сторон.
  * onReady — сцена нарисована, onShake(сила, этоЧеловек) — шар встряхнули (для вибрации и подсказки).
  * debug: true — время не идёт само, управление через window.__globe (для проверок и картинок-заглушек).
@@ -681,19 +682,34 @@ export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (as
     turnVel = ((e.clientX - lastX) * 0.007) / Math.max(0.016, (now - lastMove) / 1000);
     lastX = e.clientX; lastMove = now;
   });
-  const release = () => { if (!dragging) return; dragging = false; idleSince = clock; if (!moved) shake(1); };
+  const release = () => {
+    if (!dragging) return;
+    dragging = false; idleSince = clock;
+    try { motion?.permit?.(); } catch {} // на iPhone доступ к датчику движения дают только по нажатию
+    if (!moved) shake(1);
+  };
   canvas.addEventListener('pointerup', release);
   canvas.addEventListener('pointercancel', () => { dragging = false; });
   canvas.addEventListener('pointerleave', release);
 
-  // акселерометр: резкий рывок — встряска; наклон — снег немного сносит
-  let prev = null, lastJerk = 0;
+  // акселерометр: резкий рывок или сильное отклонение от покоя — встряска.
+  // Телефоны отдают разное: м/с² с силой тяжести (в покое ≈ 9.8), g (≈ 1) или без силы тяжести (≈ 0) —
+  // определяем по среднему значению и приводим к м/с².
+  let prev = null, lastJerk = -1, gAvg = 0, samples = 0;
   const onMotion = (x, y, z) => {
-    if (prev) {
-      const jerk = Math.hypot(x - prev[0], y - prev[1], z - prev[2]);
-      if (jerk > 9 && clock - lastJerk > 0.45) { lastJerk = clock; shake(Math.min(1.4, jerk / 18)); }
-    }
+    if (![x, y, z].every(Number.isFinite)) return;
+    const m = Math.hypot(x, y, z);
+    gAvg = samples++ ? gAvg * 0.92 + m * 0.08 : m;
+    if (samples < 4) { prev = [x, y, z]; return; }
+    const unit = gAvg > 5 ? 'ms2' : gAvg > 0.45 ? 'g' : 'linear';
+    const k = unit === 'g' ? 9.81 : 1;
+    const jerk = prev ? Math.hypot(x - prev[0], y - prev[1], z - prev[2]) * k : 0;
+    const dev = unit === 'linear' ? m : Math.abs(m * k - 9.81);
     prev = [x, y, z];
+    if ((jerk > 7 || dev > 8) && clock - lastJerk > 0.45) {
+      lastJerk = clock;
+      shake(MathUtils.clamp(Math.max(jerk, dev) / 16, 0.7, 1.4));
+    }
   };
 
   const animate = (dt) => {
