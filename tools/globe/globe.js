@@ -8,7 +8,7 @@
    ёлка из веточек с гирляндой, фонарь, снеговик, подарки.
    Снежинки — настоящие кристаллы с физикой: падают медленно, как в воде,
    кувыркаются, ложатся на снег, шляпу, плечи, ёлку и подарки; при встряске
-   взлетают вихрем. Встряхнуть: нажать на шар или потрясти телефон.
+   взлетают вихрем. Встряхнуть — нажать на шар, покрутить — пальцем вбок.
    Лицо не показываем: поворот шара ограничен (TURN_MIN/TURN_MAX), ноздри скрыты —
    проверено рендером.
    ========================================================== */
@@ -460,15 +460,13 @@ function makeFlakes(atlas, colliders) {
 /**
  * Ставит сцену в container (элемент во всю шапку).
  * glb — Promise<ArrayBuffer> с моделью носорога.
- * motion — { start(cb), stop(), permit() }: акселерометр телефона, cb(x, y, z) — в м/с² или в g
- *   (единицы определяются сами); permit() вызывается по нажатию — на iPhone так спрашивают доступ.
  * gx — где по ширине стоит шар (0..1), функция от соотношения сторон.
  * onReady — сцена нарисована, onShake(сила, этоЧеловек) — шар встряхнули (для вибрации и подсказки).
  * onView({ x, y, r }) — где на экране стеклянный шар (центр и радиус в пикселях контейнера):
  *   по нему надпись «2027» уходит за шар по круглому контуру.
  * debug: true — время не идёт само, управление через window.__globe (для проверок и картинок-заглушек).
  */
-export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (aspect > 1.9 ? 0.72 : 0.7),
+export function mountGlobe({ container, glb, gx = (aspect) => (aspect > 1.9 ? 0.72 : 0.7),
   onReady = () => {}, onShake = () => {}, onFail = () => {}, onView = () => {}, debug = false }) {
   let renderer;
   try {
@@ -687,32 +685,11 @@ export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (as
   const release = () => {
     if (!dragging) return;
     dragging = false; idleSince = clock;
-    try { motion?.permit?.(); } catch {} // на iPhone доступ к датчику движения дают только по нажатию
     if (!moved) shake(1);
   };
   canvas.addEventListener('pointerup', release);
   canvas.addEventListener('pointercancel', () => { dragging = false; });
   canvas.addEventListener('pointerleave', release);
-
-  // акселерометр: резкий рывок или сильное отклонение от покоя — встряска.
-  // Телефоны отдают разное: м/с² с силой тяжести (в покое ≈ 9.8), g (≈ 1) или без силы тяжести (≈ 0) —
-  // определяем по среднему значению и приводим к м/с².
-  let prev = null, lastJerk = -1, gAvg = 0, samples = 0;
-  const onMotion = (x, y, z) => {
-    if (![x, y, z].every(Number.isFinite)) return;
-    const m = Math.hypot(x, y, z);
-    gAvg = samples++ ? gAvg * 0.92 + m * 0.08 : m;
-    if (samples < 4) { prev = [x, y, z]; return; }
-    const unit = gAvg > 5 ? 'ms2' : gAvg > 0.45 ? 'g' : 'linear';
-    const k = unit === 'g' ? 9.81 : 1;
-    const jerk = prev ? Math.hypot(x - prev[0], y - prev[1], z - prev[2]) * k : 0;
-    const dev = unit === 'linear' ? m : Math.abs(m * k - 9.81);
-    prev = [x, y, z];
-    if ((jerk > 7 || dev > 8) && clock - lastJerk > 0.45) {
-      lastJerk = clock;
-      shake(MathUtils.clamp(Math.max(jerk, dev) / 16, 0.7, 1.4));
-    }
-  };
 
   const animate = (dt) => {
     clock += dt;
@@ -755,10 +732,10 @@ export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (as
   };
 
   // рисуем только когда шапка видна, не чаще 30 кадров в секунду
-  let raf = 0, last = 0, visible = true, dead = false, started = false, listening = false;
+  let raf = 0, last = 0, visible = true, dead = false, started = false;
   const loop = (now) => {
     raf = 0;
-    if (dead || !visible || document.hidden) { if (listening) { motion?.stop(); listening = false; } return; }
+    if (dead || !visible || document.hidden) return;
     raf = requestAnimationFrame(loop);
     if (now - last < 1000 / 31) return;
     const dt = last ? Math.min(0.1, (now - last) / 1000) : 1 / 30;
@@ -767,7 +744,6 @@ export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (as
   };
   const wake = () => {
     if (!started || raf || dead || !visible || document.hidden) return;
-    if (motion && !listening) { listening = true; motion.start(onMotion); }
     last = 0; raf = requestAnimationFrame(loop);
   };
   const io = 'IntersectionObserver' in window ? new IntersectionObserver(([en]) => { visible = en.isIntersecting; wake(); }) : null;
@@ -820,7 +796,6 @@ export function mountGlobe({ container, glb, motion = null, gx = (aspect) => (as
     destroy() {
       dead = true;
       cancelAnimationFrame(raf);
-      if (listening) motion?.stop();
       io?.disconnect(); ro?.disconnect();
       document.removeEventListener('visibilitychange', wake);
       try { renderer.dispose(); renderer.forceContextLoss(); } catch {}

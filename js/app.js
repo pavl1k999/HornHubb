@@ -244,7 +244,7 @@ const I18N = {
     maintTitle: 'Магазин на техническом обслуживании',
     maintText: 'Мы обновляем магазин и скоро вернёмся. Пожалуйста, загляните чуть позже.',
     maintStatus: 'Скоро откроемся',
-    nyHero: 'С наступающим', nyHeroAfter: 'С Новым годом', globeHint: 'Нажми на шарик ❄', globeHintMotion: 'или потряси телефон',
+    nyHero: 'С наступающим', nyHeroAfter: 'С Новым годом', globeHint: 'Нажми на шарик ❄',
     nyTitle: 'До Нового года', nyLeft: 'осталось', nyWhen: '31.12 · полночь', nyHappy: 'С Новым 2027 годом!', nyWish: 'Спасибо, что вы с нами',
     deniedTitle: 'Доступ закрыт',
     deniedText: 'Магазин недоступен для вашего аккаунта.',
@@ -285,7 +285,7 @@ const I18N = {
     maintTitle: 'Магазин на технічному обслуговуванні',
     maintText: 'Ми оновлюємо магазин і скоро повернемося. Будь ласка, зазирніть трохи пізніше.',
     maintStatus: 'Скоро відкриємося',
-    nyHero: 'З наступаючим', nyHeroAfter: 'З Новим роком', globeHint: 'Натисни на кульку ❄', globeHintMotion: 'або потруси телефон',
+    nyHero: 'З наступаючим', nyHeroAfter: 'З Новим роком', globeHint: 'Натисни на кульку ❄',
     nyTitle: 'До Нового року', nyLeft: 'залишилось', nyWhen: '31.12 · опівночі', nyHappy: 'З Новим 2027 роком!', nyWish: 'Дякуємо, що ви з нами',
     deniedTitle: 'Доступ закрито',
     deniedText: 'Магазин недоступний для вашого акаунта.',
@@ -326,7 +326,7 @@ const I18N = {
     maintTitle: 'The shop is under maintenance',
     maintText: "We're updating the shop and will be back soon. Please check back a little later.",
     maintStatus: 'Opening soon',
-    nyHero: 'Happy New Year', nyHeroAfter: 'Happy New Year', globeHint: 'Tap the globe ❄', globeHintMotion: 'or shake your phone',
+    nyHero: 'Happy New Year', nyHeroAfter: 'Happy New Year', globeHint: 'Tap the globe ❄',
     nyTitle: 'Until New Year', nyLeft: 'left', nyWhen: 'Dec 31 · midnight', nyHappy: 'Happy New Year 2027!', nyWish: 'Thank you for being with us',
     deniedTitle: 'Access denied',
     deniedText: 'The shop is not available for your account.',
@@ -1309,58 +1309,10 @@ function renderMaintenance() {
 
 /* ── Новый год: снежный шар, снег, гирлянда ─────────────── */
 
-// Акселерометр для снежного шара (потрясти телефон). Сначала — датчик Telegram (с версии 8.0);
-// если он не запустился или молчит — датчик движения самого телефона. На iPhone к нему дают доступ
-// только по нажатию: permit() шар вызывает, когда на него нажали.
-function motionSource() {
-  const hasTg = isTg && tgVersion('8.0') && Boolean(tg.Accelerometer);
-  const hasDm = 'DeviceMotionEvent' in window && matchMedia('(pointer: coarse)').matches;
-  if (!hasTg && !hasDm) return null;
-  const needPermit = hasDm && typeof DeviceMotionEvent.requestPermission === 'function';
-  let cb = null, mode = hasTg ? 'tg' : 'dm', permitted = !needPermit, lastEvent = 0, watchdog = 0;
-  const emit = (x, y, z) => { lastEvent = Date.now(); if (cb) cb(x, y, z); };
-  const onTg = () => { const a = tg.Accelerometer; if (a && a.x != null) emit(a.x, a.y, a.z); };
-  const onDm = (e) => { const a = e.accelerationIncludingGravity; if (a && a.x != null) emit(a.x, a.y, a.z); };
-  const stopTg = () => { try { tg.offEvent('accelerometerChanged', onTg); tg.offEvent('accelerometerFailed', toDm); tg.Accelerometer.stop(); } catch {} };
-  const startDm = () => { if (permitted) addEventListener('devicemotion', onDm); };
-  function toDm() { // датчик Telegram не работает — переходим на датчик телефона
-    if (mode !== 'tg' || !hasDm) return;
-    stopTg(); mode = 'dm';
-    if (cb) startDm();
-  }
-  return {
-    start(fn) {
-      cb = fn;
-      if (mode === 'tg') {
-        try {
-          tg.onEvent('accelerometerChanged', onTg);
-          tg.onEvent('accelerometerFailed', toDm);
-          tg.Accelerometer.start({ refresh_rate: 50 });
-        } catch { toDm(); }
-        clearTimeout(watchdog);
-        watchdog = setTimeout(() => { if (Date.now() - lastEvent > 2000) toDm(); }, 2500);
-      } else startDm();
-    },
-    stop() {
-      cb = null; clearTimeout(watchdog);
-      if (mode === 'tg') stopTg(); else removeEventListener('devicemotion', onDm);
-    },
-    permit() {
-      if (permitted || !needPermit) return;
-      DeviceMotionEvent.requestPermission().then((r) => {
-        if (r !== 'granted') return;
-        permitted = true;
-        if (cb && mode === 'dm') startDm();
-      }).catch(() => {});
-    },
-  };
-}
-
 // 3D-сцену грузим после показа страницы; пока грузится (и если 3D недоступно) — картинка той же сцены.
 // live — кому поставить is-live, когда сцена готова; hint — подсказка «Нажми на шарик»; gx — где шар по ширине.
-function mountGlobe(box, { live, hint, hintMotion, gx, onView } = {}) {
+function mountGlobe(box, { live, hint, gx, onView } = {}) {
   if (THEME !== 'newyear' || !box || reducedMotion() || !window.WebGLRenderingContext) return;
-  const motion = motionSource();
   const start = () => {
     const glb = fetch(`models/rhino.glb${ASSET_V}`).then((r) => {
       if (!r.ok) throw new Error(`model ${r.status}`);
@@ -1370,13 +1322,11 @@ function mountGlobe(box, { live, hint, hintMotion, gx, onView } = {}) {
     import(`./globe.js${ASSET_V}`).then((m) => m.mountGlobe({
       container: box,
       glb,
-      motion,
       gx,
       onView,
       onReady: () => {
         live?.classList.add('is-live');
         if (hint) hint.hidden = false;
-        if (hintMotion) hintMotion.hidden = !motion;
       },
       onShake: (power, byUser) => {
         if (byUser && power > 0.6) haptic.tap(); // шар может и сам встряхнуться, если его долго не трогали
@@ -1391,7 +1341,7 @@ function mountGlobe(box, { live, hint, hintMotion, gx, onView } = {}) {
 function mountHeroGlobe() {
   const box = $('globe'), hero = box?.closest('.ny-hero');
   mountGlobe(box, {
-    live: hero, hint: $('globeHint'), hintMotion: $('globeHintMotion'),
+    live: hero, hint: $('globeHint'),
     onView: ({ x, y, r }) => {
       hero?.style.setProperty('--gx', `${x.toFixed(1)}px`);
       hero?.style.setProperty('--gy', `${y.toFixed(1)}px`);
@@ -1403,7 +1353,7 @@ function mountHeroGlobe() {
 // шар на экране техобслуживания: по центру карточки, крупный
 function mountMaintGlobe() {
   const box = $('maintGlobe');
-  mountGlobe(box, { live: box?.parentElement, hint: $('maintHint'), hintMotion: $('maintHintMotion'), gx: () => 0.5 });
+  mountGlobe(box, { live: box?.parentElement, hint: $('maintHint'), gx: () => 0.5 });
 }
 
 // Падающий снег поверх витрины — лёгкий, на CSS

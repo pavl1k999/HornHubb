@@ -292,7 +292,6 @@ img { display: block; max-width: 100%; }
   color: rgba(255, 255, 255, .82); font: 600 clamp(11px, 2.9vw, 14px)/1.25 var(--font);
   opacity: 0; transition: opacity .5s;
 }
-.ny-hint small { display: block; margin-top: 2px; color: rgba(255, 255, 255, .55); font-size: .9em; font-weight: 500; }
 .ny-hero.is-live .ny-hint:not([hidden]) { opacity: 1; animation: hint-nudge 2.4s ease-in-out infinite; }
 @keyframes hint-nudge { 50% { transform: translateX(4px); } }
 
