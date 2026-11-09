@@ -35,16 +35,20 @@ const SUBSCRIBERS_URL = 'https://script.google.com/macros/s/AKfycbyJ76zkKy6f6FXx
 // Новый район — просто допишите название в список.
 const DISTRICTS = ['Bemowo', 'Ożarów'];
 
-// Таймер акции под баннером (время по Варшаве). До старта — «до старта …», во время — «до конца …»,
-// после окончания таймер сам исчезает. Сейчас акции нет: const SALE = null;
-// Пример (так была устроена хэллоуинская распродажа):
-// const SALE = {
-//   start: '2026-12-30T00:00:00+01:00',
-//   end:   '2027-01-01T00:00:00+01:00',
-//   title: { ru: 'Новогодняя распродажа', ua: 'Новорічний розпродаж', en: 'New Year sale' },
-//   prices: { liquid: 30 },  // цены на время акции по категориям, во всех районах; можно по районам: { 'Bemowo': 30, 'Ożarów': 35 }
-// };
-const SALE = null;
+// Неделя акций (время по Варшаве). До старта — отсчёт «до старта», во время — «до конца», потом исчезает.
+// В теме Black Friday отсчёт крупно в шапке, под ней — дни недели акций; в других темах — блок таймера.
+// Убрать акцию: const SALE = null;
+const SALE = {
+  start: '2026-11-23T00:00:00+01:00', // понедельник 23 ноября, 00:00
+  end:   '2026-12-01T00:00:00+01:00', // конец 30 ноября (Cyber Monday) — с 1 декабря включается Новый год
+  title: { ru: 'Black Friday Week', ua: 'Black Friday Week', en: 'Black Friday Week' },
+  // Цены на время акции по категориям — во всех районах, включаются и выключаются сами.
+  // Например: liquid: 30 (все жидкости по 30 zł) или по районам: liquid: { 'Bemowo': 30, 'Ożarów': 35 }.
+  // Пока пусто — цены обычные.
+  prices: {},
+  // Главные дни недели (подсвечиваются в полоске дней)
+  days: { '2026-11-27': 'Black Friday', '2026-11-30': 'Cyber Monday' },
+};
 
 // Отсчёт до Нового года на месте таймера, когда акции нет (время по Варшаве).
 // После полуночи до дня until показывается «С Новым годом!», потом блок исчезает сам. Убрать: const NEW_YEAR = null;
@@ -265,6 +269,7 @@ const I18N = {
     saleLabel: 'Распродажа', saleLabelHalloween: 'Хэллоуин', saleLiveLabel: 'Распродажа идёт', saleLiveShort: 'Идёт',
     saleOfferAny: 'Большая распродажа', saleStartsIn: 'до старта', saleEndsIn: 'до конца',
     units: ['д', 'ч', 'мин', 'сек'],
+    bfStarts: 'до старта', bfEnds: 'до конца', bfWeek: 'Неделя акций', bfOver: 'Акция завершена',
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
     gateTitle: 'Выберите ваш район', gateSub: 'Варшава',
     districtChanged: 'Район: {d}',
@@ -306,6 +311,7 @@ const I18N = {
     saleLabel: 'Розпродаж', saleLabelHalloween: 'Хелловін', saleLiveLabel: 'Розпродаж триває', saleLiveShort: 'Триває',
     saleOfferAny: 'Великий розпродаж', saleStartsIn: 'до старту', saleEndsIn: 'до кінця',
     units: ['д', 'год', 'хв', 'сек'],
+    bfStarts: 'до старту', bfEnds: 'до кінця', bfWeek: 'Тиждень акцій', bfOver: 'Акцію завершено',
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
     gateTitle: 'Оберіть ваш район', gateSub: 'Варшава',
     districtChanged: 'Район: {d}',
@@ -347,6 +353,7 @@ const I18N = {
     saleLabel: 'Sale', saleLabelHalloween: 'Halloween', saleLiveLabel: 'Sale is on', saleLiveShort: 'Live',
     saleOfferAny: 'Big sale', saleStartsIn: 'starts in', saleEndsIn: 'ends in',
     units: ['d', 'h', 'min', 'sec'],
+    bfStarts: 'starts in', bfEnds: 'ends in', bfWeek: 'Deals week', bfOver: 'The sale is over',
     district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
     gateTitle: 'Choose your district', gateSub: 'Warsaw',
     districtChanged: 'District: {d}',
@@ -950,7 +957,7 @@ function renderSaleTimer(force = false) {
   if (force || key !== saleView.key) {
     saleView.key = key;
     const u = I18N[state.lang].units;
-    const emoji = THEME === 'halloween' ? '🎃' : THEME === 'newyear' ? '🎁' : '🔥';
+    const emoji = THEME === 'halloween' ? '🎃' : THEME === 'newyear' ? '🎁' : THEME === 'blackfriday' ? '🖤' : '🔥';
     const days = Math.round((end - start) / 86400000);
     const range = `<span class="nowrap">${esc(saleDay(start))}–${esc(saleDay(end - 1))}</span>`;
     const label = live
@@ -1013,6 +1020,47 @@ function renderNewYear(el, now) {
   const pad = (n) => String(n).padStart(2, '0');
   const hms = `${pad(Math.floor(left / 3600) % 24)}:${pad(Math.floor(left / 60) % 60)}:${pad(left % 60)}`;
   el.querySelector('.sale-timer-time').textContent = d ? `${d}${I18N[state.lang].units[0]} ${hms}` : hms;
+}
+
+// Black Friday: даты и крупный отсчёт в шапке, под ней — дни недели акций (главные дни подсвечены)
+const bfView = { key: '' };
+const warsaw = (loc, opts) => new Intl.DateTimeFormat(loc, { timeZone: 'Europe/Warsaw', ...opts });
+function renderBf() {
+  if (THEME !== 'blackfriday' || !SALE) return;
+  const now = Date.now(), start = Date.parse(SALE.start), end = Date.parse(SALE.end);
+  const live = now >= start, over = now >= end, loc = I18N[state.lang].locale;
+  const dayKey = (ms) => warsaw('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(ms);
+  const key = `${state.lang}|${live}|${over}|${dayKey(now)}`;
+  if (key !== bfView.key) {
+    bfView.key = key;
+    const md = warsaw(loc, { day: 'numeric', month: 'long' });
+    let range;
+    try { range = md.formatRange(start, end - 1); } catch { range = `${md.format(start)} – ${md.format(end - 1)}`; }
+    $('bfDates').textContent = range;
+    const u = I18N[state.lang].units;
+    $('bfCount').innerHTML = over ? `<div class="bf-status">${esc(t('bfOver'))}</div>` :
+      `<div class="bf-status">${esc(t(live ? 'bfEnds' : 'bfStarts'))}</div>
+       <div class="bf-digits">${u.map((x) => `<span><b>00</b><i>${esc(x)}</i></span>`).join('')}</div>`;
+    // дни недели акций
+    const wd = warsaw(loc, { weekday: 'short' }), dn = warsaw(loc, { day: 'numeric' }), today = dayKey(now);
+    let days = '';
+    for (let ms = start; ms < end; ms += 86400000) {
+      const k = dayKey(ms), label = SALE.days?.[k];
+      const cls = ['bf-day', label === 'Black Friday' && 'is-main', label === 'Cyber Monday' && 'is-cyber',
+        k === today && 'is-today', ms + 86400000 <= now && 'is-past'].filter(Boolean).join(' ');
+      days += `<div class="${cls}"><small>${esc(wd.format(ms).replace('.', ''))}</small><b>${esc(dn.format(ms))}</b></div>`;
+    }
+    const note = Object.entries(SALE.days || {}).map(([d, label]) =>
+      `<b>${esc(label)}</b> — ${esc(md.format(Date.parse(`${d}T12:00:00+01:00`)))}`).join(' · ');
+    const week = $('bfWeek');
+    week.innerHTML = `<div class="bf-week-head"><b>${esc(t('bfWeek'))}</b><span>${esc(range)}</span></div>
+      <div class="bf-days">${days}</div>${note ? `<div class="bf-week-note">${note}</div>` : ''}`;
+    week.hidden = over;
+  }
+  if (over) return;
+  const left = Math.max(0, Math.floor(((live ? end : start) - now) / 1000));
+  const parts = [Math.floor(left / 86400), Math.floor(left / 3600) % 24, Math.floor(left / 60) % 60, left % 60];
+  $('bfCount').querySelectorAll('.bf-digits b').forEach((b, i) => { b.textContent = String(parts[i]).padStart(2, '0'); });
 }
 
 /* ── Рендер: фильтры ──────────────────────────────────── */
@@ -1423,6 +1471,7 @@ function showLock(reason) {
 function renderAll() {
   safely(renderStatic);
   safely(() => renderSaleTimer(true));
+  safely(renderBf);
   safely(renderChips);
   safely(renderGrid);
   safely(renderBadges);
@@ -1959,7 +2008,7 @@ function startShop() {
   safely(mountHeroGlobe);
   refreshFromSheet();
   checkAccess();
-  if (SALE || NEW_YEAR) setInterval(() => safely(() => renderSaleTimer()), 1000);
+  if (SALE || NEW_YEAR) setInterval(() => { safely(() => renderSaleTimer()); safely(renderBf); }, 1000);
   // Telegram может долго держать магазин открытым — при возвращении в него обновим цены
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && Date.now() - catalogInfo.checkedAt > 2 * 60 * 1000) refreshFromSheet();
