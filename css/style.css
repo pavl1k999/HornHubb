@@ -78,38 +78,53 @@
 
 /* ── Тема «Black Friday» ───────────────────────────────
    Включается атрибутом data-theme="blackfriday" (сейчас — скриптом в index.html по дате, до 1 декабря).
-   Чёрный, белый и красный; в шапке — носорог в красном свете и отсчёт до старта/конца недели акций. */
+   Чёрно-белая: цвет остаётся только на фото товаров. В шапке — носорог в живом свете прожекторов. */
 :root[data-theme="blackfriday"] {
-  --bg: #050505;
-  --bg-rgb: 5, 5, 5;
-  --bg-elev: #0e0e0e;
-  --surface: #131313;
-  --surface-2: #1b1b1b;
-  --surface-3: #272727;
-  --line: rgba(255, 255, 255, .08);
-  --line-2: rgba(255, 255, 255, .15);
+  --bg: #000000;
+  --bg-rgb: 0, 0, 0;
+  --bg-elev: #0b0b0b;
+  --surface: #101010;
+  --surface-2: #181818;
+  --surface-3: #262626;
+  --line: rgba(255, 255, 255, .09);
+  --line-2: rgba(255, 255, 255, .18);
   --text: #ffffff;
-  --text-2: #d6d6d6;
-  --muted: #8c8c8c;
-  --violet: #ff2020;            /* красный Black Friday */
+  --text-2: #d2d2d2;
+  --muted: #858585;
+  --violet: #ffffff;            /* акцент — белый */
   --pink: #ffffff;
-  --green: #4ade80;
-  --red: #ff5050;
-  --accent-rgb: 255, 32, 32;
+  --green: #ffffff;
+  --red: #ff6b6b;               /* только для ошибок */
+  --accent-rgb: 255, 255, 255;
   --accent2-rgb: 255, 255, 255;
-  --glow-rgb: 255, 30, 30;
-  --accent-soft: #ff6b6b;
-  --accent-ink: #b8000f;
-  --grad: linear-gradient(135deg, #ff5a4f 0%, #ff2020 50%, #c3000f 100%);
+  --glow-rgb: 255, 255, 255;
+  --accent-soft: #ffffff;
+  --accent-ink: #000000;
+  --grad: linear-gradient(135deg, #ffffff 0%, #dedede 100%);
+  --glow: 0 6px 22px rgba(255, 255, 255, .1);
   --banner: none;
-  --banner-ratio: 4 / 3;
+  --banner-ratio: 4 / 5;
   --banner-pos: center;
 }
-[data-theme="blackfriday"] body {
-  background: radial-gradient(800px 420px at 90% -10%, rgba(255, 30, 30, .14), transparent 60%), var(--bg);
-  background-attachment: fixed;
+[data-theme="blackfriday"] body { background: var(--bg); }
+/* на белых кнопках и значках текст чёрный */
+[data-theme="blackfriday"] :is(.btn-primary, .chips:not(.chips-sm) .chip.is-active, .segmented button.is-active,
+  .badge-accent, .tag-sale, .cart-bar) { color: #000; }
+[data-theme="blackfriday"] :is(.tag-sale, .chips:not(.chips-sm) .chip.is-active) { box-shadow: none; }
+[data-theme="blackfriday"] .logo span, [data-theme="blackfriday"] .footer-logo span { background: none; color: var(--muted); }
+[data-theme="blackfriday"] .cart-bar { box-shadow: 0 14px 34px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .5); }
+[data-theme="blackfriday"] .cart-bar-icon { background: rgba(0, 0, 0, .08); }
+[data-theme="blackfriday"] .cart-bar-qty { background: #000; color: #fff; }
+[data-theme="blackfriday"] .cart-bar-cta { background: #000; color: #fff; }
+[data-theme="blackfriday"] .save-pill { background: rgba(255, 255, 255, .1); }
+[data-theme="blackfriday"] .stock::before, [data-theme="blackfriday"] .sale-timer.is-live .sale-timer-label::before { box-shadow: none; }
+/* строка акции под шапкой: тонкая рамка, без значка */
+[data-theme="blackfriday"] .sale-timer {
+  grid-template-columns: minmax(0, 1fr) auto; padding: 12px 14px;
+  background: none; border: 1px solid var(--line-2); border-radius: 14px; box-shadow: none;
 }
-[data-theme="blackfriday"] .topbar { border-bottom-color: rgba(255, 40, 40, .32); }
+[data-theme="blackfriday"] .sale-timer-emoji { display: none; }
+[data-theme="blackfriday"] .sale-timer-label { color: var(--muted); }
 
 /* ── Тема «Новый год» ──────────────────────────────────
    Включается атрибутом data-theme="newyear" у <html> в index.html.
@@ -277,88 +292,62 @@ img { display: block; max-width: 100%; }
   pointer-events: none;
 }
 
-/* ── Black Friday: шапка ── */
-.bf-hero, .bf-week { display: none; }
+/* ── Black Friday: шапка — надпись позади, носорог в живом свете (js/app.js рисует свет на холсте) ── */
+.bf-hero { display: none; }
 [data-theme="blackfriday"] .hero {
-  background: radial-gradient(70% 95% at 76% 46%, rgba(255, 25, 25, .26), transparent 70%), #070707;
+  background: radial-gradient(60% 46% at 50% 62%, rgba(255, 255, 255, .07), transparent 72%), #000;
+  box-shadow: none; border: 1px solid var(--line);
 }
 [data-theme="blackfriday"] .hero::after { display: none; }
-[data-theme="blackfriday"] .bf-hero { display: block; position: absolute; inset: 0; z-index: 1; overflow: hidden; }
-.bf-rhino {
-  position: absolute; right: -6%; bottom: 0; height: 108%; width: auto;
-  /* края картинки растворяются в фоне — без видимого прямоугольника */
-  -webkit-mask-image: radial-gradient(closest-side ellipse at 50% 46%, #000 74%, transparent 100%);
-          mask-image: radial-gradient(closest-side ellipse at 50% 46%, #000 74%, transparent 100%);
+[data-theme="blackfriday"] .bf-hero {
+  display: block; position: absolute; inset: 0; z-index: 1; overflow: hidden;
+  touch-action: pan-y; -webkit-user-select: none; user-select: none; cursor: grab;
+  --lx: 50%;                          /* где сейчас свет (ставит js) — им подсвечивается надпись */
+}
+/* надпись во всю ширину (размер шрифта подгоняет js), носорог стоит перед ней */
+.bf-words { position: absolute; top: 14px; left: 12px; right: 12px; display: flex; flex-direction: column; gap: 4px; }
+.bf-word {
+  font: 800 60px/.84 var(--font-display); letter-spacing: -.02em; text-align: center; white-space: nowrap;
+  color: #fff;
+  animation: bf-word-in .9s var(--ease) both;
+  transition: none !important;        /* размер шрифта ставит js — он должен применяться сразу */
+}
+.bf-word span { display: inline-block; }
+.bf-word-2 {
+  position: relative; animation-delay: .12s;
+  /* контурные буквы: обводка рисуется под чёрной заливкой — без лишних линий внутри букв */
+  color: #000; -webkit-text-stroke: 3px rgba(255, 255, 255, .9); paint-order: stroke fill;
+}
+/* контур слегка заливается светом там, где сейчас прожектор */
+.bf-word-2::after {
+  content: attr(data-text); position: absolute; inset: 0;
+  -webkit-text-stroke: 0; color: transparent;
+  background: radial-gradient(circle at var(--lx) 50%, rgba(255, 255, 255, .42), rgba(255, 255, 255, 0) 36%);
+  -webkit-background-clip: text; background-clip: text;
+}
+@keyframes bf-word-in { from { opacity: 0; transform: translateY(14px); } }
+.bf-stage {
+  position: absolute; bottom: 0; left: 50%; height: 88%; aspect-ratio: 3 / 4;
+  transform: translateX(-50%);
   pointer-events: none;
 }
-.bf-text {
-  position: absolute; left: 16px; top: 12px; bottom: 46px;
-  display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
-  max-width: 62%;
+.bf-canvas, .bf-poster { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.bf-poster { opacity: 0; transition: opacity .6s; }
+.bf-hero.is-poster .bf-poster { opacity: 1; }       /* без анимации — готовая картинка */
+.bf-hint {
+  position: absolute; left: 0; right: 0; bottom: 9px; z-index: 3;
+  text-align: center; pointer-events: none;
+  color: rgba(255, 255, 255, .5); font: 600 10.5px/1.2 var(--font); letter-spacing: .04em;
+  opacity: 0; transition: opacity .8s 1.2s;
 }
-.bf-kicker { font: 700 10px/1 var(--font); letter-spacing: .22em; color: #ff5a5a; text-transform: uppercase; }
-.bf-title {
-  margin-top: 8px;
-  font: 800 clamp(30px, 9.6vw, 88px)/.92 var(--font-display);
-  letter-spacing: -.01em; color: #fff;
-}
-.bf-title span { display: block; color: transparent; -webkit-text-stroke: 1.5px #fff; }
-.bf-dates {
-  margin-top: 10px; padding: 5px 9px;
-  background: #ff2020; color: #000;
-  font: 800 11px/1 var(--font); letter-spacing: .08em; text-transform: uppercase;
-}
-.bf-count { margin-top: 12px; }
-.bf-status { font: 700 9.5px/1 var(--font); letter-spacing: .18em; color: #a3a3a3; text-transform: uppercase; }
-.bf-digits { margin-top: 6px; display: flex; gap: 5px; }
-.bf-digits span {
-  min-width: 40px; padding: 6px 4px 5px;
-  display: flex; flex-direction: column; align-items: center;
-  background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .14); border-radius: 8px;
-  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-}
-.bf-digits b { font: 800 18px/1 var(--font-display); font-variant-numeric: tabular-nums; color: #fff; }
-.bf-digits i { margin-top: 3px; font: 600 8.5px/1 var(--font); font-style: normal; color: #a3a3a3; text-transform: uppercase; letter-spacing: .06em; }
-.bf-tape {
-  position: absolute; left: -8%; right: -8%; bottom: 12px; height: 24px;
-  display: flex; align-items: center; overflow: hidden;
-  background: #ff2020; transform: rotate(-3deg);
-  box-shadow: 0 6px 22px rgba(255, 30, 30, .35);
-}
-.bf-tape-track {
-  white-space: nowrap; flex: none;
-  font: 800 11px/1 var(--font-display); letter-spacing: .14em; color: #000;
-  animation: bf-tape 22s linear infinite;
-}
-@keyframes bf-tape { to { transform: translateX(-50%); } }
-/* дни недели акций */
-[data-theme="blackfriday"] .bf-week:not([hidden]) { display: block; margin: 12px 12px 0; }
-.bf-week-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-.bf-week-head b { font: 800 13px/1 var(--font-display); letter-spacing: .04em; text-transform: uppercase; }
-.bf-week-head span { color: var(--muted); font: 600 11px/1 var(--font); }
-.bf-days { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 5px; }
-.bf-day {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  padding: 8px 0 7px;
-  border-radius: 10px; background: var(--surface); border: 1px solid var(--line);
-}
-.bf-day small { font: 700 9px/1 var(--font); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-.bf-day b { font: 800 15px/1 var(--font-display); }
-.bf-day.is-cyber { border-color: #ff2020; }
-.bf-day.is-main { background: #ff2020; border-color: #ff2020; box-shadow: 0 6px 18px rgba(255, 30, 30, .35); }
-.bf-day.is-main small, .bf-day.is-main b { color: #000; }
-.bf-day.is-past { opacity: .35; }
-.bf-day.is-today { outline: 2px solid #fff; outline-offset: 1px; }
-.bf-week-note { margin-top: 8px; color: var(--text-2); font: 600 11.5px/1.35 var(--font); text-align: center; }
-.bf-week-note b { color: #ff5a5a; }
-/* отсчёт — в шапке, отдельный блок таймера не нужен */
-[data-theme="blackfriday"] .sale-timer { display: none !important; }
-/* экран техобслуживания: носорог в красном свете */
-[data-theme="blackfriday"] .maint-banner {
-  aspect-ratio: 4 / 3;
-  background: url('../images/blackfriday/rhino.webp') center 22% / auto 150% no-repeat,
-    radial-gradient(70% 90% at 50% 40%, rgba(255, 25, 25, .3), transparent 70%), #070707;
-}
+.bf-hero.is-live .bf-hint { opacity: 1; }
+/* экран техобслуживания: тот же носорог */
+[data-theme="blackfriday"] .maint-banner { aspect-ratio: 4 / 5; background: radial-gradient(60% 46% at 50% 62%, rgba(255, 255, 255, .07), transparent 72%), #000; }
+[data-theme="blackfriday"] .maint-banner::after { z-index: 3; pointer-events: none; background: linear-gradient(to bottom, transparent 84%, var(--bg-elev)); }
+[data-theme="blackfriday"] .maint-banner .bf-hint { z-index: 4; }
+[data-theme="blackfriday"] .maint-icon { display: none; }
+[data-theme="blackfriday"] .maint-body { padding-top: 4px; }
+[data-theme="blackfriday"] .maint-card { box-shadow: none; }
 
 /* ── Новый год: 3D-снежный шар во всю шапку ── */
 .ny-hero { display: none; }
@@ -1360,12 +1349,11 @@ body.has-bar .toast { bottom: calc(84px + var(--safe-bottom)); }
   .hero { margin: 16px 12px 0; border-radius: 26px; aspect-ratio: auto; height: clamp(240px, 30vw, 340px); }
   [data-theme="halloween"] .hero { height: clamp(280px, 38vw, 440px); }
   [data-theme="newyear"] .hero { aspect-ratio: auto; height: clamp(260px, 32vw, 400px); }
-  [data-theme="blackfriday"] .hero { aspect-ratio: auto; height: clamp(280px, 34vw, 420px); }
-  [data-theme="blackfriday"] .bf-text { left: 6%; }
-  [data-theme="blackfriday"] .bf-rhino { right: 8%; }
-  .bf-digits span { min-width: 58px; padding: 9px 6px 7px; }
-  .bf-digits b { font-size: 26px; }
-  .bf-week-note { text-align: left; }
+  [data-theme="blackfriday"] .hero { aspect-ratio: auto; height: clamp(300px, 36vw, 440px); }
+  /* на широком экране слова стоят по сторонам от носорога */
+  .hero .bf-words { top: 0; bottom: 0; left: 4%; right: 4%; flex-direction: row; justify-content: space-between; align-items: center; }
+  .hero .bf-word { width: 41%; }
+  .hero .bf-stage { height: 96%; }
   [data-theme="newyear"] .ny-text { padding-left: 7%; }
   [data-theme="newyear"] .ny-hero { --gx: 72%; }
   .sheet { bottom: 20px; border-radius: 26px; border-bottom: 1px solid var(--line); }

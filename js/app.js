@@ -35,19 +35,16 @@ const SUBSCRIBERS_URL = 'https://script.google.com/macros/s/AKfycbyJ76zkKy6f6FXx
 // Новый район — просто допишите название в список.
 const DISTRICTS = ['Bemowo', 'Ożarów'];
 
-// Неделя акций (время по Варшаве). До старта — отсчёт «до старта», во время — «до конца», потом исчезает.
-// В теме Black Friday отсчёт крупно в шапке, под ней — дни недели акций; в других темах — блок таймера.
-// Убрать акцию: const SALE = null;
+// Неделя акций (время по Варшаве). Строка под шапкой: до старта — «до старта …», во время — «до конца …»,
+// после окончания исчезает сама. Убрать акцию: const SALE = null;
 const SALE = {
   start: '2026-11-23T00:00:00+01:00', // понедельник 23 ноября, 00:00
   end:   '2026-12-01T00:00:00+01:00', // конец 30 ноября (Cyber Monday) — с 1 декабря включается Новый год
-  title: { ru: 'Black Friday Week', ua: 'Black Friday Week', en: 'Black Friday Week' },
+  title: { ru: 'Неделя Black Friday', ua: 'Тиждень Black Friday', en: 'Black Friday Week' },
   // Цены на время акции по категориям — во всех районах, включаются и выключаются сами.
   // Например: liquid: 30 (все жидкости по 30 zł) или по районам: liquid: { 'Bemowo': 30, 'Ożarów': 35 }.
   // Пока пусто — цены обычные.
   prices: {},
-  // Главные дни недели (подсвечиваются в полоске дней)
-  days: { '2026-11-27': 'Black Friday', '2026-11-30': 'Cyber Monday' },
 };
 
 // Отсчёт до Нового года на месте таймера, когда акции нет (время по Варшаве).
@@ -269,7 +266,7 @@ const I18N = {
     saleLabel: 'Распродажа', saleLabelHalloween: 'Хэллоуин', saleLiveLabel: 'Распродажа идёт', saleLiveShort: 'Идёт',
     saleOfferAny: 'Большая распродажа', saleStartsIn: 'до старта', saleEndsIn: 'до конца',
     units: ['д', 'ч', 'мин', 'сек'],
-    bfStarts: 'до старта', bfEnds: 'до конца', bfWeek: 'Неделя акций', bfOver: 'Акция завершена',
+    bfHint: 'Веди пальцем — двигай свет · нажми — вспышка',
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Выберите район, чтобы оформить заказ',
     gateTitle: 'Выберите ваш район', gateSub: 'Варшава',
     districtChanged: 'Район: {d}',
@@ -311,7 +308,7 @@ const I18N = {
     saleLabel: 'Розпродаж', saleLabelHalloween: 'Хелловін', saleLiveLabel: 'Розпродаж триває', saleLiveShort: 'Триває',
     saleOfferAny: 'Великий розпродаж', saleStartsIn: 'до старту', saleEndsIn: 'до кінця',
     units: ['д', 'год', 'хв', 'сек'],
-    bfStarts: 'до старту', bfEnds: 'до кінця', bfWeek: 'Тиждень акцій', bfOver: 'Акцію завершено',
+    bfHint: 'Веди пальцем — рухай світло · натисни — спалах',
     district: 'Район', districtTitle: 'Район доставки', districtRequired: 'Оберіть район, щоб оформити замовлення',
     gateTitle: 'Оберіть ваш район', gateSub: 'Варшава',
     districtChanged: 'Район: {d}',
@@ -353,7 +350,7 @@ const I18N = {
     saleLabel: 'Sale', saleLabelHalloween: 'Halloween', saleLiveLabel: 'Sale is on', saleLiveShort: 'Live',
     saleOfferAny: 'Big sale', saleStartsIn: 'starts in', saleEndsIn: 'ends in',
     units: ['d', 'h', 'min', 'sec'],
-    bfStarts: 'starts in', bfEnds: 'ends in', bfWeek: 'Deals week', bfOver: 'The sale is over',
+    bfHint: 'Drag to move the light · tap for a flash',
     district: 'District', districtTitle: 'Delivery district', districtRequired: 'Choose a district to place the order',
     gateTitle: 'Choose your district', gateSub: 'Warsaw',
     districtChanged: 'District: {d}',
@@ -957,7 +954,7 @@ function renderSaleTimer(force = false) {
   if (force || key !== saleView.key) {
     saleView.key = key;
     const u = I18N[state.lang].units;
-    const emoji = THEME === 'halloween' ? '🎃' : THEME === 'newyear' ? '🎁' : THEME === 'blackfriday' ? '🖤' : '🔥';
+    const emoji = THEME === 'halloween' ? '🎃' : THEME === 'newyear' ? '🎁' : '🔥';
     const days = Math.round((end - start) / 86400000);
     const range = `<span class="nowrap">${esc(saleDay(start))}–${esc(saleDay(end - 1))}</span>`;
     const label = live
@@ -1020,47 +1017,6 @@ function renderNewYear(el, now) {
   const pad = (n) => String(n).padStart(2, '0');
   const hms = `${pad(Math.floor(left / 3600) % 24)}:${pad(Math.floor(left / 60) % 60)}:${pad(left % 60)}`;
   el.querySelector('.sale-timer-time').textContent = d ? `${d}${I18N[state.lang].units[0]} ${hms}` : hms;
-}
-
-// Black Friday: даты и крупный отсчёт в шапке, под ней — дни недели акций (главные дни подсвечены)
-const bfView = { key: '' };
-const warsaw = (loc, opts) => new Intl.DateTimeFormat(loc, { timeZone: 'Europe/Warsaw', ...opts });
-function renderBf() {
-  if (THEME !== 'blackfriday' || !SALE) return;
-  const now = Date.now(), start = Date.parse(SALE.start), end = Date.parse(SALE.end);
-  const live = now >= start, over = now >= end, loc = I18N[state.lang].locale;
-  const dayKey = (ms) => warsaw('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(ms);
-  const key = `${state.lang}|${live}|${over}|${dayKey(now)}`;
-  if (key !== bfView.key) {
-    bfView.key = key;
-    const md = warsaw(loc, { day: 'numeric', month: 'long' });
-    let range;
-    try { range = md.formatRange(start, end - 1); } catch { range = `${md.format(start)} – ${md.format(end - 1)}`; }
-    $('bfDates').textContent = range;
-    const u = I18N[state.lang].units;
-    $('bfCount').innerHTML = over ? `<div class="bf-status">${esc(t('bfOver'))}</div>` :
-      `<div class="bf-status">${esc(t(live ? 'bfEnds' : 'bfStarts'))}</div>
-       <div class="bf-digits">${u.map((x) => `<span><b>00</b><i>${esc(x)}</i></span>`).join('')}</div>`;
-    // дни недели акций
-    const wd = warsaw(loc, { weekday: 'short' }), dn = warsaw(loc, { day: 'numeric' }), today = dayKey(now);
-    let days = '';
-    for (let ms = start; ms < end; ms += 86400000) {
-      const k = dayKey(ms), label = SALE.days?.[k];
-      const cls = ['bf-day', label === 'Black Friday' && 'is-main', label === 'Cyber Monday' && 'is-cyber',
-        k === today && 'is-today', ms + 86400000 <= now && 'is-past'].filter(Boolean).join(' ');
-      days += `<div class="${cls}"><small>${esc(wd.format(ms).replace('.', ''))}</small><b>${esc(dn.format(ms))}</b></div>`;
-    }
-    const note = Object.entries(SALE.days || {}).map(([d, label]) =>
-      `<b>${esc(label)}</b> — ${esc(md.format(Date.parse(`${d}T12:00:00+01:00`)))}`).join(' · ');
-    const week = $('bfWeek');
-    week.innerHTML = `<div class="bf-week-head"><b>${esc(t('bfWeek'))}</b><span>${esc(range)}</span></div>
-      <div class="bf-days">${days}</div>${note ? `<div class="bf-week-note">${note}</div>` : ''}`;
-    week.hidden = over;
-  }
-  if (over) return;
-  const left = Math.max(0, Math.floor(((live ? end : start) - now) / 1000));
-  const parts = [Math.floor(left / 86400), Math.floor(left / 3600) % 24, Math.floor(left / 60) % 60, left % 60];
-  $('bfCount').querySelectorAll('.bf-digits b').forEach((b, i) => { b.textContent = String(parts[i]).padStart(2, '0'); });
 }
 
 /* ── Рендер: фильтры ──────────────────────────────────── */
@@ -1404,6 +1360,159 @@ function mountMaintGlobe() {
   mountGlobe(box, { live: box?.parentElement, hint: $('maintHint'), gx: () => 0.5 });
 }
 
+/* ── Black Friday: живой свет ───────────────────────────────
+   Носорог отрендерен в Blender слоями — по одному на каждый прожектор (tools/blackfriday).
+   Здесь слои складываются на холсте с разным весом: прожекторы включаются по очереди, потом свет
+   ходит по дуге за спиной. Пальцем свет можно вести, нажатие — вспышка. Фон холста прозрачный,
+   а силуэт непрозрачный — поэтому надпись позади перекрывается фигурой. */
+const BF_ARC = 7; // прожекторов по дуге за спиной: arc0 (слева) … arc6 (справа)
+
+// надпись «BLACK FRIDAY» — точно по ширине своего блока: текущий размер шрифта × (ширина блока / ширина слова)
+function fitBfWords(root) {
+  root.querySelectorAll('.bf-word').forEach((el) => {
+    const size = parseFloat(getComputedStyle(el).fontSize);
+    const w = el.firstElementChild.getBoundingClientRect().width;
+    if (size > 0 && w > 0 && el.clientWidth > 0) el.style.fontSize = `${(size * el.clientWidth / w).toFixed(2)}px`;
+  });
+}
+
+function mountBf(root) {
+  if (THEME !== 'blackfriday' || !root) return;
+  const stage = root.querySelector('.bf-stage');
+  const fit = () => safely(() => fitBfWords(root));
+  fit();
+  document.fonts?.ready.then(fit);
+  addEventListener('resize', fit);
+  // без анимации (или если слои не загрузились) — готовая картинка
+  const usePoster = () => {
+    root.querySelector('.bf-poster').src = `images/blackfriday/poster.webp${ASSET_V}`;
+    root.classList.add('is-poster');
+  };
+  if (reducedMotion()) { usePoster(); return; }
+
+  const names = ['matte', ...Array.from({ length: BF_ARC }, (_, i) => `arc${i}`), 'key', 'top'];
+  const load = (name) => new Promise((res, rej) => {
+    const im = new Image();
+    im.onload = () => res(im); im.onerror = rej;
+    im.src = `images/blackfriday/${name}.webp${ASSET_V}`;
+  });
+  Promise.all(names.map(load)).then((imgs) => {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const w = Math.min(imgs[0].naturalWidth, Math.ceil((stage.clientWidth || 320) * dpr));
+    const h = Math.round(w * imgs[0].naturalHeight / imgs[0].naturalWidth);
+    // чёрно-белый слой → картинка, где яркость стала прозрачностью: свет складывается, фон остаётся прозрачным
+    const asLight = (im, shade) => {
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.drawImage(im, 0, 0, w, h);
+      const d = g.getImageData(0, 0, w, h), p = d.data;
+      for (let i = 0; i < p.length; i += 4) { p[i + 3] = p[i]; p[i] = p[i + 1] = p[i + 2] = shade; }
+      g.putImageData(d, 0, 0);
+      return c;
+    };
+    // готовые слои отдаём видеокарте (ImageBitmap) — так холст рисует их каждый кадр без лишней пересылки
+    const toGpu = (c) => (window.createImageBitmap ? createImageBitmap(c).then((b) => { c.width = c.height = 0; return b; }, () => c) : c);
+    return Promise.all(imgs.map((im, i) => toGpu(asLight(im, i ? 255 : 0)))).then(([matte, ...layers]) => ({ w, h, matte, layers }));
+  }).then(({ w, h, matte, layers }) => {
+    // matte — чёрный силуэт, layers — свет
+    const KEY = BF_ARC, TOP = BF_ARC + 1;
+    const canvas = document.createElement('canvas');
+    canvas.className = 'bf-canvas'; canvas.width = w; canvas.height = h;
+    stage.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    const weights = new Float32Array(layers.length);
+
+    const smooth = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
+    // лампа включается в момент t0: пара коротких вспышек, потом ровный свет
+    const lampOn = (s, t0) => {
+      const x = s - t0;
+      if (x < 0) return 0;
+      if (x < 0.05) return 0.9;
+      if (x < 0.11) return 0.05;
+      if (x < 0.15) return 0.7;
+      if (x < 0.21) return 0.15;
+      return Math.min(1, 0.4 + (x - 0.21) / 0.25 * 0.6);
+    };
+    const INTRO = 1.9, BLEND = 1.3;        // с: вступление и переход к ровному свету
+    const SWING = 2.2;                     // сам свет ходит между контровыми прожекторами; до краёв его доводит палец
+    let theta = 2, psi = Math.asin((2 - 3) / SWING); // где свет на дуге (0…6) и фаза его хода
+    let flashAt = -10, lastLx = -1;
+    const drag = { on: false, moved: false, x0: 0, target: 3 };
+
+    const frame = (s, dt) => {
+      if (drag.on && drag.moved) theta += (drag.target - theta) * Math.min(1, dt * 12);
+      else if (s > INTRO) { psi += dt * 0.42; theta += (3 + SWING * Math.sin(psi) - theta) * Math.min(1, dt * 3); }
+      for (let i = 0; i < BF_ARC; i++) {
+        const main = Math.max(0, 1 - Math.abs(theta - i) / 1.2);
+        const ghost = Math.max(0, 1 - Math.abs(BF_ARC - 1 - theta - i) / 1.2); // слабый свет с другой стороны — контур
+        weights[i] = main + ghost * 0.35;
+      }
+      weights[KEY] = 0.14;
+      weights[TOP] = 0.62 + 0.08 * Math.sin(s * 0.8);
+      const k = smooth((s - INTRO) / BLEND);
+      if (k < 1) {                          // вступление: левый контур, правый контур, луч сверху
+        for (let i = 0; i < weights.length; i++) {
+          const intro = i === 2 ? lampOn(s, 0.4) : i === 4 ? lampOn(s, 0.8) : i === TOP ? 0.62 * lampOn(s, 1.2) : 0;
+          weights[i] = intro + (weights[i] - intro) * k;
+        }
+      }
+      const f = s >= flashAt ? Math.exp(-(s - flashAt) / 0.2) : 0; // вспышка: на миг виден весь носорог
+      if (f > 0.01) {
+        weights[KEY] += 1.5 * f; weights[TOP] += 0.4 * f;
+        for (let i = 0; i < BF_ARC; i++) weights[i] += 0.35 * f;
+      }
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(matte, 0, 0);
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < layers.length; i++) {
+        for (let a = weights[i]; a > 0.004; a -= 1) { ctx.globalAlpha = Math.min(1, a); ctx.drawImage(layers[i], 0, 0); }
+      }
+      const lx = Math.round(theta / (BF_ARC - 1) * 100); // подсветка надписи там же, где свет
+      if (lx !== lastLx) { lastLx = lx; root.style.setProperty('--lx', `${lx}%`); }
+    };
+
+    // пальцем по шапке — вести свет, нажатие — вспышка
+    const toTheta = (e) => {
+      const r = root.getBoundingClientRect();
+      return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * (BF_ARC - 1);
+    };
+    root.addEventListener('pointerdown', (e) => { drag.on = true; drag.moved = false; drag.x0 = e.clientX; });
+    root.addEventListener('pointermove', (e) => {
+      if (!drag.on) return;
+      if (Math.abs(e.clientX - drag.x0) > 6) drag.moved = true;
+      if (drag.moved) drag.target = toTheta(e);
+    });
+    const release = (tap) => {
+      if (!drag.on) return;
+      drag.on = false;
+      if (drag.moved) psi = Math.asin(Math.min(1, Math.max(-1, (theta - 3) / SWING))); // свет продолжает ход с того же места
+      else if (tap) { flashAt = clock; haptic.tap(); }
+    };
+    root.addEventListener('pointerup', () => release(true));
+    root.addEventListener('pointercancel', () => release(false));
+    root.addEventListener('pointerleave', () => release(false));
+
+    // рисуем только когда шапка видна, не чаще 30 кадров в секунду
+    let raf = 0, last = 0, clock = 0, visible = true;
+    const loop = (now) => {
+      raf = 0;
+      if (!visible || document.hidden) return;
+      raf = requestAnimationFrame(loop);
+      if (last && now - last < 1000 / 31) return;
+      const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
+      last = now; clock += dt;
+      frame(clock, dt);
+    };
+    const wake = () => { if (!raf && visible && !document.hidden) { last = 0; raf = requestAnimationFrame(loop); } };
+    if ('IntersectionObserver' in window) new IntersectionObserver(([en]) => { visible = en.isIntersecting; wake(); }).observe(root);
+    document.addEventListener('visibilitychange', wake);
+    root.classList.add('is-live');
+    wake();
+  }).catch(usePoster);
+}
+
 // Падающий снег поверх витрины — лёгкий, на CSS
 function makeSnowfall() {
   const box = $('snowfall');
@@ -1471,7 +1580,6 @@ function showLock(reason) {
 function renderAll() {
   safely(renderStatic);
   safely(() => renderSaleTimer(true));
-  safely(renderBf);
   safely(renderChips);
   safely(renderGrid);
   safely(renderBadges);
@@ -2006,9 +2114,10 @@ function startShop() {
   safely(initTelegram);
   renderAll();
   safely(mountHeroGlobe);
+  safely(() => mountBf(document.querySelector('#shopView .bf-hero')));
   refreshFromSheet();
   checkAccess();
-  if (SALE || NEW_YEAR) setInterval(() => { safely(() => renderSaleTimer()); safely(renderBf); }, 1000);
+  if (SALE || NEW_YEAR) setInterval(() => safely(() => renderSaleTimer()), 1000);
   // Telegram может долго держать магазин открытым — при возвращении в него обновим цены
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && Date.now() - catalogInfo.checkedAt > 2 * 60 * 1000) refreshFromSheet();
@@ -2039,6 +2148,7 @@ if (lock) {
   // Магазин закрыт для этого покупателя — сам магазин не запускаем
   safely(initTelegram);
   safely(() => showLock(lock));
+  safely(() => mountBf(document.querySelector('#maintenance .bf-hero')));
   checkAccess(); // отметить в списке и снять блокировку, если её убрали в таблице
 } else if (MAINTENANCE && !IS_OWNER) {
   // Магазин закрыт: работает только экран техобслуживания, сам магазин не запускаем.
@@ -2046,6 +2156,7 @@ if (lock) {
   safely(initTelegram);
   safely(renderMaintenance);
   safely(mountMaintGlobe);
+  safely(() => mountBf(document.querySelector('#maintenance .bf-hero')));
   checkAccess();
 } else {
   if (MAINTENANCE) {

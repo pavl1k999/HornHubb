@@ -24,7 +24,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
   <!-- ?v= — версия файлов: меняйте её, когда меняете вместе index.html и js/css,
        иначе Telegram может взять старый файл из кэша -->
-  <link rel="stylesheet" href="css/style.css?v=2026-11-09-1">
+  <link rel="stylesheet" href="css/style.css?v=2026-11-11-1">
 </head>
 <body>
 
@@ -71,6 +71,15 @@
     <div class="maint-banner" role="img" aria-label="HORN HUB">
       <!-- Новый год: живой снежный шар (js/globe.js) — нажать, покрутить пальцем -->
       <div class="maint-stage" id="maintGlobe"></div>
+      <!-- Black Friday: тот же носорог в живом свете -->
+      <div class="bf-hero" aria-hidden="true">
+        <div class="bf-words">
+          <div class="bf-word bf-word-1"><span>BLACK</span></div>
+          <div class="bf-word bf-word-2" data-text="FRIDAY"><span>FRIDAY</span></div>
+        </div>
+        <div class="bf-stage"><img class="bf-poster" alt=""></div>
+        <div class="bf-hint" data-i18n="bfHint">Веди пальцем — двигай свет · нажми — вспышка</div>
+      </div>
       <div class="maint-hint" id="maintHint" data-i18n="globeHint" hidden>Нажми на шарик ❄</div>
     </div>
     <div class="maint-icon" aria-hidden="true"><svg class="ic"><use href="#i-wrench"/></svg></div>
@@ -133,16 +142,14 @@
           <div class="ny-hint" id="globeHint" data-i18n="globeHint" hidden>Нажми на шарик ❄</div>
         </div>
       </div>
-      <!-- Black Friday: носорог в красном свете, крупный отсчёт до старта/конца недели акций, бегущая лента -->
+      <!-- Black Friday: надпись позади, носорог в живом свете прожекторов (свет рисует js/app.js) -->
       <div class="bf-hero" aria-hidden="true">
-        <img class="bf-rhino" src="images/blackfriday/rhino.webp" alt="" decoding="async">
-        <div class="bf-text">
-          <div class="bf-kicker">HORN HUB · BLACK WEEK</div>
-          <div class="bf-title">BLACK<span>FRIDAY</span></div>
-          <div class="bf-dates" id="bfDates">23–30 ноября</div>
-          <div class="bf-count" id="bfCount"></div>
+        <div class="bf-words">
+          <div class="bf-word bf-word-1"><span>BLACK</span></div>
+          <div class="bf-word bf-word-2" data-text="FRIDAY"><span>FRIDAY</span></div>
         </div>
-        <div class="bf-tape"><div class="bf-tape-track">BLACK FRIDAY ✕ HORN HUB ✕ BLACK WEEK ✕ BLACK FRIDAY ✕ HORN HUB ✕ BLACK WEEK ✕ BLACK FRIDAY ✕ HORN HUB ✕ BLACK WEEK ✕ BLACK FRIDAY ✕ HORN HUB ✕ BLACK WEEK ✕&nbsp;</div></div>
+        <div class="bf-stage"><img class="bf-poster" alt=""></div>
+        <div class="bf-hint" data-i18n="bfHint">Веди пальцем — двигай свет · нажми — вспышка</div>
       </div>
       <div class="bats" aria-hidden="true">
         <span class="bat"><svg viewBox="0 0 64 28"><use href="#i-bat"/></svg></span>
@@ -160,8 +167,6 @@
     </div>
 
     <div class="sale-timer" id="saleTimer" hidden></div>
-    <!-- Black Friday: дни недели акций (заполняет js/app.js) -->
-    <div class="bf-week" id="bfWeek" hidden></div>
 
     <div id="listAnchor"></div>
     <div class="filters" id="filters">
@@ -375,6 +380,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="js/app.js?v=2026-11-09-1"></script>
+<script src="js/app.js?v=2026-11-11-1"></script>
 </body>
 </html>
