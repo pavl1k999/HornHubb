@@ -1,117 +1,385 @@
 <!DOCTYPE html>
-<html lang="ru">
+<!-- data-maintenance — магазин закрыт на техобслуживание (виден только экран-заглушка).
+     Открыть магазин: удалите data-maintenance, останется <html lang="ru" data-theme="newyear">.
+     data-theme — сезонное оформление: blackfriday (Black Friday), newyear (Новый год), halloween (Хэллоуин),
+     без атрибута — обычное. Сейчас тему выбирает скрипт ниже по дате. -->
+<html lang="ru" data-theme="newyear" data-maintenance>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vape Shop — Premium</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070b14">
+  <script>
+    /* Сезонное оформление по дате (время по Варшаве): до 1 декабря — Black Friday, с 1 декабря — Новый год.
+       Чтобы поставить тему вручную — удалите этот скрипт, тема возьмётся из data-theme у <html>. */
+    (function () {
+      var t = Date.now() < Date.parse('2026-12-01T00:00:00+01:00') ? 'blackfriday' : 'newyear';
+      document.documentElement.setAttribute('data-theme', t);
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', t === 'blackfriday' ? '#050505' : '#070b14');
+    })();
+  </script>
+  <meta name="format-detection" content="telephone=no">
+  <title>HORN HUB — Vape Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
+  <!-- ?v= — версия файлов: меняйте её, когда меняете вместе index.html и js/css,
+       иначе Telegram может взять старый файл из кэша -->
+  <link rel="stylesheet" href="css/style.css?v=2026-11-11-1">
 </head>
 <body>
 
-<div id="orderModal" class="order-modal hidden">
-  <div class="order-card">
-    <div class="order-header">
-      <div class="order-title">🧾 Ваш заказ</div>
-      <button class="order-close" onclick="closeOrderModal()">✕</button>
-    </div>
+<!-- Иконки -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.7s-6 6.3-6 11.3a6 6 0 0 0 12 0c0-5-6-11.3-6-11.3z"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+  <symbol id="i-podsys" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="4"/><path d="M10.5 6h3"/><circle cx="12" cy="15" r="1.5"/></symbol>
+  <symbol id="i-bat" viewBox="0 0 64 28"><path d="M29 12C22 6 12 4 2 7c4 2 5 5 4 8 3-2 6-2 8 1 2-3 5-3 7 1 2-2 5-2 7 1l4 4 4-4c2-3 5-3 7-1 2-4 5-4 7-1 2-3 5-3 8-1-1-3 0-6 4-8-10-3-20-1-27 5l-.5-5-1.7 2.5h-1.6L29.5 7z"/></symbol>
+  <symbol id="i-web2" viewBox="0 0 100 100"><path vector-effect="non-scaling-stroke" d="M0 0L90.6 0.0M0 0L93.2 18.9M0 0L83.2 35.2M0 0L72.5 60.4M0 0L60.7 67.4M0 0L39.0 82.1M0 0L22.7 91.5M0 0L0.0 98.3M11.5 0.0Q10.2 1.0 11.4 2.3Q9.6 3.0 11.2 4.7Q8.8 5.4 9.7 8.1Q7.4 7.1 8.1 9.0Q5.6 8.4 5.1 10.7Q3.7 10.2 3.1 12.3Q1.2 10.0 0.0 11.3M24.2 0.0Q20.7 2.1 23.9 4.8Q19.4 6.0 21.8 9.2Q17.7 10.8 18.6 15.4Q14.5 13.9 15.2 16.9Q10.6 16.0 9.8 20.5Q6.8 19.1 5.6 22.5Q2.5 20.7 0.0 24.5M35.9 0.0Q31.1 3.1 36.6 7.4Q31.3 9.7 34.2 14.5Q26.9 16.4 29.7 24.7Q23.7 22.8 25.4 28.3Q16.9 25.4 15.5 32.6Q11.1 30.9 9.4 38.0Q4.0 32.6 0.0 35.3M51.4 0.0Q46.7 4.7 52.2 10.6Q42.3 13.1 45.9 19.4Q38.0 23.2 40.1 33.4Q30.8 29.7 34.5 38.3Q25.1 37.6 22.1 46.5Q15.0 42.0 12.2 49.2Q5.7 46.3 0.0 53.1M68.5 0.0Q54.5 5.5 63.0 12.8Q54.5 16.8 60.0 25.4Q47.0 28.6 51.7 43.1Q39.2 37.7 41.6 46.2Q30.2 45.3 28.2 59.3Q19.3 54.1 15.3 61.5Q6.3 51.8 0.0 63.0M81.5 0.0Q72.7 7.3 80.8 16.4Q72.1 22.3 79.0 33.4Q60.7 37.0 65.4 54.5Q51.3 49.4 57.3 63.6Q38.5 57.7 34.3 72.1Q22.7 63.6 19.5 78.8Q8.4 69.0 0.0 80.6"/></symbol>
+<symbol id="i-spider" viewBox="0 0 40 44"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M15 21Q7 14 3 19M14 24Q5 22 2 27M14 27Q6 30 4 36M16 30Q10 36 9 42"/><path d="M25 21Q33 14 37 19M26 24Q35 22 38 27M26 27Q34 30 36 36M24 30Q30 36 31 42"/></g><ellipse cx="20" cy="27" rx="6.5" ry="8" fill="currentColor"/><circle cx="20" cy="16.5" r="4.6" fill="currentColor"/><circle cx="18.3" cy="16" r="1.1" fill="#ff9a3c"/><circle cx="21.7" cy="16" r="1.1" fill="#ff9a3c"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-pod" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M7 8h10M10 13h4"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="11" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-flake" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><g transform="rotate(0 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g><g transform="rotate(60 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g><g transform="rotate(120 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g><g transform="rotate(180 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g><g transform="rotate(240 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g><g transform="rotate(300 50 50)"><path d="M50 50V7M50 20l-8-8M50 20l8-8M50 33l-11-9M50 33l11-9"/></g></g></symbol>
+  <symbol id="i-sad" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01"/></symbol>
+</svg>
 
-    <div class="order-meta">
-      <span id="orderNumberLabel"></span>
-    </div>
-
-    <textarea id="orderText" readonly></textarea>
-
-    <div class="order-actions">
-      <button class="btn btn-primary" onclick="copyAndOpenTelegram()">
-        📋 Скопировать и открыть Telegram
-      </button>
-      <button class="btn btn-outline" onclick="closeOrderModal()">
-        Закрыть
-      </button>
-    </div>
-  </div>
+<!-- Паутина на фоне (только в теме «Хэллоуин») -->
+<div class="bg-webs" aria-hidden="true">
+  <svg class="bg-web bg-web-tl" viewBox="0 0 100 100"><use href="#i-web2"/></svg>
+  <svg class="bg-web bg-web-tr" viewBox="0 0 100 100"><use href="#i-web2"/></svg>
+  <svg class="bg-web bg-web-bl" viewBox="0 0 100 100"><use href="#i-web2"/></svg>
+  <svg class="bg-web bg-web-br" viewBox="0 0 100 100"><use href="#i-web2"/></svg>
 </div>
 
-
-<header id="header">
-  <div class="menu-btn" id="menuBtn" onclick="toggleMenu()">☰</div>
-  <div class="title">HORN HUB</div>
-  <div class="header-actions">
-    <div class="lang-currency">
-      <select id="langSelect" onchange="setLang(this.value)">
-        <option value="ru" selected>RU</option>
-        <option value="ua">UA</option>
-        <option value="en">EN</option>
-      </select>
-      <select id="currencySelect" onchange="setCurrency(this.value)">
-        <option value="PLN" selected>zł</option>
-        <option value="EUR">€</option>
-        <option value="UAH">₴</option>
-      </select>
+<!-- Экран техобслуживания (показывается, только когда в <html> есть data-maintenance) -->
+<section class="maintenance" id="maintenance" aria-labelledby="maintTitle">
+  <div class="maint-card">
+    <div class="maint-banner" role="img" aria-label="HORN HUB">
+      <!-- Новый год: живой снежный шар (js/globe.js) — нажать, покрутить пальцем -->
+      <div class="maint-stage" id="maintGlobe"></div>
+      <!-- Black Friday: тот же носорог в живом свете -->
+      <div class="bf-hero" aria-hidden="true">
+        <div class="bf-words">
+          <div class="bf-word bf-word-1"><span>BLACK</span></div>
+          <div class="bf-word bf-word-2" data-text="FRIDAY"><span>FRIDAY</span></div>
+        </div>
+        <div class="bf-stage"><img class="bf-poster" alt=""></div>
+        <div class="bf-hint" data-i18n="bfHint">Веди пальцем — двигай свет · нажми — вспышка</div>
+      </div>
+      <div class="maint-hint" id="maintHint" data-i18n="globeHint" hidden>Нажми на шарик ❄</div>
     </div>
-    <div class="cart-btn" onclick="openCart()">
-      🛒 <span class="cart-count" id="cartCount">0</span>
+    <div class="maint-icon" aria-hidden="true"><svg class="ic"><use href="#i-wrench"/></svg></div>
+    <div class="maint-body">
+      <div class="logo maint-logo">HORN<span>HUB</span></div>
+      <h1 class="maint-title" id="maintTitle" data-i18n="maintTitle">Магазин на техническом обслуживании</h1>
+      <p class="maint-text" data-i18n="maintText">Мы обновляем магазин и скоро вернёмся. Пожалуйста, загляните чуть позже.</p>
+      <p class="maint-status" data-i18n="maintStatus">Скоро откроемся</p>
     </div>
   </div>
-</header>
-
-<div class="sidebar" id="sidebar">
-  <button onclick="showFavorites()" data-i18n="favorites">Избранное ❤️</button>
-</div>
-
-<main id="mainPage" class="page">
-  <div class="promo-banner">
-    <img src="images/banner.png" alt="Promo banner">
-  </div>
-  
-<div class="category-panel">
-  <div class="categories">
-    <button class="category-btn active" data-category="all" onclick="filterCategory('all')" data-i18n="allProducts">Все товары</button>
-    <button class="category-btn" data-category="liquid" onclick="filterCategory('liquid')" data-i18n="liquid">Жидкости</button>
-    <button class="category-btn" data-category="disposable" onclick="filterCategory('disposable')" data-i18n="disposable">Одноразки</button>
-    <button class="category-btn" data-category="cartridge" onclick="filterCategory('cartridge')" data-i18n="cartridge">Картриджи</button>
-  </div>
-
-  <div class="brands" id="brandFilter" style="display:none;">
-    <button class="brand-btn liquid-brand" data-brand="chaser" onclick="filterBrand('chaser')">Chaser LUX</button>
-    <button class="brand-btn liquid-brand" data-brand="elf" onclick="filterBrand('elf')">Elf Liq</button>
-    <button class="brand-btn liquid-brand" data-brand="vozol" onclick="filterBrand('vozol')">Vozol</button>
-    <button class="brand-btn disposable-brand" data-brand="elfking" onclick="filterBrand('elfking')" style="display:none;">Elf King</button>
-    <button class="brand-btn disposable-brand" data-brand="bcpro" onclick="filterBrand('bcpro')" style="display:none;">BC Pro</button>
-    <button class="brand-btn disposable-brand" data-brand="vozolreve" onclick="filterBrand('vozolreve')" style="display:none;">Vozol Reve</button>
-  </div>
-</div>
-
-  <div class="products" id="productList"></div>
-</main>
-
-<section id="cartPage" class="cart-page hidden">
-  <div class="back-btn" onclick="closeCart()" data-i18n="back">← Назад</div>
-  <h3 data-i18n="cart">Корзина</h3>
-  <div id="cartItems"></div>
-  <div id="cartTotal" class="cart-total"></div>
-
-  <button class="checkout-btn" onclick="checkout()" data-i18n="checkout">Оформить заказ</button>
-  <a class="admin-btn" id="adminBtn" target="_blank" data-i18n="contactAdmin">Написать админу</a>
 </section>
 
-<div id="toast" class="toast"></div>
+<!-- Снежинки на фоне и падающий снег (только в теме «Новый год») -->
+<div class="bg-flakes" aria-hidden="true">
+  <svg class="bg-flake bg-flake-tl" viewBox="0 0 100 100"><use href="#i-flake"/></svg>
+  <svg class="bg-flake bg-flake-tr" viewBox="0 0 100 100"><use href="#i-flake"/></svg>
+  <svg class="bg-flake bg-flake-bl" viewBox="0 0 100 100"><use href="#i-flake"/></svg>
+</div>
+<div class="snowfall" id="snowfall" aria-hidden="true"></div>
 
-<!-- Modal: order details -->
-<div id="orderModal" class="modal hidden">
-  <div class="modal-content">
-    <h3 data-i18n="orderTitle">Ваш заказ</h3>
-    <div id="orderDetails" class="order-details"></div>
+<header class="topbar" id="topbar">
+  <div class="topbar-inner">
+    <button class="icon-btn" data-action="menu" data-i18n-aria="menu">
+      <svg class="ic"><use href="#i-menu"/></svg>
+    </button>
+    <button class="logo" data-action="home" aria-label="HORN HUB">
+      HORN<span>HUB</span>
+    </button>
+    <div class="topbar-actions">
+      <button class="icon-btn" data-action="favorites" data-i18n-aria="favorites">
+        <svg class="ic"><use href="#i-heart"/></svg>
+        <span class="badge" id="favBadge" hidden></span>
+      </button>
+      <button class="icon-btn" id="cartBtn" data-action="cart" data-i18n-aria="cart">
+        <svg class="ic"><use href="#i-bag"/></svg>
+        <span class="badge badge-accent" id="cartBadge" hidden></span>
+      </button>
+    </div>
+  </div>
+  <div class="garland" id="garland" aria-hidden="true"></div>
+</header>
+
+<main class="app">
+
+  <!-- ── Каталог ───────────────────────────────────── -->
+  <section id="shopView" class="view">
+    <!-- видит только владелец, когда магазин на техобслуживании -->
+    <p class="owner-note" id="ownerNote" hidden>🔧 Техобслуживание включено — магазин видите только вы</p>
+    <div class="hero" role="img" aria-label="HORN HUB">
+      <!-- Новый год: 3D-снежный шар во всю шапку (js/globe.js), пока грузится — картинка той же сцены -->
+      <div class="ny-hero" aria-hidden="true">
+        <picture class="ny-poster">
+          <source media="(min-width: 720px)" srcset="images/newyear/hero-wide.webp">
+          <img src="images/newyear/hero.webp" alt="" decoding="async">
+        </picture>
+        <div class="ny-stage" id="globe"></div>
+        <div class="ny-text">
+          <div class="ny-eyebrow" id="nyEyebrow" data-i18n="nyHero">С наступающим</div>
+          <div class="ny-year">2027</div>
+          <div class="ny-hint" id="globeHint" data-i18n="globeHint" hidden>Нажми на шарик ❄</div>
+        </div>
+      </div>
+      <!-- Black Friday: надпись позади, носорог в живом свете прожекторов (свет рисует js/app.js) -->
+      <div class="bf-hero" aria-hidden="true">
+        <div class="bf-words">
+          <div class="bf-word bf-word-1"><span>BLACK</span></div>
+          <div class="bf-word bf-word-2" data-text="FRIDAY"><span>FRIDAY</span></div>
+        </div>
+        <div class="bf-stage"><img class="bf-poster" alt=""></div>
+        <div class="bf-hint" data-i18n="bfHint">Веди пальцем — двигай свет · нажми — вспышка</div>
+      </div>
+      <div class="bats" aria-hidden="true">
+        <span class="bat"><svg viewBox="0 0 64 28"><use href="#i-bat"/></svg></span>
+        <span class="bat"><svg viewBox="0 0 64 28"><use href="#i-bat"/></svg></span>
+        <span class="bat"><svg viewBox="0 0 64 28"><use href="#i-bat"/></svg></span>
+      </div>
+      <!-- украшения слева от носорога (только в теме «Хэллоуин») -->
+      <div class="hero-deco" aria-hidden="true">
+        <span class="pumpkin-glow"></span>
+        <span class="ember"></span><span class="ember"></span><span class="ember"></span>
+        <span class="ember"></span><span class="ember"></span><span class="ember"></span>
+        <span class="ember"></span><span class="ember"></span>
+        <span class="spider"><span class="spider-thread"></span><svg class="spider-body" viewBox="0 0 40 44"><use href="#i-spider"/></svg></span>
+      </div>
+    </div>
+
+    <div class="sale-timer" id="saleTimer" hidden></div>
+
+    <div id="listAnchor"></div>
+    <div class="filters" id="filters">
+      <div class="chips" id="categoryChips"></div>
+      <div class="chips chips-sm" id="brandChips"></div>
+    </div>
+
+    <div class="list-head" id="listHead"></div>
+    <div class="grid" id="productGrid"></div>
+
+    <footer class="footer">
+      <div class="footer-logo">HORN<span>HUB</span></div>
+      <p data-i18n="ageNote"></p>
+      <p class="footer-updated" id="catalogUpdated" hidden></p>
+    </footer>
+  </section>
+
+  <!-- ── Корзина ───────────────────────────────────── -->
+  <section id="cartView" class="view" hidden>
+    <div class="view-head">
+      <button class="icon-btn" data-action="back" data-i18n-aria="back">
+        <svg class="ic"><use href="#i-back"/></svg>
+      </button>
+      <h1 class="view-title" data-i18n="cart"></h1>
+      <span class="view-sub" id="cartHeadCount"></span>
+      <button class="text-btn" id="clearCartBtn" data-action="clear-cart" data-i18n="clearCart"></button>
+    </div>
+
+    <div id="cartEmpty" class="empty" hidden>
+      <div class="empty-icon"><svg class="ic"><use href="#i-bag"/></svg></div>
+      <div class="empty-title" data-i18n="emptyCart"></div>
+      <div class="empty-hint" data-i18n="emptyCartHint"></div>
+      <button class="btn btn-primary" data-action="back" data-i18n="toCatalog"></button>
+    </div>
+
+    <div id="cartFilled">
+      <div id="cartList" class="cart-list"></div>
+
+      <div class="panel" id="districtPanel">
+        <div class="field-label" id="districtLabel"><span data-i18n="districtTitle"></span> <span class="req" aria-hidden="true">*</span></div>
+        <div class="district-options" id="districtOptions" role="radiogroup" aria-labelledby="districtLabel"
+          aria-required="true" aria-describedby="districtError"></div>
+        <div class="field-error" id="districtError" role="alert" data-i18n="districtRequired" hidden></div>
+      </div>
+
+      <div class="panel">
+        <label class="field-label" for="orderComment" data-i18n="comment"></label>
+        <textarea id="orderComment" rows="3" maxlength="500" data-i18n-ph="commentPh"></textarea>
+      </div>
+
+      <div class="panel summary">
+        <div class="sum-row"><span id="sumCountLabel"></span><span id="sumFull"></span></div>
+        <div class="sum-row sum-save" id="sumSaveRow"><span data-i18n="discount"></span><span id="sumSaved"></span></div>
+        <div class="sum-row sum-total"><span data-i18n="total"></span><span id="sumTotal"></span></div>
+        <button class="btn btn-primary btn-lg" id="checkoutBtn" data-action="checkout">
+          <span data-i18n="checkout"></span>
+          <svg class="ic"><use href="#i-arrow"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-lg" data-action="contact">
+          <svg class="ic"><use href="#i-chat"/></svg>
+          <span data-i18n="contactAdmin"></span>
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Плашка корзины внизу -->
+<button class="cart-bar" id="cartBar" data-action="cart" tabindex="-1" aria-hidden="true">
+  <span class="cart-bar-icon">
+    <svg class="ic"><use href="#i-bag"/></svg>
+    <span class="cart-bar-qty" id="cartBarQty"></span>
+  </span>
+  <span class="cart-bar-info">
+    <span class="cart-bar-total" id="cartBarTotal"></span>
+    <span class="cart-bar-save" id="cartBarSave"></span>
+  </span>
+  <span class="cart-bar-cta">
+    <span data-i18n="toCart"></span>
+    <svg class="ic"><use href="#i-arrow"/></svg>
+  </span>
+</button>
+
+<!-- Меню -->
+<aside class="drawer" id="drawer" inert aria-hidden="true">
+  <div class="drawer-head">
+    <div class="logo">HORN<span>HUB</span></div>
+    <button class="icon-btn" data-action="close" data-i18n-aria="close">
+      <svg class="ic"><use href="#i-x"/></svg>
+    </button>
+  </div>
+
+  <nav class="drawer-nav">
+    <button class="nav-item" data-action="nav-category" data-value="all">
+      <svg class="ic"><use href="#i-grid"/></svg><span data-i18n="all"></span><span class="nav-count" data-count="all"></span>
+    </button>
+    <button class="nav-item" data-action="nav-category" data-value="liquid">
+      <svg class="ic"><use href="#i-drop"/></svg><span data-i18n="liquid"></span><span class="nav-count" data-count="liquid"></span>
+    </button>
+    <button class="nav-item" data-action="nav-category" data-value="disposable">
+      <svg class="ic"><use href="#i-zap"/></svg><span data-i18n="disposable"></span><span class="nav-count" data-count="disposable"></span>
+    </button>
+    <button class="nav-item" data-action="nav-category" data-value="pod">
+      <svg class="ic"><use href="#i-podsys"/></svg><span data-i18n="pod"></span><span class="nav-count" data-count="pod"></span>
+    </button>
+    <button class="nav-item" data-action="nav-category" data-value="cartridge">
+      <svg class="ic"><use href="#i-pod"/></svg><span data-i18n="cartridge"></span><span class="nav-count" data-count="cartridge"></span>
+    </button>
+    <div class="nav-sep"></div>
+    <button class="nav-item" data-action="favorites">
+      <svg class="ic"><use href="#i-heart"/></svg><span data-i18n="favorites"></span><span class="nav-count" data-count="fav"></span>
+    </button>
+    <button class="nav-item" data-action="cart">
+      <svg class="ic"><use href="#i-bag"/></svg><span data-i18n="cart"></span><span class="nav-count" data-count="cart"></span>
+    </button>
+  </nav>
+
+  <div class="drawer-section">
+    <div class="drawer-label" data-i18n="district"></div>
+    <div class="segmented segmented-wrap" id="drawerDistricts"></div>
+  </div>
+
+  <div class="drawer-section">
+    <div class="drawer-label" data-i18n="language"></div>
+    <div class="segmented" id="langSeg">
+      <button data-action="lang" data-value="ru">RU</button>
+      <button data-action="lang" data-value="ua">UA</button>
+      <button data-action="lang" data-value="en">EN</button>
+    </div>
+  </div>
+
+  <div class="drawer-section">
+    <div class="drawer-label" data-i18n="currency"></div>
+    <div class="segmented" id="curSeg">
+      <button data-action="currency" data-value="PLN">zł</button>
+      <button data-action="currency" data-value="EUR">€</button>
+      <button data-action="currency" data-value="UAH">₴</button>
+    </div>
+  </div>
+
+  <div class="drawer-foot">
+    <button class="btn btn-tg btn-lg" data-action="contact">
+      <svg class="ic"><use href="#i-chat"/></svg>
+      <span data-i18n="contactAdmin"></span>
+    </button>
+    <p class="drawer-note" data-i18n="ageNote"></p>
+  </div>
+</aside>
+
+<div class="backdrop" id="backdrop" data-action="close"></div>
+
+<!-- Карточка товара -->
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" inert aria-hidden="true">
+  <div class="sheet-grip"></div>
+  <button class="icon-btn sheet-close" data-action="close" data-i18n-aria="close">
+    <svg class="ic"><use href="#i-x"/></svg>
+  </button>
+  <div class="sheet-body" id="sheetBody"></div>
+</div>
+
+<!-- Оформление заказа -->
+<div class="modal" id="orderModal" role="dialog" aria-modal="true" inert aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" data-i18n="orderTitle"></div>
+        <div class="modal-sub" id="orderMeta"></div>
+      </div>
+      <button class="icon-btn" data-action="close" data-i18n-aria="close">
+        <svg class="ic"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <ol class="order-steps">
+      <li data-i18n="step1"></li>
+      <li data-i18n="step2"></li>
+    </ol>
+    <textarea id="orderText" readonly rows="8"></textarea>
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="copyOrder()" data-i18n="copyOrder">Скопировать заказ</button>
-      <button class="btn btn-primary" onclick="sendOrderTelegram()" data-i18n="sendTelegram">Открыть Telegram</button>
-      <button class="btn btn-outline" onclick="closeOrderModal()" data-i18n="close">Закрыть</button>
+      <button class="btn btn-primary btn-lg" data-action="send-order">
+        <svg class="ic"><use href="#i-send"/></svg>
+        <span data-i18n="sendTelegram"></span>
+      </button>
+      <button class="btn btn-ghost btn-lg" data-action="copy-order">
+        <svg class="ic"><use href="#i-copy"/></svg>
+        <span data-i18n="copy"></span>
+      </button>
     </div>
   </div>
 </div>
 
-<script src="js/app.js"></script>
+<!-- Выбор района при входе -->
+<div class="gate" id="districtGate" role="dialog" aria-modal="true" aria-labelledby="gateTitle" inert aria-hidden="true">
+  <div class="gate-card">
+    <svg class="gate-flake" viewBox="0 0 100 100" aria-hidden="true"><use href="#i-flake"/></svg>
+    <svg class="cobweb" viewBox="0 0 100 100" aria-hidden="true"><path d="M0 0L100.0 0.0M0 0L95.1 30.9M0 0L80.9 58.8M0 0L58.8 80.9M0 0L30.9 95.1M0 0L0.0 100.0M20.0 0.0Q17.0 2.7 19.0 6.2Q15.3 7.8 16.2 11.8Q12.2 12.2 11.8 16.2Q7.8 15.3 6.2 19.0Q2.7 17.0 0.0 20.0M40.0 0.0Q34.0 5.4 38.0 12.4Q30.7 15.6 32.4 23.5Q24.3 24.3 23.5 32.4Q15.6 30.7 12.4 38.0Q5.4 34.0 0.0 40.0M60.0 0.0Q51.0 8.1 57.1 18.5Q46.0 23.4 48.5 35.3Q36.5 36.5 35.3 48.5Q23.4 46.0 18.5 57.1Q8.1 51.0 0.0 60.0M80.0 0.0Q68.0 10.8 76.1 24.7Q61.3 31.2 64.7 47.0Q48.6 48.6 47.0 64.7Q31.2 61.3 24.7 76.1Q10.8 68.0 0.0 80.0"/></svg>
+    <button class="icon-btn gate-close" data-action="close" data-i18n-aria="close">
+      <svg class="ic"><use href="#i-x"/></svg>
+    </button>
+    <div class="logo gate-logo">HORN<span>HUB</span></div>
+    <h2 class="gate-title" id="gateTitle" data-i18n="gateTitle"></h2>
+    <p class="gate-sub" data-i18n="gateSub"></p>
+    <div class="gate-options" id="gateOptions"></div>
+    <div class="segmented gate-lang">
+      <button data-action="lang" data-value="ru">RU</button>
+      <button data-action="lang" data-value="ua">UA</button>
+      <button data-action="lang" data-value="en">EN</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="js/app.js?v=2026-11-11-1"></script>
 </body>
 </html>
